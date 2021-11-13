@@ -528,6 +528,18 @@
         </valueSet>
     </fields>
     <fields>
+        <fullName>Status_Code__c</fullName>
+        <externalId>false</externalId>
+        <label>Status Code</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Subscription__c</fullName>
         <deleteConstraint>SetNull</deleteConstraint>
         <externalId>false</externalId>
@@ -612,6 +624,31 @@
         <type>AutoNumber</type>
     </nameField>
     <pluralLabel>Payments</pluralLabel>
+    <recordTypeTrackHistory>false</recordTypeTrackHistory>
+    <recordTypes>
+        <fullName>Individual_Payment</fullName>
+        <active>true</active>
+        <label>Individual Payment</label>
+        <picklistValues>
+            <picklist>Source__c</picklist>
+            <values>
+                <fullName>Authorize%2Enet</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+    </recordTypes>
+    <recordTypes>
+        <fullName>Subscription_Payment</fullName>
+        <active>true</active>
+        <label>Subscription Payment</label>
+        <picklistValues>
+            <picklist>Source__c</picklist>
+            <values>
+                <fullName>Authorize%2Enet</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+    </recordTypes>
     <searchLayouts/>
     <sharingModel>ReadWrite</sharingModel>
     <visibility>Public</visibility>
