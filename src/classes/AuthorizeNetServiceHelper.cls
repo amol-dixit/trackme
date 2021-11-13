@@ -605,16 +605,11 @@ public without sharing class AuthorizeNetServiceHelper {
 
         ManagePaymentDTOService.cls_getTransactionDetailsResponse tdresp = (ManagePaymentDTOService.cls_getTransactionDetailsResponse) System.JSON.deserialize(json.replaceAll('"transaction"', '"transaction1"'), ManagePaymentDTOService.cls_getTransactionDetailsResponse.class);
         
-        String merchId = values.payload.merchantReferenceId;
         if(tdresp.transaction1 != null && tdresp.transaction1.subscription != null && tdresp.transaction1.subscription.id != null){
             Payment__c paymentObj = new Payment__c();
             paymentObj.Amount__c = values.payload.authAmount;
             paymentObj.Event_Type__c = values.eventType;
             
-            /*List<Payment_Object_Mapping__mdt> pomList = [select SObject_Id_Prefix__c, Lookup_Field_API_Name__c	 from Payment_Object_Mapping__mdt where SObject_Id_Prefix__c = : (values.payload.merchantReferenceId).substring(0,3)];
-            if(!pomList.isempty()){
-                paymentObj.put(pomList[0].Lookup_Field_API_Name__c, values.payload.merchantReferenceId);
-            }*/
             paymentObj.Transaction_Id__c = values.payload.Id;
             paymentObj.Subscription__r = new Subscription__c(Subscription_Id__c = tdresp.transaction1.subscription.id);
             paymentObj.Payment_Number__c = tdresp.transaction1.subscription.payNum;
@@ -628,6 +623,7 @@ public without sharing class AuthorizeNetServiceHelper {
             paymentObj.Card_Type__c = tdresp.transaction1.payment.creditCard.cardType;
             paymentObj.Card_Number__c = tdresp.transaction1.payment.creditCard.cardNumber;
             paymentObj.Transaction_Status__c = tdresp.transaction1.transactionStatus;
+            paymentObj.RecordtypeId = Schema.SObjectType.Payment__c.getRecordTypeInfosById().get('Subscription Payment').getRecordTypeId();
 
             if(tdresp.transaction1.shipTo != null){
                 paymentObj.Ship_To_Address__c = tdresp.transaction1.shipTo.address;
@@ -648,7 +644,9 @@ public without sharing class AuthorizeNetServiceHelper {
                 paymentObj.Bill_To_Last_Name__c = tdresp.transaction1.billTo.lastName;      
             }
 
-            
+            if(tdresp.messages.resultCode == 'Ok' && tdresp.messages.message[0].code == 'I00001'){
+                paymentObj.Status_Code__c = 200;
+            }
 
             insert paymentObj;
             at.Payment__c = paymentObj.id;

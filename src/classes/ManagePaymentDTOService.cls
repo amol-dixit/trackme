@@ -2,6 +2,8 @@ public without sharing class ManagePaymentDTOService {
 
     public class cls_getTransactionDetailsResponse {
         public cls_transaction transaction1;
+        public Transaction_messages messages;
+
     }
         public class PaymentDetails{
             public AddressDetails addressdetails;
@@ -398,6 +400,7 @@ public without sharing class ManagePaymentDTOService {
             public String originalNetworkTransId;   //123456789NNNH
             public String originalAuthAmount;   //12.00
             public String authorizationIndicator;   //pre
+
         }
         public class cls_batch {
             public String batchId;  //12345
