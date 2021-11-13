@@ -1,0 +1,526 @@
+<template>
+  <div class=" slds-card " style="overflow-x: hidden; min-height:60px; " if:false={hidePage}>
+    <template if:true={showexternalpaymentlinksection}>
+      <div if:true={urlStateParameters}>
+
+        <div class="slds-grid slds-gutters">
+          <div class="slds-col slds-size_1-of-4">
+            <lightning-input type="toggle" label="External Payment Link" onclick={handleExternalPaymentLink}>
+            </lightning-input>
+          </div>
+          <div class="slds-col slds-size_3-of-4">
+            <h3 class="title" if:true={showexternalpaymentlink}>
+              <a href={urlStateParameters.externalPaymentURL} target="_blank">{urlStateParameters.externalPaymentURL}</a>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <div class="slds-m-around_large">
+      <div if:true={isLoaded} class="slds-is-relative">
+        <lightning-spinner alternative-text="Loading..." variant="brand">
+        </lightning-spinner>
+      </div>
+    </div>
+
+    <lightning-radio-group name="paymentTypeRadio" label="Select Payment Type" options={paymentTypes} type="button"
+      value="One Time" onchange={handlePaymentTypeChange} if:true={showpaymenttyperadio}></lightning-radio-group>
+    <br />
+
+
+
+    <template if:true={showonetimepayment}>
+
+      <div class="slds-page-header">
+        <div class="slds-page-header__row">
+          <div class="slds-page-header__col-title">
+            <div class="slds-media">
+              <div class="slds-media__figure">
+                <span class="slds-icon_container slds-icon-standard-payment" title="payment">
+                  <span class="slds-assistive-text">payment</span>
+                </span>
+              </div>
+              <template if:true={urlStateParameters}>
+
+                <div class="slds-media__body">
+
+                  <div class="slds-form__row slds-form_horizontal">
+                    <div class="slds-form__item" role="listitem">
+                      <div if:false={readonlyproduct}>
+                        <lightning-input type="text" label="Product" value={urlStateParameters.product} required=true
+                          onchange={handleproduct}>
+                        </lightning-input>
+                      </div>
+                      <div if:true={readonlyproduct}>
+                        Product: <b>{urlStateParameters.product}</b>
+
+                      </div>
+                    </div>
+
+                    <div class="slds-form__item" role="listitem">
+                      <div if:false={readonlypaymentamount}>
+
+                        <lightning-input type="number" label="Amount" value={urlStateParameters.amount} required=true
+                          onchange={handleamount}>
+                        </lightning-input>
+                      </div>
+                      <div if:true={readonlypaymentamount}>
+
+                        Amount: <b>{urlStateParameters.amount}</b>
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template if:false={showrecurringpayment}>
+
+      <template if:true={paymentReponse}>
+
+        <div class="slds-page-header">
+          <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+              <div class="slds-media">
+                <div class="slds-media__figure">
+                  <span class="slds-icon_container slds-icon-standard-payment" title="payment">
+                    <svg class="slds-icon slds-page-header__icon" aria-hidden="true">
+                      <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#opportunity"></use>
+                    </svg>
+                    <span class="slds-assistive-text">payment</span>
+                  </span>
+                </div>
+                <div class="slds-media__body">
+                  <div class="slds-page-header__name">
+                    <div class="slds-page-header__name-title">
+                      <h2>
+                        <span class="slds-page-header__title slds-truncate">Thank you for your payment</span>
+                      </h2>
+                      <!--<h1>
+                        <span class="slds-page-header__title slds-truncate" title={paymentReponse.paymentObj.Amount__c}>${paymentReponse.paymentObj.Amount__c}</span>
+                      </h1>-->
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slds-form" role="list" style="margin-left: 1%;">
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Payment Date</b></label>
+                <div class="slds-form-element__control">
+                  <lightning-formatted-date-time value={currentDatetime} year="numeric" month="numeric" day="numeric"
+                    hour="2-digit" minute="2-digit" time-zone-name="short" hour12="true">
+                  </lightning-formatted-date-time>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Product</b></label>
+                <div class="slds-form-element__control">
+                  {urlStateParameters.product}
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Billing
+                    Information</b></label>
+                <div class="slds-form-element__control">
+                  {paymentReponse.paymentObj.Bill_To_Address__c}, {paymentReponse.paymentObj.Bill_To_Address__c},
+                  {paymentReponse.paymentObj.Bill_To_City__c}, {paymentReponse.paymentObj.Bill_To_State__c},
+                  {paymentReponse.paymentObj.Bill_To_Zip__c}, {paymentReponse.paymentObj.Bill_To_Country__c}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Paid By</b></label>
+                <div class="slds-form-element__control">
+                  {paymentReponse.accountType} {paymentReponse.accountNumber}
+                </div>
+              </div>
+            </div>
+          </div>
+          <template if:true={showcc}>
+            <div class="slds-form__row">
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02"><b>Authorization
+                      Code</b></label>
+                  <div class="slds-form-element__control">
+                    {paymentReponse.authCode}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Transaction ID</b></label>
+                <div class="slds-form-element__control">
+                  {paymentReponse.transactionId}
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+        </div>
+
+      </template>
+    </template>
+
+
+    <template if:true={showrecurringpayment}>
+
+      <template if:true={subReponse}>
+
+        <div class="slds-page-header">
+          <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+              <div class="slds-media">
+                <div class="slds-media__figure">
+                  <span class="slds-icon_container slds-icon-standard-payment" title="payment">
+                    <svg class="slds-icon slds-page-header__icon" aria-hidden="true">
+                      <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#opportunity"></use>
+                    </svg>
+                    <span class="slds-assistive-text">payment</span>
+                  </span>
+                </div>
+                <div class="slds-media__body">
+                  <div class="slds-page-header__name">
+                    <div class="slds-page-header__name-title">
+                      <h2>
+                        <span class="slds-page-header__title slds-truncate">Thank you for your subscription
+                          payment.</span>
+                      </h2>
+                      <!--<h1>
+                        <span class="slds-page-header__title slds-truncate" title={paymentReponse.paymentObj.Amount__c}>${paymentReponse.paymentObj.Amount__c}</span>
+                      </h1>-->
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slds-form" role="list" style="margin-left: 1%;">
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Subscription Date</b></label>
+                <div class="slds-form-element__control">
+                  <lightning-formatted-date-time value={subReponse.subObj.Start_Date__c} year="numeric" month="numeric"
+                    day="numeric" hour12="true">
+                  </lightning-formatted-date-time>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Product</b></label>
+                <div class="slds-form-element__control">
+                  {urlStateParameters.product}
+                </div>
+              </div>
+            </div>
+          </div>
+          -->
+
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Subscription Id</b></label>
+                <div class="slds-form-element__control">
+                  {subReponse.subObj.Subscription_Id__c}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Unit</b></label>
+                <div class="slds-form-element__control">
+                  {subReponse.subObj.Unit__c}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Occurrances</b></label>
+                <div class="slds-form-element__control">
+                  {subReponse.subObj.Occurrances__c}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slds-form__row">
+            <div class="slds-form__item" role="listitem">
+              <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                <label class="slds-form-element__label" for="single-form-element-id-02"><b>Length</b></label>
+                <div class="slds-form-element__control">
+                  {subReponse.subObj.Length__c}
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+      </template>
+    </template>
+
+    <template if:false={hidePayment}>
+
+      <div class="">
+        <template if:true={showrecurringpayment}>
+
+          <lightning-radio-group name="subscriptionRadio" options={subscriptionOptions} type="button"
+            value={newexistingsub} onchange={handleSubcriptionActions}></lightning-radio-group>
+        </template>
+        <br />
+        <div if:true={showExistingSubcription}>
+
+          <div style="height: 300px;">
+            <lightning-datatable key-field="id" data={subscriptiondata} columns={columns} onrowaction={handleRowAction}
+              hide-checkbox-column="true">
+            </lightning-datatable>
+          </div>
+        </div>
+        <template if:true={showrecurringpayment}>
+
+          <!--<lightning-radio-group name="subscriptionRadio" options={subscriptionOptions} type="button"
+             value="New Subscription" onchange={handleSubcriptionActions}></lightning-radio-group>-->
+
+          <div if:true={showNewSubcription}>
+            <div class="slds-form" role="list">
+              <div class="slds-form__row">
+                <div class="slds-form__item" role="listitem">
+                  <legend class="slds-form-element__legend slds-form-element__label slds-form-element_horizontal">
+                    Subscription Details
+                  </legend>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="group-order-cc-container">
+                <c-subscription-input onsubscriptioncomplete={handleSubscriptionComplete}
+                  onsubscriptionincomplete={handleSubIncomplete} occurrances={occurrances} unit={unit}
+                  startdate={startdate} subname={subname} amount={amount} readonlymode={showsubedit}>
+                </c-subscription-input>
+              </div>
+            </div>
+          </div>
+        </template>
+        <div class="slds-grid  slds-m-top_medium ">
+          <div class="slds-col slds-size_1-of-1 slds-large-size_8-of-12">
+
+            <div class="slds-form ">
+
+              <template if:true={showpaywith}>
+
+                <lightning-radio-group name="paymentMethodRadio" label="Pay With" options={paymentMethods}
+                  value={paymentMethod} type="button" onchange={handlePaymentMethodChange}></lightning-radio-group>
+                <br />
+                <template if:true={showcheck}>
+                  <div class="slds-form" role="list">
+                    <div class="slds-form__row">
+                      <div class="slds-form__item" role="listitem">
+                        <legend class="slds-form-element__legend slds-form-element__label slds-form-element_horizontal">
+                          Bank Details
+                        </legend>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="slds-form__row slds-form_horizontal">
+                    <div class="slds-form__item" role="listitem">
+                      <lightning-input type="text" label="Bank Name" onchange={onchangerbankname} required=true>
+                      </lightning-input>
+                    </div>
+
+                    <div class="slds-form__item" role="listitem">
+                      <lightning-input type="text" label="Name on Account" onchange={onchangeaccountname} required=true>
+                      </lightning-input>
+                    </div>
+                  </div>
+
+                  <div class="slds-form__row slds-form_horizontal">
+                    <div class="slds-form__item" role="listitem">
+                      <lightning-input min="0" formatter="decimal" onchange={onchangeaccountnumber}
+                        label="Account Number" required=true maxlength="17">
+                      </lightning-input>
+                    </div>
+
+                    <div class="slds-form__item" role="listitem">
+                      <lightning-input min="0" formatter="decimal" onchange={onchangeroutingnumber}
+                        label="Routing Number" required=true maxlength="9">
+                      </lightning-input>
+                    </div>
+                  </div>
+
+                  <div class="slds-form__row slds-form_horizontal">
+                    <div class="slds-form__item" role="listitem">
+                      <lightning-combobox name="Bank Account Type" label="Bank Account Type" value={bankaccounttype}
+                        options={accountTypes} onchange={handleAccountTypeChange} required=true></lightning-combobox>
+                    </div>
+
+                    <div class="slds-form__item" role="listitem">
+                    </div>
+                  </div>
+
+                  <div class="slds-form__row slds-m-bottom_medium">
+                    <div class="slds-form__item" role="listitem">
+                      <div class="slds-form-element slds-form-element_horizontal slds-form-element_1-col  "
+                        id="checkNumberForm">
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <template if:true={showpo}>
+
+                  <div class="slds-form__row slds-m-bottom_medium">
+                    <div class="slds-form__item" role="listitem">
+                      <div
+                        class="slds-form-element slds-form-element_horizontal slds-form-element_1-col slds-is-editing "
+                        id="purchaseOrderForm">
+                        <label class="slds-form-element__label" for="purchaseOrder">
+                          <abbr class="slds-required" title="required">*</abbr>
+                          Purchase Order
+                        </label>
+                        <div class="slds-form-element__control">
+                          <input placeholder="Enter purchase order number" value={poNumber} type="text"
+                            name="purchaseOrder" class="slds-input" id="purchaseOrderInput" onchange={handlePOChange}
+                            oninput={handlePOChange}>{poNumber}</input>
+                          <div class="slds-form-element__help slds-hide" id="purchaseOrderError">Please enter a purchase
+                            order</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </template>
+            </div>
+
+          </div>
+        </div>
+
+        <template if:true={showpaywith}>
+
+          <template if:true={showcc}>
+            <div class="slds-form" role="list">
+              <div class="slds-form__row">
+                <div class="slds-form__item" role="listitem">
+                  <legend class="slds-form-element__legend slds-form-element__label slds-form-element_horizontal">Credit
+                    Card Details
+                  </legend>
+                </div>
+              </div>
+            </div>
+
+
+
+            <div>
+              <div class="group-order-cc-container">
+                <c-card-input oncardcomplete={handleCardComplete} oncardincomplete={handleCardIncomplete}
+                  onpaymentmethodchange={handlePaymentMethodChange} card-holder-first-name={firstname}
+                  card-holder-last-name={lastname} card-email={email}></c-card-input>
+              </div>
+            </div>
+          </template>
+          <!-- address input  -->
+          <div class="slds-grid slds-wrap " if:true={showonetimepayment}>
+            <div class="slds-col slds-size_1-of-1 slds-large-size_8-of-12 ">
+              <c-address-input onaddressvalid={handleAddressValid} onaddressinvalid={handleAddressInvalid}
+                address={address} state-options={stateOptions}></c-address-input>
+            </div>
+          </div>
+        </template>
+
+      </div>
+
+
+    </template>
+    <template if:true={showpaywith}>
+      <footer class="slds-card__footer slds-modal__footer " style="text-align:center;">
+
+        <template if:false={hidePayment}>
+          <lightning-button variant="brand" label="Cancel" title="Cancel" onclick={handleCancel}
+            class="slds-m-left_x-small"></lightning-button>
+          <lightning-button variant="brand" label="Pay" title="Pay" onclick={handlePay} class="slds-m-left_x-small"
+            disabled={disablepay} if:true={showonetimepayment}></lightning-button>
+          <template if:false={showsubedit}>
+            <lightning-button variant="brand" label="Subscribe" title="Subscribe" onclick={handleSub}
+              class="slds-m-left_x-small" disabled={disablepay} if:true={showrecurringpayment}></lightning-button>
+          </template>
+          <lightning-button variant="brand" label="Update Subscription" title="Update Subscription" onclick={editSub}
+            class="slds-m-left_x-small" disabled={disablepay} if:true={showsubedit}></lightning-button>
+        </template>
+        <lightning-button variant="brand" label="Done" title="Done" onclick={handleCancel} class="slds-m-left_x-small"
+          if:true={showdonebutton}></lightning-button>
+      </footer>
+    </template>
+
+  </div>
+
+  <lightning-card if:true={showconfirmationpopup}>
+    <div class="slds-container_small">
+      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+        aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Confirm?</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+            <p>Are you sure you want to cancel the Subscription?</p>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button variant="neutral" name="cancel" label="Cancel" title={cancelLabel}
+              onclick={confirmationPopupCancelAction}></lightning-button>
+            <lightning-button variant="brand" name="confirm" label="Confirm" title={confirmLabel}
+              onclick={cancelSubAction}></lightning-button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+  </lightning-card>
+
+
+
+</template>

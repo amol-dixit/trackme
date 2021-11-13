@@ -1,0 +1,17 @@
+<template>
+    <lightning-quick-action-panel title="Void Payment">
+        <template if:false={paymentResult}>
+        Are you sure you want to Void this transaction?
+    </template>
+        <br/>
+        <template if:true={paymentResult}>
+            Payment Response<br/>
+        <b>{paymentResult.message}</b>
+        </template>
+        <div slot="footer">
+            <lightning-button variant="neutral" label="Cancel" onclick={closeAction}></lightning-button>
+            <lightning-button variant="brand" label="Process" onclick={invoke} disabled={paymentdisabled}></lightning-button>
+        </div>
+      </lightning-quick-action-panel>
+    
+</template>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>52.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+        <target>lightning__AppPage</target>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+        <target>lightning__RecordAction</target>
+        <target>lightning__HomePage</target>
+        
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property name="paymentserviceprovider" type="String" datasource="Authorize.Net,Stripe" label="Payment Service Provider"/>
+            <property name="objectapiname" type="String"  />
+            <property name="subscriptionmode" type="Boolean"  />
+            <property name="readonlypaymentamount" type="Boolean" />
+            <property name="readonlyproduct" type="Boolean" />
+
+        </targetConfig>
+
+
+        <targetConfig targets="lightning__RecordPage,lightning__AppPage,lightning__HomePage">
+            <property name="paymentserviceprovider" type="String" datasource="Authorize.Net,Stripe" label="Payment Service Provider"/>
+            <property name="objectapiname" type="String"  label="SObject API Name"/>
+            <property name="subscriptionmode" type="Boolean"  label="Subscription Mode"/>
+            <property name="readonlypaymentamount" type="Boolean" label="Amount Readonly?"/>
+            <property name="readonlyproduct" type="Boolean" label="Product Readonly?"/>
+            <property name="showexternalpaymentlinksection" type="Boolean" label="Show External Payment Link?"/>
+
+        </targetConfig>
+    </targetConfigs>
+
+
+</LightningComponentBundle>

@@ -1,0 +1,16 @@
+<template>
+    <lightning-quick-action-panel title="Refund Payment">
+        <template if:false={paymentResult}>
+        Are you sure you want to refund this transaction?
+    </template>
+        <br/>
+        <template if:true={paymentResult}>
+        <b>{paymentResult.message}</b>
+        </template>
+        <div slot="footer">
+            <lightning-button variant="neutral" label="Cancel" onclick={closeAction}></lightning-button>
+            <lightning-button variant="brand" label="Process" onclick={invoke} disabled={paymentdisabled}></lightning-button>
+        </div>
+      </lightning-quick-action-panel>
+    
+</template>

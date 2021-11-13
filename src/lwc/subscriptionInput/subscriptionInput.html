@@ -1,0 +1,79 @@
+<template>
+
+  <div class="slds" if:false={readonlymode}>
+
+    <div class="slds-form_horizontal slds-form slds-grid slds-wrap">
+      <lightning-input  placeholder="Subscription Name" type="tel" name="subscriptionname" class="slds-size_1-of-2"
+      oninput={handleSubName} onchange={handleSubName} onblur={handleSubName} required value={subname} label="Subscription Name"></lightning-input>
+
+      <lightning-input placeholder="0.00" type="number" name="amount" class="slds-size_1-of-2" oninput={handleAmount}
+      onchange={handleAmount} onblur={handleAmount} required value={amount} label="Amount"></lightning-input>
+
+      <lightning-input placeholder="Start Date" type="date" name="subscriptionname" class="slds-size_1-of-2"
+      oninput={handleStartDate} onchange={handleStartDate} onblur={handleStartDate} required value={startdate} label="Start Date"> </lightning-input>
+
+      <lightning-input  placeholder="1" type="number" name="occurrances" class="slds-size_1-of-2" label="Occurrances" oninput={handleOccurr}
+      onchange={handleOccurr} onblur={handleOccurr} required value={occurrances}></lightning-input>
+
+      <lightning-combobox name="status" placeholder="Choose Status" value={unit} class="slds-size_1-of-2" label="Unit" onchange={handleUnit} required
+      options={unitoptions}>
+    </lightning-combobox>
+</div>
+  </div>
+    
+
+  <div class="slds" if:true={readonlymode}>
+
+    <div class="slds-form" role="list">
+      <div class="slds-form__row">
+        <div class="slds-form__item" role="listitem">
+          <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+            <label class="slds-form-element__label" for="single-form-element-id-02">
+              <abbr class="slds-required" title="required">*</abbr>
+              Subscription Name
+            </label>
+            <div class="slds-form-element__control">
+              {subname}
+            </div>
+          </div>
+        </div>
+        <div class="slds-form__item" role="listitem">
+          <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+            <label class="slds-form-element__label" for="single-form-element-id-03">
+              <abbr class="slds-required" title="required">*</abbr>
+              Amount</label>
+            <div class="slds-form-element__control">
+              {amount}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slds-form__row">
+      <div class="slds-form__item" role="listitem">
+        <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+          <label class="slds-form-element__label" for="single-form-element-id-02">
+            <abbr class="slds-required" title="required">*</abbr>
+            Created Date
+          </label>
+          <div class="slds-form-element__control">
+            {startdate}
+          </div>
+        </div>
+      </div>
+      <div class="slds-form__item" role="listitem">
+        <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+          <label class="slds-form-element__label" for="single-form-element-id-03">
+            <abbr class="slds-required" title="required">*</abbr>
+            Total Occurrences</label>
+          <div class="slds-form-element__control">
+            {occurrances}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</template>
