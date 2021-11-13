@@ -56,7 +56,7 @@ global without sharing class ManagePaymentService {
                 paymentObj.Source__c = paymentDetails.otherDetails.paymentserviceprovider;
                 paymentObj.Payment_Date__c = System.today();
                 paymentObj.Email__c = paymentDetails.carddetails.cardEmail;
-                paymentObj.RecordtypeId = Schema.SObjectType.Payment__c.getRecordTypeInfosById().get('Individual Payment').getRecordTypeId();
+                paymentObj.RecordtypeId = Schema.SObjectType.Payment__c.getRecordTypeInfosByName().get('Individual Payment').getRecordTypeId();
 
                 paymentObj.Customer_Id__c = paymentDetails.otherdetails.refId;
                 paymentObj.Card_Type__c = values.transactionResponse.accountType;

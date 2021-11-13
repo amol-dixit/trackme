@@ -623,7 +623,7 @@ public without sharing class AuthorizeNetServiceHelper {
             paymentObj.Card_Type__c = tdresp.transaction1.payment.creditCard.cardType;
             paymentObj.Card_Number__c = tdresp.transaction1.payment.creditCard.cardNumber;
             paymentObj.Transaction_Status__c = tdresp.transaction1.transactionStatus;
-            paymentObj.RecordtypeId = Schema.SObjectType.Payment__c.getRecordTypeInfosById().get('Subscription Payment').getRecordTypeId();
+            paymentObj.RecordtypeId = Schema.SObjectType.Payment__c.getRecordTypeInfosByName().get('Subscription Payment').getRecordTypeId();
 
             if(tdresp.transaction1.shipTo != null){
                 paymentObj.Ship_To_Address__c = tdresp.transaction1.shipTo.address;
