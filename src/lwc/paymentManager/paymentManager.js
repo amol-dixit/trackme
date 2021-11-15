@@ -950,7 +950,6 @@ getIsValid(){
     inp.value = JSON.stringify(content);
     inp.select();
     document.execCommand('copy');
-    inp.disabled = true;
 
     console.log(`copied`);
 
