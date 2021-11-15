@@ -509,7 +509,6 @@ global without sharing class ManagePaymentService {
     @AuraEnabled
     public static ManagePaymentDTOService.PaymentData retrieveRecord(Id recordId, String sobjectAPIName, String paymentserviceprovider){
 
-
         Payment_Configuration__c pconfig = AuthorizeNetServiceHelper.getPaymentConfig(sobjectAPIName, paymentserviceprovider); 
         String select1 = 'select ';
         String query =  (pconfig.Address_API_Name__c != null ? pconfig.Address_API_Name__c +',' : '');
@@ -536,45 +535,42 @@ global without sharing class ManagePaymentService {
         System.debug('query====>' + query);
         SObject record = Database.query(query);
         ManagePaymentDTOService.PaymentData pdObj = new ManagePaymentDTOService.PaymentData();
-        pdObj.amount = pconfig.Amount_API_Name__c != null ? (Decimal)record.get(pconfig.Amount_API_Name__c) : 0;
-        pdobj.street = pconfig.Address_API_Name__c != null ? (String)record.get(pconfig.Address_API_Name__c) : '';
-        pdobj.city = pconfig.City_API_Name__c != null ? (String)record.get(pconfig.City_API_Name__c) : '';
-        //pdobj.street2 = (String)record.get(pconfig.Amount_API_Name__c);
-        pdobj.state =  pconfig.State_API_Name__c != null ? (String)record.get(pconfig.State_API_Name__c) : '';
-        pdobj.zip = pconfig.Zip_API_Name__c != null ? (String)record.get(pconfig.Zip_API_Name__c) : '';
-        pdobj.country = pconfig.Country_API_Name__c != null ? (String)record.get(pconfig.Country_API_Name__c) : '';
-        pdobj.email = pconfig.Email_API_Name__c != null ? (String)record.get(pconfig.Email_API_Name__c) : '';
-        pdobj.firstname =  pconfig.First_Name_API_Name__c != null ? (String)record.get(pconfig.First_Name_API_Name__c) : '';
-        pdobj.lastname = pconfig.Last_Name_API_Name__c != null ? (String)record.get(pconfig.Last_Name_API_Name__c) : '';
-        pdobj.product = pconfig.Product_API_Name__c != null ? (String)record.get(pconfig.Product_API_Name__c) : '';
+        pdObj.amount = pconfig.Amount_API_Name__c != null ? (Decimal)fetchRecordData(record, pconfig.Amount_API_Name__c) : 0;
+        pdobj.street = pconfig.Address_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Address_API_Name__c) : '';
+        pdobj.city = pconfig.City_API_Name__c != null ? (String)fetchRecordData(record, pconfig.City_API_Name__c) : '';
+        pdobj.state =  pconfig.State_API_Name__c != null ? (String)fetchRecordData(record, pconfig.State_API_Name__c) : '';
+        pdobj.zip = pconfig.Zip_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Zip_API_Name__c) : '';
+        pdobj.country = pconfig.Country_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Country_API_Name__c) : '';
+        pdobj.email = pconfig.Email_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Email_API_Name__c) : '';
+        pdobj.firstname =  pconfig.First_Name_API_Name__c != null ? (String)fetchRecordData(record, pconfig.First_Name_API_Name__c) : '';
+        pdobj.lastname = pconfig.Last_Name_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Last_Name_API_Name__c) : '';
+        pdobj.product = pconfig.Product_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Product_API_Name__c) : '';
         pdobj.objectapiname = pconfig.Object_Api_Name__c;
         pdobj.fieldapiname = pconfig.SObject_Payment_Lookup_API_Name__c;
         
-        pdobj.refId = pconfig.RefId_Api_Name__c != null ? (String)record.get(pconfig.RefId_Api_Name__c) : '';
-        pdobj.company = pconfig.Company_API_Name__c != null ? (String)record.get(pconfig.Company_API_Name__c) : '';
-        pdobj.customerid = pconfig.Customer_Id_API_Name__c != null ? (String)record.get(pconfig.Customer_Id_API_Name__c) : '';
+        pdobj.refId = pconfig.RefId_Api_Name__c != null ? (String)fetchRecordData(record, pconfig.RefId_Api_Name__c) : '';
+        pdobj.company = pconfig.Company_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Company_API_Name__c) : '';
+        pdobj.customerid = pconfig.Customer_Id_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Customer_Id_API_Name__c) : '';
         pdobj.externalPaymentURL = pconfig.Community_URL__c + '';
 
         pdobj.externalPaymentURL = pconfig.Community_URL__c;
 
-        pdobj.externalPaymentURL += '?amount=' + (pconfig.Amount_API_Name__c != null ? (Decimal)record.get(pconfig.Amount_API_Name__c) : 0);
-        pdobj.externalPaymentURL += '&street=' + (pconfig.Address_API_Name__c != null ? (String)record.get(pconfig.Address_API_Name__c) : '');
-        pdobj.externalPaymentURL += '&city=' + (pconfig.City_API_Name__c != null ? (String)record.get(pconfig.City_API_Name__c) : '');
-        pdobj.externalPaymentURL += '&state=' + (pconfig.State_API_Name__c != null ? (String)record.get(pconfig.State_API_Name__c) : '');
-        pdobj.externalPaymentURL += '&zip=' + (pconfig.Zip_API_Name__c != null ? (String)record.get(pconfig.Zip_API_Name__c) : '');
-        pdobj.externalPaymentURL += '&country=' + (pconfig.Country_API_Name__c != null ? (String)record.get(pconfig.Country_API_Name__c) : '');
-        pdobj.externalPaymentURL += '&email=' + (pconfig.Email_API_Name__c != null ? (String)record.get(pconfig.Email_API_Name__c) : '');
-        pdobj.externalPaymentURL += '&firstname=' + (pconfig.First_Name_API_Name__c != null ? (String)record.get(pconfig.First_Name_API_Name__c) : '');
-        pdobj.externalPaymentURL += '&lastname=' + (pconfig.Last_Name_API_Name__c != null ? (String)record.get(pconfig.Last_Name_API_Name__c) : '');
-        pdobj.externalPaymentURL += '&product=' + (pconfig.Product_API_Name__c != null ? (String)record.get(pconfig.Product_API_Name__c) : '');
+        pdobj.externalPaymentURL += '?amount=' + (pconfig.Amount_API_Name__c != null ? pdObj.amount : 0);
+        pdobj.externalPaymentURL += '&street=' + (pconfig.Address_API_Name__c != null ? pdobj.street : '');
+        pdobj.externalPaymentURL += '&city=' + (pconfig.City_API_Name__c != null ? pdobj.city : '');
+        pdobj.externalPaymentURL += '&state=' + (pconfig.State_API_Name__c != null ? pdobj.state : '');
+        pdobj.externalPaymentURL += '&zip=' + (pconfig.Zip_API_Name__c != null ? pdobj.zip : '');
+        pdobj.externalPaymentURL += '&country=' + (pconfig.Country_API_Name__c != null ? pdobj.country : '');
+        pdobj.externalPaymentURL += '&email=' + (pconfig.Email_API_Name__c != null ? pdobj.email : '');
+        pdobj.externalPaymentURL += '&firstname=' + (pconfig.First_Name_API_Name__c != null ? pdobj.firstname : '');
+        pdobj.externalPaymentURL += '&lastname=' + (pconfig.Last_Name_API_Name__c != null ? pdobj.lastname : '');
+        pdobj.externalPaymentURL += '&product=' + (pconfig.Product_API_Name__c != null ? pdobj.product : '');
         pdobj.externalPaymentURL += '&objectapiname=' + (pconfig.Object_Api_Name__c);
         pdobj.externalPaymentURL += '&fieldapiname=' + (pconfig.SObject_Payment_Lookup_API_Name__c);
-        pdobj.externalPaymentURL += '&refid=' +  (pconfig.RefId_Api_Name__c != null ? (String)record.get(pconfig.RefId_Api_Name__c) : '');
-        pdobj.externalPaymentURL += '&company=' + (pconfig.Company_API_Name__c != null ? (String)record.get(pconfig.Company_API_Name__c) : '');
-        pdobj.externalPaymentURL += '&customerid=' + (pconfig.Customer_Id_API_Name__c != null ? (String)record.get(pconfig.Customer_Id_API_Name__c) : '');
+        pdobj.externalPaymentURL += '&refid=' +  (pconfig.RefId_Api_Name__c != null ? pdobj.refId : '');
+        pdobj.externalPaymentURL += '&company=' + (pconfig.Company_API_Name__c != null ? pdobj.company : '');
+        pdobj.externalPaymentURL += '&customerid=' + (pconfig.Customer_Id_API_Name__c != null ? pdobj.customerid : '');
 
-
-        
         return pdobj;
 
     }
@@ -583,4 +579,18 @@ global without sharing class ManagePaymentService {
         AuthorizeNetServiceHelper.authorizeNetProcessWebhook(requestbody);
     }
     
+    private static Object fetchRecordData(SObject record, String apiName){
+        List<String> fieldSplitList = apiName.split('\\.');
+        System.debug('fieldSplitList==>' + fieldSplitList + ' == APINAME ==' + apiName);
+        if(fieldSplitList.size() > 1){
+            String fieldName = fieldSplitList[fieldSplitList.size() - 1];
+            fieldSplitList.remove(fieldSplitList.size() - 1);
+            SObject sObj;
+            for(String field : fieldSplitList){
+                sObj = record.getSObject(field);
+            }
+            return sObj.get(fieldName);
+        }
+        return record.get(apiName);
+    }
 }
