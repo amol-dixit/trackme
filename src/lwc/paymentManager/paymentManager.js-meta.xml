@@ -16,6 +16,7 @@
             <property name="paymentserviceprovider" type="String" datasource="Authorize.Net,Stripe" label="Payment Service Provider"/>
             <property name="objectapiname" type="String"  />
             <property name="subscriptionmode" type="Boolean"  />
+            <property name="singletimepaymentmode" type="Boolean"  />
             <property name="readonlypaymentamount" type="Boolean" />
             <property name="readonlyproduct" type="Boolean" />
 
@@ -26,6 +27,7 @@
             <property name="paymentserviceprovider" type="String" datasource="Authorize.Net,Stripe" label="Payment Service Provider"/>
             <property name="objectapiname" type="String"  label="SObject API Name"/>
             <property name="subscriptionmode" type="Boolean"  label="Subscription Mode"/>
+            <property name="singletimepaymentmode" type="Boolean" label="Single Payment Mode"/>
             <property name="readonlypaymentamount" type="Boolean" label="Amount Readonly?"/>
             <property name="readonlyproduct" type="Boolean" label="Product Readonly?"/>
             <property name="showexternalpaymentlinksection" type="Boolean" label="Show External Payment Link?"/>

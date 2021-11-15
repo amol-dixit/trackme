@@ -31,6 +31,10 @@ public without sharing class ManagePaymentDTOService {
             //public String subId;
             public String subscriptionId;
             public String paymentserviceprovider;
+            public String custom1;
+            public String custom2;
+            public String custom3;
+            public String custom4;
 
 
         }
@@ -272,6 +276,16 @@ public without sharing class ManagePaymentDTOService {
             @AuraEnabled
             public String accountType;
             @AuraEnabled
+            public String address;
+            @AuraEnabled
+            public String city;
+            @AuraEnabled
+            public String state;
+            @AuraEnabled
+            public String zip;
+            @AuraEnabled
+            public String country;
+            @AuraEnabled
             public Payment__c paymentObj;
         }
         
@@ -327,6 +341,17 @@ public without sharing class ManagePaymentDTOService {
             public String objectapiname;
             @AuraEnabled
             public String externalPaymentURL;
+            @AuraEnabled
+            public String custom1;
+            @AuraEnabled
+            public String custom2;
+            @AuraEnabled
+            public String custom3;
+            @AuraEnabled
+            public String custom4;
+            @AuraEnabled
+            public String subheader;
+
 
         }
         public class SubscriptionWrapper{

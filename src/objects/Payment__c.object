@@ -305,6 +305,50 @@
         <type>Lookup</type>
     </fields>
     <fields>
+        <fullName>Custom_1__c</fullName>
+        <externalId>false</externalId>
+        <label>Custom 1</label>
+        <length>255</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Custom_2__c</fullName>
+        <externalId>false</externalId>
+        <label>Custom 2</label>
+        <length>255</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Custom_3__c</fullName>
+        <externalId>false</externalId>
+        <label>Custom 3</label>
+        <length>255</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Custom_4__c</fullName>
+        <externalId>false</externalId>
+        <label>Custom 4</label>
+        <length>255</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Customer_Id__c</fullName>
         <externalId>false</externalId>
         <label>Customer Id</label>

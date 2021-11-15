@@ -35,7 +35,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
     @track email;
     @api subscriptionmode = false;
     @api fieldapiname;
-    @track singletimepaymentmode = true;
+    @api singletimepaymentmode = false;
     @track showpaymenttyperadio = false;
     @track showonetimepayment = false;
     @track showrecurringpayment = false;
@@ -49,6 +49,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
     @track showexternalpaymentlink = false;
     @api showexternalpaymentlinksection = false;
     @api recordId;
+    custom1;custom2;custom3;custom4;
   
     @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
@@ -90,6 +91,11 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
       this.lastname = this.urlStateParameters.lastname;
       this.address.internationalAddress = false;
       this.paymentdetail.addressdetails = this.address;
+      //Custom
+      this.custom1 = this.urlStateParameters.custom1;
+      this.custom2 = this.urlStateParameters.custom2;
+      this.custom3 = this.urlStateParameters.custom3;
+      this.custom4 = this.urlStateParameters.custom4;
 
       console.log('My adde', this.address,this.firstname, this.lastname, this.email);
       this.isLoaded = !this.isLoaded;
@@ -701,7 +707,11 @@ getIsValid(){
           amount: this.urlStateParameters.amount,
           refid: this.urlStateParameters.refid,
           fieldapiname: this.urlStateParameters.fieldapiname,
-          objectapiname: this.urlStateParameters.objectapiname
+          objectapiname: this.urlStateParameters.objectapiname,
+          custom1: this.urlStateParameters.custom1,
+          custom2: this.urlStateParameters.custom2,
+          custom3: this.urlStateParameters.custom3,
+          custom4: this.urlStateParameters.custom4
 
         }
         if(this.showcheck){
@@ -779,7 +789,12 @@ getIsValid(){
           this.showsubedit = false;
           this.processSubscriptionActions('Existing Subscriptions');
         }else{
-          window.open(this.urlStateParameters.returl, "_self");
+          if(this.urlStateParameters.returl && this.urlStateParameters.returl != ''){
+            window.open(this.urlStateParameters.returl, "_self");
+          }else{
+            location.reload();
+          }
+
         }
   
       }

@@ -46,7 +46,7 @@
                 <div class="slds-media__body">
 
                   <div class="slds-form__row slds-form_horizontal">
-                    <div class="slds-form__item" role="listitem">
+                    <div class="slds-form__item" role="listitem" style="font-size: 1rem;">
                       <div if:false={readonlyproduct}>
                         <lightning-input type="text" label="Product" value={urlStateParameters.product} required=true
                           onchange={handleproduct}>
@@ -58,20 +58,30 @@
                       </div>
                     </div>
 
-                    <div class="slds-form__item" role="listitem">
+                    <div class="slds-form__item" role="listitem" style="font-size: 1rem;">
                       <div if:false={readonlypaymentamount}>
 
-                        <lightning-input type="number" label="Amount" value={urlStateParameters.amount} required=true
+                        $<lightning-input type="number" label="Amount" value={urlStateParameters.amount} required=true
                           onchange={handleamount}>
                         </lightning-input>
                       </div>
                       <div if:true={readonlypaymentamount}>
 
-                        Amount: <b>{urlStateParameters.amount}</b>
+                        Amount: <b>${urlStateParameters.amount}</b>
 
                       </div>
                     </div>
                   </div>
+                  <div class="slds-form__row slds-form_horizontal">
+
+                  <div class="slds-form__item" role="listitem" if:true={urlStateParameters.subheader}>
+
+
+                    {urlStateParameters.subheader}
+
+                </div>
+                </div>
+
 
                 </div>
               </template>
@@ -147,9 +157,9 @@
                 <label class="slds-form-element__label" for="single-form-element-id-02"><b>Billing
                     Information</b></label>
                 <div class="slds-form-element__control">
-                  {paymentReponse.paymentObj.Bill_To_Address__c}, {paymentReponse.paymentObj.Bill_To_Address__c},
-                  {paymentReponse.paymentObj.Bill_To_City__c}, {paymentReponse.paymentObj.Bill_To_State__c},
-                  {paymentReponse.paymentObj.Bill_To_Zip__c}, {paymentReponse.paymentObj.Bill_To_Country__c}
+                  {paymentReponse.address},
+                  {paymentReponse.city}, {paymentReponse.state},
+                  {paymentReponse.zip}, {paymentReponse.country}
                 </div>
               </div>
             </div>

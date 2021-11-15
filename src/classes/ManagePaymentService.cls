@@ -1,4 +1,4 @@
-global without sharing class ManagePaymentService {
+global with sharing class ManagePaymentService {
     @AuraEnabled
     public static ManagePaymentDTOService.ChargeTransactionResponse chargeTransaction(String paymentData){
         System.debug('paymentData' + paymentData);
@@ -81,13 +81,25 @@ global without sharing class ManagePaymentService {
                 paymentObj.Account_Number__c = paymentDetails.bankdetails.accountNumber;
                 paymentObj.Name_on_Account__c = paymentDetails.bankdetails.nameOnAccount;
                 
-                insert paymentObj;
+                paymentObj.Custom_1__c = paymentDetails.otherDetails.custom1;
+                paymentObj.Custom_2__c = paymentDetails.otherDetails.custom2;
+                paymentObj.Custom_3__c = paymentDetails.otherDetails.custom3;
+                paymentObj.Custom_4__c = paymentDetails.otherDetails.custom4;
+
+                ManagePaymentServiceHelper.handleInsertDML(paymentObj);
+                //insert paymentObj;
                 at.Payment__c = paymentObj.id;
 
         
                 System.debug('paymentObj==>' + paymentObj.id);
         
                 ctrObj.paymentObj = paymentObj;
+
+                ctrObj.address = paymentObj.Bill_To_Address__c;
+                ctrObj.city = paymentObj.Bill_To_City__c;
+                ctrObj.state = paymentObj.Bill_To_State__c;
+                ctrObj.zip = paymentObj.Bill_To_Zip__c;
+                ctrObj.country = paymentObj.Bill_To_Country__c;
             }else{
                 ctrObj.success = false;
                 ctrObj.responseText = responseMessage;
@@ -100,8 +112,8 @@ global without sharing class ManagePaymentService {
 
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
-
-                insert at;
+                ManagePaymentServiceHelper.handleInsertDML(at);
+                //insert at;
             }
 
         }
@@ -183,14 +195,17 @@ global without sharing class ManagePaymentService {
                 upsertPaymentList.add(paymentclone);
             }
 
-            upsert upsertPaymentList;
+            //upsert upsertPaymentList;
+            ManagePaymentServiceHelper.handleUpsertDML(upsertPaymentList);
+
 
             tr.success = ctrObj.success;
             tr.message = responseMessage;
 
 
             if(pconfig == null || pconfig.Enable_Logging__c){
-                insert at;
+                //insert at;
+                ManagePaymentServiceHelper.handleInsertDML(at);
             }
 
 
@@ -279,14 +294,15 @@ global without sharing class ManagePaymentService {
                 paymentclone.Voided__c = true;
                 upsertPaymentList.add(paymentclone);
             }
-
-            upsert upsertPaymentList;
+            ManagePaymentServiceHelper.handleUpsertDML(upsertPaymentList);
+            //upsert upsertPaymentList;
             tr.success = ctrObj.success;
             tr.message = responseMessage;
 
             if(pconfig == null || pconfig.Enable_Logging__c){
 
-                insert at;
+                //insert at;
+                ManagePaymentServiceHelper.handleInsertDML(at);
             }
 
         }
@@ -345,7 +361,8 @@ global without sharing class ManagePaymentService {
                 subscriptionObj.Occurrances__c = Decimal.valueOf(paymentDetails.subDetails.occurrances);
                 subscriptionObj.Unit__c = paymentDetails.subDetails.unit;
                 subscriptionObj.Amount__c = paymentDetails.subDetails.amount;
-                insert subscriptionObj;
+                //insert subscriptionObj;
+                ManagePaymentServiceHelper.handleInsertDML(subscriptionObj);
                 at.Subscription__c = subscriptionObj.id;
 
                 System.debug('subscriptionObj==>' + subscriptionObj.id);
@@ -364,7 +381,8 @@ global without sharing class ManagePaymentService {
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
 
-                insert at;
+                //insert at;
+                ManagePaymentServiceHelper.handleInsertDML(at);
             }
 
         }
@@ -423,7 +441,8 @@ global without sharing class ManagePaymentService {
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
 
-                insert at;
+                //insert at;
+                ManagePaymentServiceHelper.handleInsertDML(at);
             }
 
         }
@@ -485,7 +504,8 @@ global without sharing class ManagePaymentService {
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
 
-                insert at;
+                //insert at;
+                ManagePaymentServiceHelper.handleInsertDML(at);
             }
 
         }
@@ -525,6 +545,7 @@ global without sharing class ManagePaymentService {
         query += (pconfig.State_API_Name__c != null ? pconfig.State_API_Name__c +',' : '');
         query += (pconfig.Zip_API_Name__c != null ? pconfig.Zip_API_Name__c +',' : '');
         query += (pconfig.Last_Name_API_Name__c != null ? pconfig.Last_Name_API_Name__c +',' : '');
+        query += (pconfig.Sub_Header_API_Name__c != null ? pconfig.Sub_Header_API_Name__c +',' : '');
 
         Set<String> tmpSet = New Set<String>(query.split(','));
         query = string.join(New List<String>(tmpSet),',');
@@ -547,11 +568,16 @@ global without sharing class ManagePaymentService {
         pdobj.product = (String)fetchRecordData(record, pconfig.Product_API_Name__c);
         pdobj.objectapiname = pconfig.Object_Api_Name__c;
         pdobj.fieldapiname = pconfig.SObject_Payment_Lookup_API_Name__c;
-        
         pdobj.refId = (String)fetchRecordData(record, pconfig.RefId_Api_Name__c);
         pdobj.company = (String)fetchRecordData(record, pconfig.Company_API_Name__c);
         pdobj.customerid = (String)fetchRecordData(record, pconfig.Customer_Id_API_Name__c);
-        pdobj.externalPaymentURL = pconfig.Community_URL__c + '';
+        pdobj.subheader = (String)fetchRecordData(record, pconfig.Sub_Header_API_Name__c);
+
+        //Custom info
+        pdobj.custom1 = pconfig.Custom_1__c;
+        pdobj.custom2 = pconfig.Custom_2__c;
+        pdobj.custom3 = pconfig.Custom_3__c;
+        pdobj.custom4 = pconfig.Custom_4__c;
 
         pdobj.externalPaymentURL = pconfig.Community_URL__c;
 
@@ -570,6 +596,12 @@ global without sharing class ManagePaymentService {
         pdobj.externalPaymentURL += '&refid=' +  (pconfig.RefId_Api_Name__c != null ? pdobj.refId : '');
         pdobj.externalPaymentURL += '&company=' + (pconfig.Company_API_Name__c != null ? pdobj.company : '');
         pdobj.externalPaymentURL += '&customerid=' + (pconfig.Customer_Id_API_Name__c != null ? pdobj.customerid : '');
+        if(!String.isEmpty(pconfig.Custom_1__c)) pdobj.externalPaymentURL += '&custom1=' + pconfig.Custom_1__c;
+        if(!String.isEmpty(pconfig.Custom_2__c)) pdobj.externalPaymentURL += '&custom2=' + pconfig.Custom_2__c;
+        if(!String.isEmpty(pconfig.Custom_3__c)) pdobj.externalPaymentURL += '&custom3=' + pconfig.Custom_3__c;
+        if(!String.isEmpty(pconfig.Custom_4__c)) pdobj.externalPaymentURL += '&custom4=' + pconfig.Custom_4__c;
+        if(!String.isEmpty(pconfig.Sub_Header_API_Name__c)) pdobj.externalPaymentURL += '&subheader=' + pdobj.subheader;
+
 
         return pdobj;
 
@@ -592,12 +624,13 @@ global without sharing class ManagePaymentService {
             for(String field : fieldSplitList){
                 sObj = record.getSObject(field);
             }
-            return hasSObjectField(apiName, sobj) ? sObj.get(fieldName) : null;
+            return (sobj != null && hasSObjectField(fieldName, sobj)) ? sObj.get(fieldName) : null;
         }
         return hasSObjectField(apiName, record) ? record.get(apiName) : null;
     }
     public static boolean hasSObjectField(String fieldName, SObject so){
         return so.getSobjectType().getDescribe().fields.getMap().keySet().contains(fieldName.toLowerCase());
-}
+    }
+//Attempt to de-reference a null object Class.trackmev1.ManagePaymentService.hasSObjectField: line 600, column 1 Class.trackmev1.ManagePaymentService.fetchRecordData: line 595, column 1 Class.trackmev1.ManagePaymentService.retrieveRecord: line 547, column 1
 
 }
