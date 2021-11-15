@@ -535,22 +535,22 @@ global without sharing class ManagePaymentService {
         System.debug('query====>' + query);
         SObject record = Database.query(query);
         ManagePaymentDTOService.PaymentData pdObj = new ManagePaymentDTOService.PaymentData();
-        pdObj.amount = pconfig.Amount_API_Name__c != null ? (Decimal)fetchRecordData(record, pconfig.Amount_API_Name__c) : 0;
-        pdobj.street = pconfig.Address_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Address_API_Name__c) : '';
-        pdobj.city = pconfig.City_API_Name__c != null ? (String)fetchRecordData(record, pconfig.City_API_Name__c) : '';
-        pdobj.state =  pconfig.State_API_Name__c != null ? (String)fetchRecordData(record, pconfig.State_API_Name__c) : '';
-        pdobj.zip = pconfig.Zip_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Zip_API_Name__c) : '';
-        pdobj.country = pconfig.Country_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Country_API_Name__c) : '';
-        pdobj.email = pconfig.Email_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Email_API_Name__c) : '';
-        pdobj.firstname =  pconfig.First_Name_API_Name__c != null ? (String)fetchRecordData(record, pconfig.First_Name_API_Name__c) : '';
-        pdobj.lastname = pconfig.Last_Name_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Last_Name_API_Name__c) : '';
-        pdobj.product = pconfig.Product_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Product_API_Name__c) : '';
+        pdObj.amount = (Decimal)fetchRecordData(record, pconfig.Amount_API_Name__c);
+        pdobj.street = (String)fetchRecordData(record, pconfig.Address_API_Name__c);
+        pdobj.city = (String)fetchRecordData(record, pconfig.City_API_Name__c);
+        pdobj.state =  (String)fetchRecordData(record, pconfig.State_API_Name__c);
+        pdobj.zip = (String)fetchRecordData(record, pconfig.Zip_API_Name__c);
+        pdobj.country = (String)fetchRecordData(record, pconfig.Country_API_Name__c);
+        pdobj.email = (String)fetchRecordData(record, pconfig.Email_API_Name__c);
+        pdobj.firstname =  (String)fetchRecordData(record, pconfig.First_Name_API_Name__c);
+        pdobj.lastname = (String)fetchRecordData(record, pconfig.Last_Name_API_Name__c);
+        pdobj.product = (String)fetchRecordData(record, pconfig.Product_API_Name__c);
         pdobj.objectapiname = pconfig.Object_Api_Name__c;
         pdobj.fieldapiname = pconfig.SObject_Payment_Lookup_API_Name__c;
         
-        pdobj.refId = pconfig.RefId_Api_Name__c != null ? (String)fetchRecordData(record, pconfig.RefId_Api_Name__c) : '';
-        pdobj.company = pconfig.Company_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Company_API_Name__c) : '';
-        pdobj.customerid = pconfig.Customer_Id_API_Name__c != null ? (String)fetchRecordData(record, pconfig.Customer_Id_API_Name__c) : '';
+        pdobj.refId = (String)fetchRecordData(record, pconfig.RefId_Api_Name__c);
+        pdobj.company = (String)fetchRecordData(record, pconfig.Company_API_Name__c);
+        pdobj.customerid = (String)fetchRecordData(record, pconfig.Customer_Id_API_Name__c);
         pdobj.externalPaymentURL = pconfig.Community_URL__c + '';
 
         pdobj.externalPaymentURL = pconfig.Community_URL__c;
@@ -580,6 +580,9 @@ global without sharing class ManagePaymentService {
     }
     
     private static Object fetchRecordData(SObject record, String apiName){
+        if(apiName == null || apiName == ''){
+            return null;
+        }
         List<String> fieldSplitList = apiName.split('\\.');
         System.debug('fieldSplitList==>' + fieldSplitList + ' == APINAME ==' + apiName);
         if(fieldSplitList.size() > 1){
