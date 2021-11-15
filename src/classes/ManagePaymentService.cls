@@ -589,8 +589,12 @@ global without sharing class ManagePaymentService {
             for(String field : fieldSplitList){
                 sObj = record.getSObject(field);
             }
-            return sObj.get(fieldName);
+            return hasSObjectField(apiName, sobj) ? sObj.get(fieldName) : null;
         }
-        return record.get(apiName);
+        return hasSObjectField(apiName, record) ? record.get(apiName) : null;
     }
+    public static boolean hasSObjectField(String fieldName, SObject so){
+        return so.getSobjectType().getDescribe().fields.getMap().keySet().contains(fieldName.toLowerCase());
+}
+
 }
