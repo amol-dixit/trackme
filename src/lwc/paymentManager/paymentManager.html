@@ -67,7 +67,9 @@
                       </div>
                       <div if:true={readonlypaymentamount}>
 
-                        Amount: <b>${urlStateParameters.amount}</b>
+                        Amount: <b><lightning-formatted-number value={urlStateParameters.amount} format-style="currency" currency-code="USD" minimum-fraction-digits="2" maximum-fraction-digits="2"></lightning-formatted-number></b>
+
+
 
                       </div>
                     </div>

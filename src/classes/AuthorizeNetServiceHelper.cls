@@ -43,7 +43,7 @@ public without sharing class AuthorizeNetServiceHelper {
                     if(creditcard){
                     gen.writeFieldName('creditCard');
                         gen.writeStartObject();
-                        gen.writeStringField('cardNumber', paymentDetails.carddetails.cardNumber);
+                        gen.writeStringField('cardNumber', paymentDetails.carddetails.cardNumber.replaceAll(' ', ''));
                         gen.writeStringField('expirationDate', '20'+ paymentDetails.carddetails.cardExpiry.split('/')[1].trim() + '-' + paymentDetails.carddetails.cardExpiry.split('/')[0].trim());
                         gen.writeStringField('cardCode', paymentDetails.carddetails.cardCVV);
                         gen.writeEndObject();
@@ -51,8 +51,8 @@ public without sharing class AuthorizeNetServiceHelper {
                         gen.writeFieldName('bankAccount');
                         gen.writeStartObject();
                         gen.writeStringField('accountType', paymentDetails.bankdetails.accountType);
-                        gen.writeStringField('routingNumber', paymentDetails.bankdetails.routingNumber);
-                        gen.writeStringField('accountNumber', paymentDetails.bankdetails.accountNumber);
+                        gen.writeStringField('routingNumber', paymentDetails.bankdetails.routingNumber.replaceAll(' ', ''));
+                        gen.writeStringField('accountNumber', paymentDetails.bankdetails.accountNumber.replaceAll(' ', ''));
                         gen.writeStringField('nameOnAccount', paymentDetails.bankdetails.nameOnAccount);
                         gen.writeEndObject();
 
