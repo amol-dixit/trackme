@@ -45,7 +45,7 @@
         </rules>
     </decisions>
     <interviewLabel>Payment Service Config Selection {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Payment Service Config Selection v16</label>
+    <label>Payment Service Config Selection v21</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -113,6 +113,30 @@
             <field>Country_API_Name__c</field>
             <value>
                 <elementReference>Country_API_Name_0_0</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Custom_1__c</field>
+            <value>
+                <elementReference>Custom_1_New</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Custom_2__c</field>
+            <value>
+                <elementReference>Custom_2_New</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Custom_3__c</field>
+            <value>
+                <elementReference>Custom_3_New</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Custom_4__c</field>
+            <value>
+                <elementReference>Custom_4_New</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -197,6 +221,12 @@
             <field>State_API_Name__c</field>
             <value>
                 <elementReference>State_API_0_0</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Sub_Header_API_Name__c</field>
+            <value>
+                <elementReference>Sub_Header_API_Name</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -295,6 +325,30 @@
             </value>
         </inputAssignments>
         <inputAssignments>
+            <field>Custom_1__c</field>
+            <value>
+                <elementReference>Custom_1</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Custom_2__c</field>
+            <value>
+                <elementReference>Custom_2</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Custom_3__c</field>
+            <value>
+                <elementReference>Custom_3</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Custom_4__c</field>
+            <value>
+                <elementReference>Custom_4</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
             <field>Customer_Id_API_Name__c</field>
             <value>
                 <elementReference>Customer_Id_API_0</elementReference>
@@ -376,6 +430,12 @@
             <field>State_API_Name__c</field>
             <value>
                 <elementReference>State_API_0</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Sub_Header_API_Name__c</field>
+            <value>
+                <elementReference>Sub_Header_API_Name_Existing</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -557,6 +617,16 @@
             <storeOutputAutomatically>true</storeOutputAutomatically>
         </fields>
         <fields>
+            <name>Payment_Community_URL</name>
+            <dataType>String</dataType>
+            <defaultValue>
+                <elementReference>Get_Payment_Config.Community_URL__c</elementReference>
+            </defaultValue>
+            <fieldText>Payment Community URL</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
             <name>Track_Callback_Response_0_0</name>
             <dataType>Boolean</dataType>
             <defaultValue>
@@ -708,6 +778,56 @@
                 <elementReference>Get_Payment_Config.Return_URL_API_Name__c</elementReference>
             </defaultValue>
             <fieldText>Return URL API Name</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Custom_1</name>
+            <dataType>String</dataType>
+            <defaultValue>
+                <elementReference>Get_Payment_Config.Custom_1__c</elementReference>
+            </defaultValue>
+            <fieldText>Custom 1</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Custom_2</name>
+            <dataType>String</dataType>
+            <defaultValue>
+                <elementReference>Get_Payment_Config.Custom_2__c</elementReference>
+            </defaultValue>
+            <fieldText>Custom 2</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Custom_3</name>
+            <dataType>String</dataType>
+            <defaultValue>
+                <elementReference>Get_Payment_Config.Custom_3__c</elementReference>
+            </defaultValue>
+            <fieldText>Custom 3</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Custom_4</name>
+            <dataType>String</dataType>
+            <defaultValue>
+                <elementReference>Get_Payment_Config.Custom_4__c</elementReference>
+            </defaultValue>
+            <fieldText>Custom 4</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Sub_Header_API_Name_Existing</name>
+            <dataType>String</dataType>
+            <defaultValue>
+                <elementReference>Get_Payment_Config.Sub_Header_API_Name__c</elementReference>
+            </defaultValue>
+            <fieldText>Sub Header API Name</fieldText>
             <fieldType>InputField</fieldType>
             <isRequired>false</isRequired>
         </fields>
@@ -899,6 +1019,41 @@
             <name>Return_URL_API_Name_0_0</name>
             <dataType>String</dataType>
             <fieldText>Return URL API Name</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Custom_1_New</name>
+            <dataType>String</dataType>
+            <fieldText>Custom 1</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Custom_2_New</name>
+            <dataType>String</dataType>
+            <fieldText>Custom 2</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Custom_3_New</name>
+            <dataType>String</dataType>
+            <fieldText>Custom 3</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Custom_4_New</name>
+            <dataType>String</dataType>
+            <fieldText>Custom 4</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Sub_Header_API_Name</name>
+            <dataType>String</dataType>
+            <fieldText>Sub Header API Name</fieldText>
             <fieldType>InputField</fieldType>
             <isRequired>false</isRequired>
         </fields>
