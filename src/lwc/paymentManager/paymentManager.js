@@ -947,7 +947,7 @@ getIsValid(){
 
   handleExternalPaymentLink(event){
     this.showexternalpaymentlink = event.target.checked;
-    document.execCommand('copy');
+    /*document.execCommand('copy');
     let content = this.urlStateParameters.externalPaymentURL;
     let inp = this.template.querySelector('.my-class');
     inp.disabled = false;
@@ -955,7 +955,7 @@ getIsValid(){
     inp.select();
     document.execCommand('copy');
 
-    console.log(`copied`);
+    console.log(`copied`);*/
 
 
   }
