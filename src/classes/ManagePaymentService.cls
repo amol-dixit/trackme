@@ -581,20 +581,20 @@ global with sharing class ManagePaymentService {
 
         pdobj.externalPaymentURL = pconfig.Community_URL__c;
 
-        pdobj.externalPaymentURL += '?amount=' + (pconfig.Amount_API_Name__c != null ? pdObj.amount : 0);
-        pdobj.externalPaymentURL += '&street=' + (pconfig.Address_API_Name__c != null ? pdobj.street : '');
-        pdobj.externalPaymentURL += '&city=' + (pconfig.City_API_Name__c != null ? pdobj.city : '');
-        pdobj.externalPaymentURL += '&state=' + (pconfig.State_API_Name__c != null ? pdobj.state : '');
-        pdobj.externalPaymentURL += '&zip=' + (pconfig.Zip_API_Name__c != null ? pdobj.zip : '');
-        pdobj.externalPaymentURL += '&country=' + (pconfig.Country_API_Name__c != null ? pdobj.country : '');
-        pdobj.externalPaymentURL += '&email=' + (pconfig.Email_API_Name__c != null ? pdobj.email : '');
-        pdobj.externalPaymentURL += '&firstname=' + (pconfig.First_Name_API_Name__c != null ? pdobj.firstname : '');
-        pdobj.externalPaymentURL += '&lastname=' + (pconfig.Last_Name_API_Name__c != null ? pdobj.lastname : '');
-        pdobj.externalPaymentURL += '&product=' + (pconfig.Product_API_Name__c != null ? pdobj.product : '');
+        pdobj.externalPaymentURL += '?amount=' + (pdObj.amount != null ? pdObj.amount : 0);
+        pdobj.externalPaymentURL += '&street=' + (pdobj.street != null ? pdobj.street : '');
+        pdobj.externalPaymentURL += '&city=' + (pdobj.city != null ? pdobj.city : '');
+        pdobj.externalPaymentURL += '&state=' + (pdobj.state != null ? pdobj.state : '');
+        pdobj.externalPaymentURL += '&zip=' + (pdobj.zip != null ? pdobj.zip : '');
+        pdobj.externalPaymentURL += '&country=' + (pdobj.country != null ? pdobj.country : '');
+        pdobj.externalPaymentURL += '&email=' + (pdobj.email != null ? pdobj.email : '');
+        pdobj.externalPaymentURL += '&firstname=' + (pdobj.firstname != null ? pdobj.firstname : '');
+        pdobj.externalPaymentURL += '&lastname=' + (pdobj.lastname != null ? pdobj.lastname : '');
+        pdobj.externalPaymentURL += '&product=' + (pdobj.product != null ? pdobj.product : '');
         pdobj.externalPaymentURL += '&objectapiname=' + (pconfig.Object_Api_Name__c);
         pdobj.externalPaymentURL += '&fieldapiname=' + (pconfig.SObject_Payment_Lookup_API_Name__c);
-        pdobj.externalPaymentURL += '&refid=' +  (pconfig.RefId_Api_Name__c != null ? pdobj.refId : '');
-        pdobj.externalPaymentURL += '&company=' + (pconfig.Company_API_Name__c != null ? pdobj.company : '');
+        pdobj.externalPaymentURL += '&refid=' +  (pdobj.refId != null ? pdobj.refId : '');
+        pdobj.externalPaymentURL += '&company=' + (pdobj.company != null ? pdobj.company : '');
         pdobj.externalPaymentURL += '&customerid=' + (pconfig.Customer_Id_API_Name__c != null ? pdobj.customerid : '');
         if(!String.isEmpty(pconfig.Custom_1__c)) pdobj.externalPaymentURL += '&custom1=' + pconfig.Custom_1__c;
         if(!String.isEmpty(pconfig.Custom_2__c)) pdobj.externalPaymentURL += '&custom2=' + pconfig.Custom_2__c;

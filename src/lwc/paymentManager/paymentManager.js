@@ -700,7 +700,7 @@ getIsValid(){
 
       handlePay(){
         this.isLoaded = !this.isLoaded;
-
+        this.disablepay = true;
         let otherDetails = {
           paymentserviceprovider:this.paymentserviceprovider,
           product: this.urlStateParameters.product,
@@ -756,6 +756,8 @@ getIsValid(){
               mode: 'dismissable'
           });
           this.dispatchEvent(event);
+          this.disablepay = false;
+
           }
           this.isLoaded = !this.isLoaded;
         })
@@ -777,6 +779,8 @@ getIsValid(){
             this.error = error;
             this.contacts = undefined;
             this.isLoaded = !this.isLoaded;
+            this.disablepay = false;
+
         });
         
 
