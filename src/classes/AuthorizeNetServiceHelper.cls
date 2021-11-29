@@ -1,21 +1,9 @@
-public without sharing class AuthorizeNetServiceHelper {
-    static Payment_Configuration__c pconfig;
-    public static Payment_Configuration__c getPaymentConfig(String objectApiName, String paymentserviceprovider) {
-        if(pconfig == null){
+public without sharing class AuthorizeNetServiceHelper implements PaymentServiceInterface{
 
-            List<Payment_Configuration__c> pconfiglist = [select Sub_Header_API_Name__c, Custom_1__c, Custom_2__c, Custom_3__c, Custom_4__c, External_Payment_URL__c, Community_URL__c, Enable_Logging__c, Auth_API_Login_Id__c, Endpoint_URL__c, Auth_Transaction_Key__c, 
-            SObject_Payment_Lookup_API_Name__c, Object_Api_Name__c, Address_API_Name__c, Amount_API_Name__c,
-            City_API_Name__c,Company_API_Name__c, Country_API_Name__c, Customer_Id_API_Name__c, Email_API_Name__c,First_Name_API_Name__c, Last_Name_API_Name__c,
-                Product_API_Name__c, RefId_Api_Name__c, Return_URL__c,Return_URL_API_Name__c, State_API_Name__c, Zip_API_Name__c from Payment_Configuration__c where name = :paymentserviceprovider AND Object_Api_Name__c =: objectApiName];
-            if(pconfiglist == null || pconfiglist.size() == 0 ){
-                throw new PaymentException('Payment Service Provider details have not configured, please contact your system admnistrator for more details.');
-            }
-            pconfig = pconfiglist[0];
-        }
-        return pconfig;
-    }
+    public static ManagePaymentDTOService.Transaction_Reponse_Wrapper chargeTransaction(ManagePaymentDTOService.PaymentDetails paymentDetails){
+        //Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(ManagePaymentServiceHelper, paymentDetails.otherdetails.paymentserviceprovider);
+        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
-    public static ManagePaymentDTOService.Transaction_Reponse_Wrapper authorizeNetChargeTransaction(ManagePaymentDTOService.PaymentDetails paymentDetails, Payment_Configuration__c pconfig){
         ManagePaymentDTOService.cls_transactionRequest tr = new ManagePaymentDTOService.cls_transactionRequest();
 
         System.debug('paymentDetails===>' + paymentDetails);
@@ -117,18 +105,55 @@ public without sharing class AuthorizeNetServiceHelper {
         HttpResponse res = http.send(req);
         System.debug('JSON Response :: ' + res.getBody());
 
-        ManagePaymentDTOService.Transaction_Reponse_Wrapper rw = (ManagePaymentDTOService.Transaction_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Transaction_Reponse_Wrapper.class);
-        rw.requestString = jsonData;
-        rw.responseString = res.getBody();
-        rw.statuscode = res.getStatusCode();
-        return rw;
+        ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper rw = (ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper.class);
+        ManagePaymentDTOService.Transaction_Reponse_Wrapper trw = new ManagePaymentDTOService.Transaction_Reponse_Wrapper();
+        trw.requestString = jsonData;
+        trw.responseString = res.getBody();
+        trw.statuscode = res.getStatusCode();
+
+
+        String responseMessage = '';
+
+        if(rw.messages != null && !rw.messages.message.isempty()){
+            for(ManagePaymentDTOService.cls_message message : rw.messages.message){
+                responseMessage += 'Code = ' + message.code + ' :: Description = ' + message.text + ' \n';
+            }
+        }
+
+        if(rw.transactionResponse != null && rw.transactionResponse.messages != null && !rw.transactionResponse.messages.isempty()){
+            for(ManagePaymentDTOService.Transaction_response_messages message : rw.transactionResponse.messages){
+                responseMessage += 'Success Code = ' + message.code + ' :: Description = ' + message.description + ' \n';
+            }
+        }
+        responseMessage += '\n';
+
+        if(rw.transactionResponse != null && rw.transactionResponse.errors != null&& !rw.transactionResponse.errors.isempty()){
+            for(ManagePaymentDTOService.cls_error message : rw.transactionResponse.errors){
+                responseMessage += 'Code :: ' + message.errorCode + ' :: Description = ' + message.errorText + '\n';
+            }
+        }
+        if(rw.messages.resultCode == 'Ok' && (rw.transactionResponse.errors == null || rw.transactionResponse.errors.isempty())){
+            trw.statuscode = 200;
+            trw.transId = rw.transactionResponse.transId;
+            trw.authCode = rw.transactionResponse.authCode;
+            trw.accountNumber = rw.transactionResponse.accountNumber;
+            trw.accountType = rw.transactionResponse.accountType;
+            trw.resultCode = rw.messages.resultCode;
+
+            trw.issuccess = true;
+        }else{
+            trw.issuccess = false;
+        }
+        trw.responseMessage = responseMessage;
+        return trw;
 
     }
 
 
-    public static ManagePaymentDTOService.Transaction_Reponse_Wrapper authorizeNetRefundTransaction(Payment__c paymentObj, Payment_Configuration__c pconfig ){
-        //Payment_Configuration__c pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
+    public static ManagePaymentDTOService.Transaction_Reponse_Wrapper refundTransaction(Payment__c paymentObj ){
+        //Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
+        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
         JSONGenerator gen = JSON.createGenerator(true);
 
@@ -193,18 +218,55 @@ public without sharing class AuthorizeNetServiceHelper {
         String response = res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿','');
         System.debug('res==>' + response);
 
-        //return (ManagePaymentDTOService.Transaction_Reponse_Wrapper) System.JSON.deserialize(response, ManagePaymentDTOService.Transaction_Reponse_Wrapper.class);
+        //return (ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper) System.JSON.deserialize(response, ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper.class);
 
-        ManagePaymentDTOService.Transaction_Reponse_Wrapper rw = (ManagePaymentDTOService.Transaction_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Transaction_Reponse_Wrapper.class);
-        rw.requestString = json;
-        rw.responseString = res.getBody();
-        rw.statuscode = res.getStatusCode();
-        return rw;
+        ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper values = (ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper.class);
+        ManagePaymentDTOService.Transaction_Reponse_Wrapper trw = new ManagePaymentDTOService.Transaction_Reponse_Wrapper();
+        trw.requestString = json;
+        trw.responseString = res.getBody();
+        trw.statuscode = res.getStatusCode();
+
+        String responseMessage = '';
+
+        if(values.messages != null && !values.messages.message.isempty()){
+            for(ManagePaymentDTOService.cls_message message : values.messages.message){
+                responseMessage += 'Code = ' + message.code + ' :: Description = ' + message.text + ' \n';
+            }
+        }
+
+        ManagePaymentDTOService.ChargeTransactionResponse ctrObj = new ManagePaymentDTOService.ChargeTransactionResponse();
+
+        if(values.transactionResponse != null && values.transactionResponse.messages != null && !values.transactionResponse.messages.isempty()){
+            for(ManagePaymentDTOService.Transaction_response_messages message : values.transactionResponse.messages){
+                responseMessage += 'Success Code = ' + message.code + ' :: Description = ' + message.description + ' \n';
+            }
+        }
+        responseMessage += '\n';
+
+        if(values.transactionResponse != null && values.transactionResponse.errors != null&& !values.transactionResponse.errors.isempty()){
+            for(ManagePaymentDTOService.cls_error message : values.transactionResponse.errors){
+                responseMessage += 'Code :: ' + message.errorCode + ' :: Description = ' + message.errorText + '\n';
+            }
+        }
+
+        if(values.messages.resultCode == 'Ok' && (values.transactionResponse.errors == null || values.transactionResponse.errors.isempty())){
+            trw.issuccess = true;
+            trw.authCode = values.transactionResponse.authCode;
+            trw.transId = values.transactionResponse.transId;
+            trw.accountNumber = values.transactionResponse.accountNumber;
+            trw.accountType = values.transactionResponse.accountType;
+            trw.resultCode = values.messages.resultCode;
+        }else{
+            trw.issuccess = false;
+        }
+        trw.responseMessage = responseMessage;
+
+        return trw;
 
     }
 
-    public static ManagePaymentDTOService.Transaction_Reponse_Wrapper authorizeNetVoidTransaction(Payment__c paymentObj, Payment_Configuration__c pconfig){
-        //Payment_Configuration__c pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
+    public static ManagePaymentDTOService.Transaction_Reponse_Wrapper voidTransaction(Payment__c paymentObj){
+        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
         JSONGenerator gen = JSON.createGenerator(true);
         gen.writeStartObject();     
@@ -245,17 +307,52 @@ public without sharing class AuthorizeNetServiceHelper {
         String response = res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿','');
         System.debug('res==>' + response);
 
-        ManagePaymentDTOService.Transaction_Reponse_Wrapper rw = (ManagePaymentDTOService.Transaction_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Transaction_Reponse_Wrapper.class);
-        rw.requestString = json;
-        rw.responseString = res.getBody();
-        rw.statuscode = res.getStatusCode();
-        return rw;
+        ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper values = (ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper.class);
+        ManagePaymentDTOService.Transaction_Reponse_Wrapper trw = new ManagePaymentDTOService.Transaction_Reponse_Wrapper();
+        trw.requestString = json;
+        trw.responseString = res.getBody();
+        trw.statuscode = res.getStatusCode();
+        String responseMessage = '';
+        trw.issuccess = false;
+
+          if(values.transactionResponse.messages != null && !values.transactionResponse.messages.isempty()){
+                for(ManagePaymentDTOService.Transaction_response_messages message : values.transactionResponse.messages){
+                    if(message.code == '1'){
+                        trw.issuccess = true;
+                    }else{
+                        trw.issuccess = false;
+                    }
+                    responseMessage += 'Code = ' + message.code + (message.description != null ? ' :: Description = ' + message.description : '') + ' \n';
+                }
+            }
+    
+            if(values.transactionResponse != null && values.transactionResponse.errors != null&& !values.transactionResponse.errors.isempty()){
+                for(ManagePaymentDTOService.cls_error message : values.transactionResponse.errors){
+                    responseMessage += 'Code :: ' + message.errorCode + ' :: Description = ' + message.errorText + '\n';
+                }
+            }
+            
+            if(trw.issuccess){
+                trw.issuccess = true;
+                trw.authCode = values.transactionResponse.authCode;
+                trw.transId = values.transactionResponse.transId;
+                trw.accountNumber = values.transactionResponse.accountNumber;
+                trw.accountType = values.transactionResponse.accountType;
+                trw.resultCode = values.messages.resultCode;
+                
+            }else{
+                trw.issuccess = false;
+
+            }
+            trw.responseMessage = responseMessage;
+
+        return trw;
     }
     public static Map<String, String> UNIT_MAPPING = new Map<String, String>{'Monthly'=>'months', 'Weekly'=>'days'};
 
-    public static ManagePaymentDTOService.Sub_Reponse_Wrapper authorizeNetCreateSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails, Payment_Configuration__c pconfig ){
+    public static ManagePaymentDTOService.Sub_Reponse_Wrapper createSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails ){
 
-        //Payment_Configuration__c pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
         System.debug('paymentDetails===>' + paymentDetails);
         Decimal amount = paymentDetails.otherdetails.amount;
@@ -366,7 +463,8 @@ public without sharing class AuthorizeNetServiceHelper {
 
     }
 
-    public static ManagePaymentDTOService.Sub_Reponse_Wrapper authorizeNetUpdateSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails, Payment_Configuration__c pconfig){
+    public static ManagePaymentDTOService.Sub_Reponse_Wrapper updateSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails){
+        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
 
         System.debug('paymentDetails===>' + paymentDetails);
@@ -443,8 +541,8 @@ public without sharing class AuthorizeNetServiceHelper {
     }
 
 
-    public static ManagePaymentDTOService.SubscriptionWrapper authorizeNetCancelubscription(ManagePaymentDTOService.PaymentDetails paymentDetails, Payment_Configuration__c pconfig){
-        //Payment_Configuration__c pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+    public static ManagePaymentDTOService.SubscriptionWrapper cancelSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails){
+        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
         System.debug('paymentDetails===>' + paymentDetails);
         Decimal amount = paymentDetails.otherdetails.amount;
@@ -494,9 +592,9 @@ public without sharing class AuthorizeNetServiceHelper {
 
     }
 
-    public static ManagePaymentDTOService.SubscriptionWrapper authorizeNetGetSubscriptions(ManagePaymentDTOService.PaymentDetails paymentDetails){
+    public static ManagePaymentDTOService.SubscriptionWrapper getSubscriptions(ManagePaymentDTOService.PaymentDetails paymentDetails){
 
-        Payment_Configuration__c pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
         String query = 'select Amount__c,Card_Number__c,CreatedById,CreatedDate,Customer_Payment_ProfileId__c,Customer_Profile_Id__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Length__c,Name,Occurrances__c,Opportunity__c,OwnerId,Record_Id__c,Start_Date__c,Status__c,Subscription_Id__c,SystemModstamp,Unit__c from Subscription__c where '+paymentDetails.otherdetails.fieldapiname + '=\''+paymentDetails.otherdetails.refId+'\' and status__c = \'Active\'';
         List<Subscription__c> subscriptionList = Database.query(query);
@@ -519,45 +617,6 @@ public without sharing class AuthorizeNetServiceHelper {
         wrapper.subscriptionDetails = subscriptionDetails;
         return wrapper;
 
-/*Payment_Configuration__c pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
-
-        System.debug('paymentDetails===>' + paymentDetails);
-        Decimal amount = paymentDetails.otherdetails.amount;
-        JSONGenerator gen = JSON.createGenerator(true);
-
-
-        gen.writeStartObject();     
-        gen.writeFieldName('ARBGetSubscriptionListRequest');
-        gen.writeStartObject();
-            gen.writeFieldName('merchantAuthentication');
-                gen.writeStartObject();
-                gen.writeStringField('name', pconfig.Auth_API_Login_Id__c);
-                gen.writeStringField('transactionKey', pconfig.Auth_Transaction_Key__c);
-                gen.writeEndObject();
-            gen.writeStringField('refId', paymentDetails.otherdetails.refId);
-            gen.writeStringField('searchType', 'subscriptionActive');
-
-            gen.writeEndObject();
-        gen.writeEndObject();
-
-        String jsonData = gen.getAsString();
-
-        System.debug('MyData===>' + jsonData);
-
-        Http http = new Http();
-        HttpRequest req = new HttpRequest();
-        req.setEndpoint(pconfig.Endpoint_URL__c + '/xml/v1/request.api');
-        req.setMethod('POST');
-        req.setBody(jsonData);
-        req.setHeader('Content-Type', 'application/json');
-        req.setHeader('Accept','application/json');
-
-        System.debug('JSON Request :: ' + Json.serialize(jsonData));
-        HttpResponse res = http.send(req);
-        System.debug('JSON Response :: ' + res.getBody());
-        */
-        //return (ManagePaymentDTOService.SubscriptionWrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.SubscriptionWrapper.class);
-        //return null;
     }
 
     public static void authorizeNetProcessWebhook(String requestbody){  

@@ -12,10 +12,60 @@ export default class CardInput extends LightningElement {
     { label: "Check", value: "Check" }
   ];
 
-  set initcmp(value){
-    this.cardEmailValid = this.getIsValid(this.cardEmail, "cardEmail");
 
+  
+  @api get email() {
+    return this.cardEmail;
   }
+
+  set email(value) {
+    this.setAttribute('email', value);
+    this.cardEmail = value;
+    if(this.cardEmail){
+      this.cardEmailValid = this.getIsValid(this.cardEmail, "cardEmail");
+      this.cardEmailTouched = true;
+      //this.showFeedback();
+      //this.checkIfComplete();
+    }
+  }
+
+  @api get firstName() {
+    return this.cardHolderFirstName;
+  }
+
+  @api get lastName() {
+    return this.cardHolderLastName;
+  }
+
+  set lastName(value) {
+      this.setAttribute('lastName', value);
+      this.cardHolderLastName = value;
+      this.cardHolderLastNameValid = this.getIsValid(this.cardHolderLastName, "cardHolderLastName");
+      console.log('Here is the Last Name', this.cardHolderLastName);
+      if(this.cardHolderLastName){
+        this.cardHolderLastNameTouched = true;
+        //this.showFeedback();
+        this.checkIfComplete();
+  
+      }
+  
+  }
+
+  set firstName(value) {
+    this.setAttribute('firstName', value);
+    this.cardHolderFirstName = value;
+    this.cardHolderFirstNameValid = this.getIsValid(this.cardHolderFirstName, "cardHolderFirstName");
+    console.log('Here is the First Name', this.cardHolderFirstName);
+    if(this.cardHolderFirstName && this.cardHolderFirstName != null && this.cardHolderFirstName != undefined ){
+      this.cardHolderFirstNameTouched = true;
+      //this.showFeedback();
+      this.checkIfComplete();
+      this.handlefirstnamechange();
+
+
+    }
+
+}
 
   @track card;
 
@@ -26,8 +76,8 @@ export default class CardInput extends LightningElement {
   @track cardHolderFirstNameValid = false;
   @track cardHolderLastNameValid = false;
   @track cardExpiryValid = false;
-  @api cardHolderFirstName;
-  @api cardHolderLastName;
+  @track cardHolderFirstName;
+  @track cardHolderLastName;
 
   @track cardNumberTouched = false;
   @track cardEmailTouched = false;
@@ -52,23 +102,17 @@ export default class CardInput extends LightningElement {
         //reference to this object so will work with web components
         context: self,
 
-        // a selector or DOM element for the form where users will
-        // be entering their information
         form: self.template.querySelector(".cc-input"),
-        // a selector or DOM element for the container
-        // where you want the card to appear
         container: ".cc-wrapper", // *required*
 
-        width: 250, // optional — default 350px
-        formatting: true, // optional - default true
+        width: 250, 
+        formatting: true, 
 
-        // Strings for translation - optional
         messages: {
-          validDate: "valid\ndate", // optional - default 'valid\nthru'
-          monthYear: "mm/yyyy" // optional - default 'month/year'
+          validDate: "valid\ndate", 
+          monthYear: "mm/yyyy" 
         },
 
-        // Default placeholders for rendered fields - optional
         placeholders: {
           number: "•••• •••• •••• ••••",
           name: "Full Name",
@@ -79,19 +123,26 @@ export default class CardInput extends LightningElement {
         },
 
         masks: {
-          cardNumber: "•" // optional - mask card number
+          cardNumber: "•" 
         },
 
-        // if true, will log helpful messages for setting up Card
-        debug: true // optional - default false
+        debug: true 
       });
+      this.handlefirstnamechange();
+
     }, 50);
-    console.log('this.cardEmail', this.cardEmail);
-    this.cardHolderFirstNameValid = this.getIsValid(this.cardHolderFirstName, "cardHolderFirstName");
-    this.cardHolderLastNameValid = this.getIsValid(this.cardHolderLastName, "cardHolderLastName");
-    this.cardEmailValid = this.getIsValid(this.cardEmail, "cardEmail");
 
+  }
 
+  handlefirstnamechange(){
+    console.log('!!!!!!!!!!' , this.cardHolderFirstName);
+    if(this.cardHolderFirstName && this.cardHolderFirstName != null && this.cardHolderFirstName != undefined ){
+      var element = this.template.querySelector('[data-id="firstnameinput"]');
+      if(element){
+        var event = new Event('change');
+        element.dispatchEvent(event);
+      }
+    }
   }
 
   handleCCInput(event) {

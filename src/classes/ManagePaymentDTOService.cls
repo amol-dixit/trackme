@@ -203,6 +203,17 @@ public without sharing class ManagePaymentDTOService {
             public String requestString;
             public String responseString;
             public Integer statusCode;
+            public Boolean issuccess;
+            public String refId;
+            public String transId;
+            public String authCode;
+            public String accountNumber;
+            public String accountType;
+            public String responseMessage;
+            public String resultCode;
+        }
+
+        public class Auth_Transaction_Reponse_Wrapper{
             public cls_transactionResponse transactionResponse;
             public String refId;
             public Transaction_messages messages;
@@ -237,14 +248,14 @@ public without sharing class ManagePaymentDTOService {
         public class cls_message {
             public String code; //I00001
             public String text; //Successful.
+            public String description; //Successful.
+            
         }
 
         public class cls_transactionResponse {
             public String responseCode;	//1
+            public String responseMessage;	//1
             public String authCode;	//
-            public String avsResultCode;	//P
-            public String cvvResultCode;	//
-            public String cavvResultCode;	//
             public String transId;	//40067222795
             public String refTransID;	//40065051483
             public String transHash;	//
@@ -253,8 +264,7 @@ public without sharing class ManagePaymentDTOService {
             public String accountType;	//Visa
             public cls_error[] errors;
             public Transaction_response_messages[] messages;
-            
-            public String transHashSha2;	//4261FA94C7DE2BA95275EF49C75F845D4BD3E67F9115133C46607A890440124FD7C4DCE820E79C706C969ECBF51E7464A3CBF64712F2D69DFFC2ECFE7E9A0898
+            public String transHashSha2;
             public Integer SupplementalDataQualificationIndicator;	//0
         }
         public class cls_error {
@@ -358,7 +368,7 @@ public without sharing class ManagePaymentDTOService {
             public String requestString;
             public String responseString;
             public Integer statusCode;
-
+            public Boolean issuccess;
             @AuraEnabled public Integer totalNumInResultSet;	//36391
             @AuraEnabled public cls_subscriptionDetails[] subscriptionDetails;
             @AuraEnabled public String refId;

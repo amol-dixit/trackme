@@ -1,5 +1,13 @@
 <template>
   <div class=" slds-card " style="overflow-x: hidden; min-height:60px; " if:false={hidePage}>
+    
+    <template if:true={logourl}>
+      <div class="slds-align_absolute-center" >
+        <img src={logourl}/>
+      </div>
+
+    </template>    
+
     <template if:true={showexternalpaymentlinksection}>
       <div if:true={urlStateParameters}>
 
@@ -177,7 +185,7 @@
             </div>
           </div>
           <template if:true={showcc}>
-            <div class="slds-form__row">
+            <div class="slds-form__row" if:true={paymentReponse.authCode}>
               <div class="slds-form__item" role="listitem">
                 <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                   <label class="slds-form-element__label" for="single-form-element-id-02"><b>Authorization
@@ -470,8 +478,8 @@
             <div>
               <div class="group-order-cc-container">
                 <c-card-input oncardcomplete={handleCardComplete} oncardincomplete={handleCardIncomplete}
-                  onpaymentmethodchange={handlePaymentMethodChange} card-holder-first-name={firstname}
-                  card-holder-last-name={lastname} card-email={email}></c-card-input>
+                  onpaymentmethodchange={handlePaymentMethodChange} first-name={firstname}
+                  last-name={lastname} email={email}></c-card-input>
               </div>
             </div>
           </template>

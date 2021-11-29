@@ -5,48 +5,27 @@ global with sharing class ManagePaymentService {
         ManagePaymentDTOService.ChargeTransactionResponse ctrObj = new ManagePaymentDTOService.ChargeTransactionResponse();
         ManagePaymentDTOService.PaymentDetails paymentDetails = (ManagePaymentDTOService.PaymentDetails) System.JSON.deserialize(paymentData, ManagePaymentDTOService.PaymentDetails.class);
         Payment_Configuration__c pconfig;
+        ManagePaymentDTOService.Transaction_Reponse_Wrapper values;
         if(paymentDetails.otherDetails.paymentserviceprovider == null || paymentDetails.otherDetails.paymentserviceprovider == ''){
             throw new AuthorizeNetServiceHelper.PaymentException('Payment Service Provider is not configured. Please contact system administrator.');
         }
-        if(paymentDetails.otherDetails.paymentserviceprovider == 'Authorize.Net'){
-            pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
-        }
+
         API_Tracker__c at = new API_Tracker__c();
 
         try{
+            values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).chargeTransaction(paymentDetails);
 
-            ManagePaymentDTOService.Transaction_Reponse_Wrapper values = AuthorizeNetServiceHelper.authorizeNetChargeTransaction(paymentDetails, pconfig);
             at.Request_Body__c = values.requestString;
             at.Response_Body__c = values.responseString;
             at.Status_Code__c = values.statusCode;
             System.debug('values==>' + values);
-            String responseMessage = '';
 
-            if(values.messages != null && !values.messages.message.isempty()){
-                for(ManagePaymentDTOService.cls_message message : values.messages.message){
-                    responseMessage += 'Code = ' + message.code + ' :: Description = ' + message.text + ' \n';
-                }
-            }
-
-            if(values.transactionResponse != null && values.transactionResponse.messages != null && !values.transactionResponse.messages.isempty()){
-                for(ManagePaymentDTOService.Transaction_response_messages message : values.transactionResponse.messages){
-                    responseMessage += 'Success Code = ' + message.code + ' :: Description = ' + message.description + ' \n';
-                }
-            }
-            responseMessage += '\n';
-
-            if(values.transactionResponse != null && values.transactionResponse.errors != null&& !values.transactionResponse.errors.isempty()){
-                for(ManagePaymentDTOService.cls_error message : values.transactionResponse.errors){
-                    responseMessage += 'Code :: ' + message.errorCode + ' :: Description = ' + message.errorText + '\n';
-                }
-            }
-
-            if(values.messages.resultCode == 'Ok' && (values.transactionResponse.errors == null || values.transactionResponse.errors.isempty())){
+            if(values.issuccess){
                 ctrObj.success = true;
-                ctrObj.authCode = values.transactionResponse.authCode;
-                ctrObj.transactionId = values.transactionResponse.transId;
-                ctrObj.accountNumber = values.transactionResponse.accountNumber;
-                ctrObj.accountType = values.transactionResponse.accountType;
+                ctrObj.authCode = values.authCode;
+                ctrObj.transactionId = values.transId;
+                ctrObj.accountNumber = values.accountNumber;
+                ctrObj.accountType = values.accountType;
 
                 Payment__c paymentObj = new Payment__c();
                 paymentObj.Amount__c = paymentDetails.otherdetails.amount;
@@ -59,8 +38,8 @@ global with sharing class ManagePaymentService {
                 paymentObj.RecordtypeId = Schema.SObjectType.Payment__c.getRecordTypeInfosByName().get('Individual Payment').getRecordTypeId();
 
                 paymentObj.Customer_Id__c = paymentDetails.otherdetails.refId;
-                paymentObj.Card_Type__c = values.transactionResponse.accountType;
-                paymentObj.Card_Number__c = values.transactionResponse.accountNumber;
+                paymentObj.Card_Type__c = values.accountType;
+                paymentObj.Card_Number__c = values.accountNumber;
                 paymentObj.Transaction_Status__c = 'Approved';
         
                 paymentObj.Ship_To_Address__c = paymentDetails.addressdetails.BillingStreet;
@@ -87,7 +66,6 @@ global with sharing class ManagePaymentService {
                 paymentObj.Custom_4__c = paymentDetails.otherDetails.custom4;
 
                 ManagePaymentServiceHelper.handleInsertDML(paymentObj);
-                //insert paymentObj;
                 at.Payment__c = paymentObj.id;
 
         
@@ -102,7 +80,7 @@ global with sharing class ManagePaymentService {
                 ctrObj.country = paymentObj.Bill_To_Country__c;
             }else{
                 ctrObj.success = false;
-                ctrObj.responseText = responseMessage;
+                ctrObj.responseText = values.responseMessage;
             }
 
         }catch(Exception e){
@@ -113,7 +91,6 @@ global with sharing class ManagePaymentService {
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
                 ManagePaymentServiceHelper.handleInsertDML(at);
-                //insert at;
             }
 
         }
@@ -129,82 +106,58 @@ global with sharing class ManagePaymentService {
         tr.message = '';
         if(!paymentList.isempty()){
             Payment_Configuration__c pconfig;
-            if(paymentList[0].Source__c == 'Authorize.Net'){
-                pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
-            }
+            ManagePaymentDTOService.Transaction_Reponse_Wrapper values;
+            pconfig = getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
+
+            values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentList[0].Source__c.replace('.', '')).refundTransaction(paymentList[0]);
+
     
             API_Tracker__c at = new API_Tracker__c();
             at.Payment__c = paymentList[0].id;
 
-            ManagePaymentDTOService.Transaction_Reponse_Wrapper values = AuthorizeNetServiceHelper.authorizeNetRefundTransaction(paymentList[0], pconfig);
 			System.debug('values==>' + values);
             at.Request_Body__c = values.requestString;
             at.Response_Body__c = values.responseString;
             at.Status_Code__c = values.statusCode;
-
-            String responseMessage = '';
-
-            if(values.messages != null && !values.messages.message.isempty()){
-                for(ManagePaymentDTOService.cls_message message : values.messages.message){
-                    responseMessage += 'Code = ' + message.code + ' :: Description = ' + message.text + ' \n';
-                }
-            }
-    
             ManagePaymentDTOService.ChargeTransactionResponse ctrObj = new ManagePaymentDTOService.ChargeTransactionResponse();
-
-            if(values.transactionResponse != null && values.transactionResponse.messages != null && !values.transactionResponse.messages.isempty()){
-                for(ManagePaymentDTOService.Transaction_response_messages message : values.transactionResponse.messages){
-                    responseMessage += 'Success Code = ' + message.code + ' :: Description = ' + message.description + ' \n';
-                }
-            }
-            responseMessage += '\n';
-    
-            if(values.transactionResponse != null && values.transactionResponse.errors != null&& !values.transactionResponse.errors.isempty()){
-                for(ManagePaymentDTOService.cls_error message : values.transactionResponse.errors){
-                    responseMessage += 'Code :: ' + message.errorCode + ' :: Description = ' + message.errorText + '\n';
-                }
-            }
-    
-            if(ctrObj.success != false && values.messages.resultCode == 'Ok' && (values.transactionResponse.errors == null || values.transactionResponse.errors.isempty())){
+            if(values.issuccess){
                 ctrObj.success = true;
-                ctrObj.authCode = values.transactionResponse.authCode;
-                ctrObj.transactionId = values.transactionResponse.transId;
-                ctrObj.accountNumber = values.transactionResponse.accountNumber;
-                ctrObj.accountType = values.transactionResponse.accountType;
+                ctrObj.authCode = values.authCode;
+                ctrObj.transactionId = values.transId;
+                ctrObj.accountNumber = values.accountNumber;
+                ctrObj.accountType = values.accountType;
             }else{
                 ctrObj.success = false;
             }
-            ctrObj.responseText = responseMessage;
+            ctrObj.responseText = values.responseMessage;
             Payment__c originalPaymentObj = new Payment__c();
             List<Payment__c> upsertPaymentList = new List<Payment__c>();
             if(!ctrObj.success){
-                upsertPaymentList.add(new Payment__c (id = paymentId, Refund_Response__c = responseMessage, Refund_Result_Code__c = values.messages.resultCode));
-                at.Error_Message__c = responseMessage;
+                upsertPaymentList.add(new Payment__c (id = paymentId, Refund_Response__c = values.responseMessage, Refund_Result_Code__c = values.resultCode));
+                at.Error_Message__c = values.responseMessage;
 
             }else{
-                upsertPaymentList.add( new Payment__c (id = paymentId, Refund_Response__c = responseMessage, Refund_Result_Code__c = values.messages.resultCode, Refunded__c = true));
+                upsertPaymentList.add( new Payment__c (id = paymentId, Refund_Response__c = values.responseMessage, Refund_Result_Code__c = values.resultCode, Refunded__c = true));
 
                 Payment__c paymentclone = (Payment__c)paymentList[0].clone(false, false, false, false);
                 paymentclone.Amount__c = -paymentclone.Amount__c;
-                paymentclone.Transaction_Id__c = values.transactionResponse.transId;
+                paymentclone.Transaction_Id__c = values.transId;
                 paymentclone.Transaction_Status__c = 'Refunded';
                 paymentclone.Original_Payment__c = paymentList[0].id;
-                paymentclone.Refund_Result_Code__c = values.messages.resultCode;
-                paymentclone.Refund_Response__c = responseMessage;
+                paymentclone.Refund_Result_Code__c = values.resultCode;
+                paymentclone.Refund_Response__c = values.responseMessage;
                 paymentclone.Refunded__c = true;
                 upsertPaymentList.add(paymentclone);
             }
 
-            //upsert upsertPaymentList;
             ManagePaymentServiceHelper.handleUpsertDML(upsertPaymentList);
 
 
             tr.success = ctrObj.success;
-            tr.message = responseMessage;
+            tr.message = values.responseMessage;
 
 
             if(pconfig == null || pconfig.Enable_Logging__c){
-                //insert at;
                 ManagePaymentServiceHelper.handleInsertDML(at);
             }
 
@@ -220,88 +173,56 @@ global with sharing class ManagePaymentService {
 
         List<Payment__c> paymentList = Database.query('SELECT SObect_API_Name__c, Amount__c,Bill_To_Address__c,Bill_To_City__c,Bill_To_Country__c,Bill_To_First_Name__c,Bill_To_Last_Name__c,Bill_To_Phone__c,Bill_To_State__c,Bill_To_Zip__c,Card_Number__c,Card_Type__c,CreatedById,CreatedDate,Customer_Id__c,Email__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Name,Opportunity__c,OwnerId,Payment_Date__c,Refund_Response__c,Refund_Result_Code__c,Ship_To_Address__c,Ship_To_City__c,Ship_To_Country__c,Ship_To_State__c,Ship_To_Zip__c,Source__c,SystemModstamp,Transaction_Id__c,Transaction_Status__c from Payment__c where id =: paymentId');
         ManagePaymentDTOService.TransactionResponse tr = new ManagePaymentDTOService.TransactionResponse();
-        tr.success = false;
         tr.message = '';
         if(!paymentList.isempty()){
 
-            Payment_Configuration__c pconfig;
+             Payment_Configuration__c pconfig = getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
+             ManagePaymentDTOService.Transaction_Reponse_Wrapper values;
+            values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentList[0].Source__c.replace('.', '')).voidTransaction(paymentList[0]);
 
-            if(paymentList[0].Source__c == 'Authorize.Net'){
-                pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
-            }
-    
+
             API_Tracker__c at = new API_Tracker__c();
             at.Payment__c = paymentList[0].id;
-
-            ManagePaymentDTOService.Transaction_Reponse_Wrapper values = AuthorizeNetServiceHelper.authorizeNetVoidTransaction(paymentList[0], pconfig);
 
 			System.debug('values==>' + values);
             at.Request_Body__c = values.requestString;
             at.Response_Body__c = values.responseString;
             at.Status_Code__c = values.statusCode;
 
-            String responseMessage = '';
             ManagePaymentDTOService.ChargeTransactionResponse ctrObj = new ManagePaymentDTOService.ChargeTransactionResponse();
             
-            if(values.messages != null && !values.messages.message.isempty()){
-                for(ManagePaymentDTOService.cls_message message : values.messages.message){
-                    if(message.code != '1'){
-                        ctrObj.success = false;
-                    }else{
-                        ctrObj.success = true;
-                    }
-                    responseMessage += 'Code = ' + message.code + ' :: Description = ' + message.text + ' \n';
-                }
-            }
-    
-            if(values.transactionResponse != null && values.transactionResponse.messages != null && !values.transactionResponse.messages.isempty()){
-                for(ManagePaymentDTOService.Transaction_response_messages message : values.transactionResponse.messages){
-                    responseMessage += 'Success Code = ' + message.code + ' :: Description = ' + message.description + ' \n';
-                }
-            }
-            responseMessage += '\n';
-    
-            if(values.transactionResponse != null && values.transactionResponse.errors != null&& !values.transactionResponse.errors.isempty()){
-                for(ManagePaymentDTOService.cls_error message : values.transactionResponse.errors){
-                    responseMessage += 'Code :: ' + message.errorCode + ' :: Description = ' + message.errorText + '\n';
-                }
-            }
-    
-            if(values.messages.resultCode == 'Ok' && (values.transactionResponse.errors == null || values.transactionResponse.errors.isempty())){
+            if(values.issuccess){
                 ctrObj.success = true;
-                ctrObj.authCode = values.transactionResponse.authCode;
-                ctrObj.transactionId = values.transactionResponse.transId;
-                ctrObj.accountNumber = values.transactionResponse.accountNumber;
-                ctrObj.accountType = values.transactionResponse.accountType;
+                ctrObj.authCode = values.authCode;
+                ctrObj.transactionId = values.transId;
+                ctrObj.accountNumber = values.accountNumber;
+                ctrObj.accountType = values.accountType;
             }else{
                 ctrObj.success = false;
             }
-            ctrObj.responseText = responseMessage;
+            ctrObj.responseText = values.responseMessage;
             Payment__c originalPaymentObj = new Payment__c();
             List<Payment__c> upsertPaymentList = new List<Payment__c>();
             if(!ctrObj.success){
-                upsertPaymentList.add(new Payment__c (id = paymentId, Void_Response__c = responseMessage, Void_Result_Code__c = values.messages.resultCode));
+                upsertPaymentList.add(new Payment__c (id = paymentId, Void_Response__c = values.responseMessage, Void_Result_Code__c = values.resultCode));
             }else{
-                upsertPaymentList.add( new Payment__c (id = paymentId, Void_Response__c = responseMessage, Void_Result_Code__c = values.messages.resultCode, Voided__c = true));
+                upsertPaymentList.add( new Payment__c (id = paymentId, Void_Response__c = values.responseMessage, Void_Result_Code__c = values.resultCode, Voided__c = true));
 
                 Payment__c paymentclone = (Payment__c)paymentList[0].clone(false, false, false, false);
                 paymentclone.Amount__c = -paymentclone.Amount__c;
-                paymentclone.Transaction_Id__c = values.transactionResponse.transId;
+                paymentclone.Transaction_Id__c = values.transId;
                 paymentclone.Transaction_Status__c = 'Voided';
                 paymentclone.Original_Payment__c = paymentList[0].id;
-                paymentclone.Void_Result_Code__c = values.messages.resultCode;
-                paymentclone.Void_Response__c = responseMessage;
+                paymentclone.Void_Result_Code__c = values.resultCode;
+                paymentclone.Void_Response__c = values.responseMessage;
                 paymentclone.Voided__c = true;
                 upsertPaymentList.add(paymentclone);
             }
             ManagePaymentServiceHelper.handleUpsertDML(upsertPaymentList);
-            //upsert upsertPaymentList;
-            tr.success = ctrObj.success;
-            tr.message = responseMessage;
+            tr.message = values.responseMessage;
+            tr.success = values.issuccess;
 
             if(pconfig == null || pconfig.Enable_Logging__c){
-
-                //insert at;
                 ManagePaymentServiceHelper.handleInsertDML(at);
             }
 
@@ -323,13 +244,10 @@ global with sharing class ManagePaymentService {
             if(paymentDetails.otherDetails.paymentserviceprovider == null || paymentDetails.otherDetails.paymentserviceprovider == ''){
                 throw new AuthorizeNetServiceHelper.PaymentException('Payment Service Provider is not configured. Please contact system administrator.');
             }
-            if(paymentDetails.otherDetails.paymentserviceprovider == 'Authorize.Net'){
-                pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
-            }
+            pconfig = getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
-            //Payment_Configuration__c pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+            ManagePaymentDTOService.Sub_Reponse_Wrapper values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).createSubscription(paymentDetails);
 
-            ManagePaymentDTOService.Sub_Reponse_Wrapper values = AuthorizeNetServiceHelper.authorizeNetCreateSubscription(paymentDetails, pconfig);        
             at.Request_Body__c = values.requestString;
             at.Response_Body__c = values.responseString;
             at.Status_Code__c = values.statusCode;
@@ -380,8 +298,6 @@ global with sharing class ManagePaymentService {
 
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
-
-                //insert at;
                 ManagePaymentServiceHelper.handleInsertDML(at);
             }
 
@@ -401,16 +317,15 @@ global with sharing class ManagePaymentService {
 
         try{
             if(paymentDetails.otherDetails.paymentserviceprovider == 'Authorize.Net'){
-                pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+                pconfig = getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
             }
     
-            ManagePaymentDTOService.Sub_Reponse_Wrapper values = AuthorizeNetServiceHelper.authorizeNetUpdateSubscription(paymentDetails, pconfig);
+            ManagePaymentDTOService.Sub_Reponse_Wrapper values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).updateSubscription(paymentDetails);
+
             at.Request_Body__c = values.requestString;
             at.Response_Body__c = values.responseString;
             at.Status_Code__c = values.statusCode;
             at.Subscription__r = new Subscription__c(Subscription_Id__c = paymentDetails.otherdetails.subscriptionId);
-
-            
 
             System.debug('values==>' + values);
             String responseMessage = '';
@@ -440,8 +355,6 @@ global with sharing class ManagePaymentService {
 
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
-
-                //insert at;
                 ManagePaymentServiceHelper.handleInsertDML(at);
             }
 
@@ -465,10 +378,11 @@ global with sharing class ManagePaymentService {
             }
 
             if(paymentDetails.otherDetails.paymentserviceprovider == 'Authorize.Net'){
-                pconfig = AuthorizeNetServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+                pconfig = getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
             }
     
-            ManagePaymentDTOService.SubscriptionWrapper values = AuthorizeNetServiceHelper.authorizeNetCancelubscription(paymentDetails, pconfig);
+            ManagePaymentDTOService.SubscriptionWrapper values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).cancelSubscription(paymentDetails);
+
             at.Request_Body__c = values.requestString;
             at.Response_Body__c = values.responseString;
             at.Status_Code__c = values.statusCode;
@@ -482,7 +396,6 @@ global with sharing class ManagePaymentService {
                     responseMessage += 'Code = ' + message.code + ' :: Description = ' + message.text + ' \n';
                 }
             }
-
 
             responseMessage += '\n';
 
@@ -503,8 +416,6 @@ global with sharing class ManagePaymentService {
 
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
-
-                //insert at;
                 ManagePaymentServiceHelper.handleInsertDML(at);
             }
 
@@ -512,24 +423,19 @@ global with sharing class ManagePaymentService {
         return ctrObj;
     }
 
-
-
-
     @AuraEnabled
     public static ManagePaymentDTOService.SubscriptionWrapper getSubscriptions(String paymentData){
         System.debug('paymentData' + paymentData);
         ManagePaymentDTOService.SubscriptionTransactionResponse ctrObj = new ManagePaymentDTOService.SubscriptionTransactionResponse();
-
         ManagePaymentDTOService.PaymentDetails paymentDetails = (ManagePaymentDTOService.PaymentDetails) System.JSON.deserialize(paymentData, ManagePaymentDTOService.PaymentDetails.class);
         ManagePaymentDTOService.cls_transactionRequest tr = new ManagePaymentDTOService.cls_transactionRequest();
-        return AuthorizeNetServiceHelper.authorizeNetGetSubscriptions(paymentDetails);
-
+        return ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).getSubscriptions(paymentDetails);
     }
 
     @AuraEnabled
     public static ManagePaymentDTOService.PaymentData retrieveRecord(Id recordId, String sobjectAPIName, String paymentserviceprovider){
 
-        Payment_Configuration__c pconfig = AuthorizeNetServiceHelper.getPaymentConfig(sobjectAPIName, paymentserviceprovider); 
+        Payment_Configuration__c pconfig = getPaymentConfig(sobjectAPIName, paymentserviceprovider);
         String select1 = 'select ';
         String query =  (pconfig.Address_API_Name__c != null ? pconfig.Address_API_Name__c +',' : '');
         query += (pconfig.Amount_API_Name__c != null ? pconfig.Amount_API_Name__c +',' : '');
@@ -580,7 +486,6 @@ global with sharing class ManagePaymentService {
         pdobj.custom4 = pconfig.Custom_4__c;
 
         pdobj.externalPaymentURL = pconfig.Community_URL__c;
-
         pdobj.externalPaymentURL += '?amount=' + (pdObj.amount != null ? pdObj.amount : 0);
         pdobj.externalPaymentURL += '&street=' + (pdobj.street != null ? pdobj.street : '');
         pdobj.externalPaymentURL += '&city=' + (pdobj.city != null ? pdobj.city : '');
@@ -631,6 +536,23 @@ global with sharing class ManagePaymentService {
     public static boolean hasSObjectField(String fieldName, SObject so){
         return so.getSobjectType().getDescribe().fields.getMap().keySet().contains(fieldName.toLowerCase());
     }
-//Attempt to de-reference a null object Class.trackmev1.ManagePaymentService.hasSObjectField: line 600, column 1 Class.trackmev1.ManagePaymentService.fetchRecordData: line 595, column 1 Class.trackmev1.ManagePaymentService.retrieveRecord: line 547, column 1
+
+    static Payment_Configuration__c pconfig;
+    public static Payment_Configuration__c getPaymentConfig(String objectApiName, String paymentserviceprovider) {
+        if(pconfig == null){
+
+            List<Payment_Configuration__c> pconfiglist = [select Secret_Key__c,Sub_Header_API_Name__c, Custom_1__c, Custom_2__c, Custom_3__c, Custom_4__c, External_Payment_URL__c, Community_URL__c, Enable_Logging__c, Auth_API_Login_Id__c, Endpoint_URL__c, Auth_Transaction_Key__c, 
+            SObject_Payment_Lookup_API_Name__c, Object_Api_Name__c, Address_API_Name__c, Amount_API_Name__c,
+            City_API_Name__c,Company_API_Name__c, Country_API_Name__c, Customer_Id_API_Name__c, Email_API_Name__c,First_Name_API_Name__c, Last_Name_API_Name__c,
+                Product_API_Name__c, RefId_Api_Name__c, Return_URL__c,Return_URL_API_Name__c, State_API_Name__c, Zip_API_Name__c from Payment_Configuration__c where name = :paymentserviceprovider AND Object_Api_Name__c =: objectApiName];
+            if(pconfiglist == null || pconfiglist.size() == 0 ){
+                throw new PaymentException('Payment Service Provider details have not configured, please contact your system admnistrator for more details.');
+            }
+            pconfig = pconfiglist[0];
+        }
+        return pconfig;
+    }
+
+    public class PaymentException extends Exception{}
 
 }

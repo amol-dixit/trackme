@@ -49,7 +49,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
     @track showexternalpaymentlink = false;
     @api showexternalpaymentlinksection = false;
     @api recordId;
-    custom1;custom2;custom3;custom4;
+    custom1;custom2;custom3;custom4;logourl;
   
     @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
@@ -75,6 +75,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
     initUrlParams(){
 
       this.amount = this.urlStateParameters.amount;
+      this.logourl = this.urlStateParameters.logourl;
       console.log('INIT==>', this.urlStateParameters);
 
       this.address.BillingStreet = this.urlStateParameters.street;

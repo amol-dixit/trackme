@@ -41,6 +41,16 @@ private class ManagePaymentServiceTest {
               
               insert pconfig;
 
+              pconfig = new Payment_Configuration__c();
+              if(log)
+              pconfig.Enable_Logging__c = true;
+              pconfig.Name = 'Stripe';
+              pconfig.Object_Api_Name__c = 'Opportunity';
+              pconfig.Secret_Key__c = 'Secret_Key__c';
+              pconfig.Amount_API_Name__c = 'Amount';
+              
+              insert pconfig;
+
         }
     
         static testMethod void testChargeTransaction_Card_Positive() {
