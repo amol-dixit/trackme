@@ -308,6 +308,17 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Secret_Key__c</fullName>
+        <externalId>false</externalId>
+        <label>Secret Key</label>
+        <length>255</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Enable_Logging__c</fullName>
         <defaultValue>false</defaultValue>
         <externalId>false</externalId>

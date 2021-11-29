@@ -76,8 +76,8 @@ export default class CardInput extends LightningElement {
   @track cardHolderFirstNameValid = false;
   @track cardHolderLastNameValid = false;
   @track cardExpiryValid = false;
-  @track cardHolderFirstName;
-  @track cardHolderLastName;
+  @api cardHolderFirstName;
+  @api cardHolderLastName;
 
   @track cardNumberTouched = false;
   @track cardEmailTouched = false;
