@@ -45,7 +45,7 @@
         </rules>
     </decisions>
     <interviewLabel>Payment Service Config Selection {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Payment Service Config Selection v21</label>
+    <label>Payment Service Config Selection v30</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -152,15 +152,33 @@
             </value>
         </inputAssignments>
         <inputAssignments>
+            <field>Enable_Encrypted_Payment_URL__c</field>
+            <value>
+                <elementReference>Enable_Encrypted_Payment_Link_New</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
             <field>Enable_Logging__c</field>
             <value>
                 <elementReference>Track_Callback_Response_0_0_0</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
+            <field>Encryption_Key__c</field>
+            <value>
+                <elementReference>Encryption_Key_New</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
             <field>Endpoint_URL__c</field>
             <value>
                 <elementReference>EndpointURL_0_0_0.value</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Expiration_Days__c</field>
+            <value>
+                <elementReference>Payment_Link_Expiration_Days_New</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -173,6 +191,12 @@
             <field>Last_Name_API_Name__c</field>
             <value>
                 <elementReference>Last_Name_API_0_0</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Logourl_API_Name__c</field>
+            <value>
+                <elementReference>LogoURL_API_Name_New</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -215,6 +239,12 @@
             <field>SObject_Payment_Lookup_API_Name__c</field>
             <value>
                 <elementReference>Object_Payment_Lookup_API_Name</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Secret_Key__c</field>
+            <value>
+                <elementReference>Secret_Key_New</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -361,15 +391,33 @@
             </value>
         </inputAssignments>
         <inputAssignments>
+            <field>Enable_Encrypted_Payment_URL__c</field>
+            <value>
+                <elementReference>Enable_Encrypted_Payment_Link</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
             <field>Enable_Logging__c</field>
             <value>
                 <elementReference>Track_Callback_Response_0_0</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
+            <field>Encryption_Key__c</field>
+            <value>
+                <elementReference>Encryption_Key</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
             <field>Endpoint_URL__c</field>
             <value>
                 <elementReference>EndpointURL_0_0.value</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Expiration_Days__c</field>
+            <value>
+                <elementReference>Payment_Link_Expiration_Days</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -382,6 +430,12 @@
             <field>Last_Name_API_Name__c</field>
             <value>
                 <elementReference>Last_Name_API_0</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Logourl_API_Name__c</field>
+            <value>
+                <elementReference>LogoURL_API_Name</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -424,6 +478,12 @@
             <field>SObject_Payment_Lookup_API_Name__c</field>
             <value>
                 <elementReference>Object_Payment_Lookup_API_Name</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Secret_Key__c</field>
+            <value>
+                <elementReference>Secret_Key</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -537,104 +597,189 @@
             <fieldType>DisplayText</fieldType>
         </fields>
         <fields>
-            <name>EndpointURL_0_0</name>
-            <extensionName>flowruntime:url</extensionName>
-            <fieldType>ComponentInstance</fieldType>
-            <inputParameters>
-                <name>label</name>
-                <value>
-                    <stringValue>EndpointURL</stringValue>
-                </value>
-            </inputParameters>
-            <inputParameters>
-                <name>value</name>
-                <value>
-                    <elementReference>Get_Payment_Config.Endpoint_URL__c</elementReference>
-                </value>
-            </inputParameters>
-            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
-            <isRequired>true</isRequired>
-            <storeOutputAutomatically>true</storeOutputAutomatically>
-        </fields>
-        <fields>
-            <name>API_Login_Id_0_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Auth_API_Login_Id__c</elementReference>
-            </defaultValue>
-            <fieldText>API Login Id</fieldText>
-            <fieldType>InputField</fieldType>
+            <name>Payment_Service_Config_Selection_0_0_Section1</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>Payment_Service_Config_Selection_0_0_Section1_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>EndpointURL_0_0</name>
+                    <extensionName>flowruntime:url</extensionName>
+                    <fieldType>ComponentInstance</fieldType>
+                    <inputParameters>
+                        <name>label</name>
+                        <value>
+                            <stringValue>EndpointURL</stringValue>
+                        </value>
+                    </inputParameters>
+                    <inputParameters>
+                        <name>value</name>
+                        <value>
+                            <elementReference>Get_Payment_Config.Endpoint_URL__c</elementReference>
+                        </value>
+                    </inputParameters>
+                    <inputParameters>
+                        <name>required</name>
+                        <value>
+                            <booleanValue>true</booleanValue>
+                        </value>
+                    </inputParameters>
+                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+                    <isRequired>true</isRequired>
+                    <storeOutputAutomatically>true</storeOutputAutomatically>
+                </fields>
+                <fields>
+                    <name>API_Login_Id_0_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Auth_API_Login_Id__c</elementReference>
+                    </defaultValue>
+                    <fieldText>API Login Id</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                    <visibilityRule>
+                        <conditionLogic>and</conditionLogic>
+                        <conditions>
+                            <leftValueReference>Payment_selection</leftValueReference>
+                            <operator>EqualTo</operator>
+                            <rightValue>
+                                <stringValue>Authorize.Net</stringValue>
+                            </rightValue>
+                        </conditions>
+                    </visibilityRule>
+                </fields>
+                <fields>
+                    <name>Return_URL_0_0</name>
+                    <extensionName>flowruntime:url</extensionName>
+                    <fieldType>ComponentInstance</fieldType>
+                    <inputParameters>
+                        <name>label</name>
+                        <value>
+                            <stringValue>Return URL</stringValue>
+                        </value>
+                    </inputParameters>
+                    <inputParameters>
+                        <name>value</name>
+                        <value>
+                            <elementReference>Get_Payment_Config.Return_URL__c</elementReference>
+                        </value>
+                    </inputParameters>
+                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+                    <isRequired>true</isRequired>
+                    <storeOutputAutomatically>true</storeOutputAutomatically>
+                </fields>
+                <fields>
+                    <name>Track_Callback_Response_0_0</name>
+                    <dataType>Boolean</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Enable_Logging__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Enable Logging?</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                </fields>
+                <fields>
+                    <name>Enable_Encrypted_Payment_Link</name>
+                    <dataType>Boolean</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Enable_Encrypted_Payment_URL__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Enable Encrypted Payment Link</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Payment_Service_Config_Selection_0_0_Section1_Column2</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Secret_Key</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Secret_Key__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Secret Key</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                    <visibilityRule>
+                        <conditionLogic>and</conditionLogic>
+                        <conditions>
+                            <leftValueReference>Payment_selection</leftValueReference>
+                            <operator>EqualTo</operator>
+                            <rightValue>
+                                <elementReference>Stripe</elementReference>
+                            </rightValue>
+                        </conditions>
+                    </visibilityRule>
+                </fields>
+                <fields>
+                    <name>Transaction_Key_0_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Auth_Transaction_Key__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Transaction Key</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                    <visibilityRule>
+                        <conditionLogic>and</conditionLogic>
+                        <conditions>
+                            <leftValueReference>Payment_selection</leftValueReference>
+                            <operator>EqualTo</operator>
+                            <rightValue>
+                                <stringValue>Authorize.Net</stringValue>
+                            </rightValue>
+                        </conditions>
+                    </visibilityRule>
+                </fields>
+                <fields>
+                    <name>Payment_Community_URL</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Community_URL__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Payment Community URL</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Payment_Link_Expiration_Days</name>
+                    <dataType>Number</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Expiration_Days__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Payment Link Expiration Days</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                    <scale>0</scale>
+                </fields>
+                <fields>
+                    <name>Encryption_Key</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Encryption_Key__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Encryption Key</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <helpText>&lt;p&gt;Has to be 16 characters&lt;/p&gt;</helpText>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
             <isRequired>false</isRequired>
-            <visibilityRule>
-                <conditionLogic>and</conditionLogic>
-                <conditions>
-                    <leftValueReference>Payment_selection</leftValueReference>
-                    <operator>EqualTo</operator>
-                    <rightValue>
-                        <stringValue>Authorize.Net</stringValue>
-                    </rightValue>
-                </conditions>
-            </visibilityRule>
-        </fields>
-        <fields>
-            <name>Transaction_Key_0_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Auth_Transaction_Key__c</elementReference>
-            </defaultValue>
-            <fieldText>Transaction Key</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-            <visibilityRule>
-                <conditionLogic>and</conditionLogic>
-                <conditions>
-                    <leftValueReference>Payment_selection</leftValueReference>
-                    <operator>EqualTo</operator>
-                    <rightValue>
-                        <stringValue>Authorize.Net</stringValue>
-                    </rightValue>
-                </conditions>
-            </visibilityRule>
-        </fields>
-        <fields>
-            <name>Return_URL_0_0</name>
-            <extensionName>flowruntime:url</extensionName>
-            <fieldType>ComponentInstance</fieldType>
-            <inputParameters>
-                <name>label</name>
-                <value>
-                    <stringValue>Return URL</stringValue>
-                </value>
-            </inputParameters>
-            <inputParameters>
-                <name>value</name>
-                <value>
-                    <elementReference>Get_Payment_Config.Return_URL__c</elementReference>
-                </value>
-            </inputParameters>
-            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
-            <isRequired>true</isRequired>
-            <storeOutputAutomatically>true</storeOutputAutomatically>
-        </fields>
-        <fields>
-            <name>Payment_Community_URL</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Community_URL__c</elementReference>
-            </defaultValue>
-            <fieldText>Payment Community URL</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Track_Callback_Response_0_0</name>
-            <dataType>Boolean</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Enable_Logging__c</elementReference>
-            </defaultValue>
-            <fieldText>Enable Logging?</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>true</isRequired>
         </fields>
         <fields>
             <name>Field_Mapping_Header_0</name>
@@ -642,193 +787,230 @@
             <fieldType>DisplayText</fieldType>
         </fields>
         <fields>
-            <name>Product_Field_API_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Product_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Product Field API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Amount_Field_API_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Amount_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Amount Field API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Unique_Record_Id_API_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.RefId_Api_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Unique Record Id API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Customer_Id_API_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Customer_Id_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Customer Id API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Company_API_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Company_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Company API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Email_Field_API_Name_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Email_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Email Field API Name</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>First_Name_API_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.First_Name_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>First Name API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Last_Name_API_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Last_Name_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Last Name API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Address_API_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Address_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Address API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>City_API_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.City_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>City API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>State_API_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.State_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>State API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>ZIP_API_Name_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Zip_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>ZIP API Name</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Country_API_Name_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Country_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Country API Name</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Return_URL_API_Name_0</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Return_URL_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Return URL API Name</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Custom_1</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Custom_1__c</elementReference>
-            </defaultValue>
-            <fieldText>Custom 1</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Custom_2</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Custom_2__c</elementReference>
-            </defaultValue>
-            <fieldText>Custom 2</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Custom_3</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Custom_3__c</elementReference>
-            </defaultValue>
-            <fieldText>Custom 3</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Custom_4</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Custom_4__c</elementReference>
-            </defaultValue>
-            <fieldText>Custom 4</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Sub_Header_API_Name_Existing</name>
-            <dataType>String</dataType>
-            <defaultValue>
-                <elementReference>Get_Payment_Config.Sub_Header_API_Name__c</elementReference>
-            </defaultValue>
-            <fieldText>Sub Header API Name</fieldText>
-            <fieldType>InputField</fieldType>
+            <name>Payment_Service_Config_Selection_0_0_Section2</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>Payment_Service_Config_Selection_0_0_Section2_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Product_Field_API_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Product_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Product Field API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Unique_Record_Id_API_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.RefId_Api_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Unique Record Id API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Company_API_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Company_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Company API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>First_Name_API_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.First_Name_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>First Name API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Address_API_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Address_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Address API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>State_API_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.State_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>State API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Country_API_Name_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Country_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Country API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Sub_Header_API_Name_Existing</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Sub_Header_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Sub Header API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Custom_1</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Custom_1__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Custom 1</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Custom_3</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Custom_3__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Custom 3</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Payment_Service_Config_Selection_0_0_Section2_Column2</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Amount_Field_API_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Amount_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Amount Field API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Customer_Id_API_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Customer_Id_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Customer Id API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Email_Field_API_Name_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Email_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Email Field API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Last_Name_API_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Last_Name_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Last Name API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>City_API_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.City_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>City API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>ZIP_API_Name_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Zip_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>ZIP API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Return_URL_API_Name_0</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Return_URL_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Return URL API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>LogoURL_API_Name</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Logourl_API_Name__c</elementReference>
+                    </defaultValue>
+                    <fieldText>LogoURL API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Custom_2</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Custom_2__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Custom 2</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Custom_4</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Custom_4__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Custom 4</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
             <isRequired>false</isRequired>
         </fields>
         <showFooter>true</showFooter>
@@ -851,73 +1033,149 @@
             <fieldType>DisplayText</fieldType>
         </fields>
         <fields>
-            <name>EndpointURL_0_0_0</name>
-            <extensionName>flowruntime:url</extensionName>
-            <fieldType>ComponentInstance</fieldType>
-            <inputParameters>
-                <name>label</name>
-                <value>
-                    <stringValue>EndpointURL</stringValue>
-                </value>
-            </inputParameters>
-            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
-            <isRequired>true</isRequired>
-            <storeOutputAutomatically>true</storeOutputAutomatically>
-        </fields>
-        <fields>
-            <name>API_Login_Id_0_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>API Login Id</fieldText>
-            <fieldType>InputField</fieldType>
+            <name>Payment_Service_Config_Selection_0_0_0_Section1</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>Payment_Service_Config_Selection_0_0_0_Section1_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>EndpointURL_0_0_0</name>
+                    <extensionName>flowruntime:url</extensionName>
+                    <fieldType>ComponentInstance</fieldType>
+                    <inputParameters>
+                        <name>label</name>
+                        <value>
+                            <stringValue>EndpointURL</stringValue>
+                        </value>
+                    </inputParameters>
+                    <inputParameters>
+                        <name>required</name>
+                        <value>
+                            <booleanValue>true</booleanValue>
+                        </value>
+                    </inputParameters>
+                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+                    <isRequired>true</isRequired>
+                    <storeOutputAutomatically>true</storeOutputAutomatically>
+                </fields>
+                <fields>
+                    <name>API_Login_Id_0_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>API Login Id</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                    <visibilityRule>
+                        <conditionLogic>and</conditionLogic>
+                        <conditions>
+                            <leftValueReference>Payment_selection</leftValueReference>
+                            <operator>EqualTo</operator>
+                            <rightValue>
+                                <stringValue>Authorize.Net</stringValue>
+                            </rightValue>
+                        </conditions>
+                    </visibilityRule>
+                </fields>
+                <fields>
+                    <name>Return_URL_0_0_0</name>
+                    <extensionName>flowruntime:url</extensionName>
+                    <fieldType>ComponentInstance</fieldType>
+                    <inputParameters>
+                        <name>label</name>
+                        <value>
+                            <stringValue>Return URL</stringValue>
+                        </value>
+                    </inputParameters>
+                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+                    <isRequired>true</isRequired>
+                    <storeOutputAutomatically>true</storeOutputAutomatically>
+                </fields>
+                <fields>
+                    <name>Track_Callback_Response_0_0_0</name>
+                    <dataType>Boolean</dataType>
+                    <fieldText>Enable Logging?</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                </fields>
+                <fields>
+                    <name>Enable_Encrypted_Payment_Link_New</name>
+                    <dataType>Boolean</dataType>
+                    <fieldText>Enable Encrypted Payment Link New</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Payment_Service_Config_Selection_0_0_0_Section1_Column2</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Secret_Key_New</name>
+                    <dataType>String</dataType>
+                    <fieldText>Secret Key</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                    <visibilityRule>
+                        <conditionLogic>and</conditionLogic>
+                        <conditions>
+                            <leftValueReference>Payment_selection</leftValueReference>
+                            <operator>EqualTo</operator>
+                            <rightValue>
+                                <elementReference>Stripe</elementReference>
+                            </rightValue>
+                        </conditions>
+                    </visibilityRule>
+                </fields>
+                <fields>
+                    <name>Transaction_Key_0_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Transaction Key</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                    <visibilityRule>
+                        <conditionLogic>and</conditionLogic>
+                        <conditions>
+                            <leftValueReference>Payment_selection</leftValueReference>
+                            <operator>EqualTo</operator>
+                            <rightValue>
+                                <stringValue>Authorize.Net</stringValue>
+                            </rightValue>
+                        </conditions>
+                    </visibilityRule>
+                </fields>
+                <fields>
+                    <name>Payment_Link_Expiration_Days_New</name>
+                    <dataType>Number</dataType>
+                    <fieldText>Payment Link Expiration Days New</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                    <scale>0</scale>
+                </fields>
+                <fields>
+                    <name>Encryption_Key_New</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <stringValue>trackmepaymentss</stringValue>
+                    </defaultValue>
+                    <fieldText>Encryption Key</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <helpText>&lt;p&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgb(62, 62, 60);&quot;&gt;Has to be 16 characters&lt;/span&gt;&lt;/p&gt;</helpText>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
             <isRequired>false</isRequired>
-            <visibilityRule>
-                <conditionLogic>and</conditionLogic>
-                <conditions>
-                    <leftValueReference>Payment_selection</leftValueReference>
-                    <operator>EqualTo</operator>
-                    <rightValue>
-                        <stringValue>Authorize.Net</stringValue>
-                    </rightValue>
-                </conditions>
-            </visibilityRule>
-        </fields>
-        <fields>
-            <name>Transaction_Key_0_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Transaction Key</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-            <visibilityRule>
-                <conditionLogic>and</conditionLogic>
-                <conditions>
-                    <leftValueReference>Payment_selection</leftValueReference>
-                    <operator>EqualTo</operator>
-                    <rightValue>
-                        <stringValue>Authorize.Net</stringValue>
-                    </rightValue>
-                </conditions>
-            </visibilityRule>
-        </fields>
-        <fields>
-            <name>Return_URL_0_0_0</name>
-            <extensionName>flowruntime:url</extensionName>
-            <fieldType>ComponentInstance</fieldType>
-            <inputParameters>
-                <name>label</name>
-                <value>
-                    <stringValue>Return URL</stringValue>
-                </value>
-            </inputParameters>
-            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
-            <isRequired>true</isRequired>
-            <storeOutputAutomatically>true</storeOutputAutomatically>
-        </fields>
-        <fields>
-            <name>Track_Callback_Response_0_0_0</name>
-            <dataType>Boolean</dataType>
-            <fieldText>Enable Logging?</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>true</isRequired>
         </fields>
         <fields>
             <name>Field_Mapping_Header_0_0</name>
@@ -925,136 +1183,170 @@
             <fieldType>DisplayText</fieldType>
         </fields>
         <fields>
-            <name>Product_Field_API_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Product Field API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Amount_Field_API_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Amount Field API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Unique_Record_Id_API_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Unique Record Id API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Customer_Id_API_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Customer Id API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Company_API_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Company API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Email_Field_API_Name_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Email Field API Name</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>First_Name_API_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>First Name API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Last_Name_API_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Last Name API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Address_API_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Address API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>City_API_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>City API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>State_API_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>State API</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>ZIP_API_Name_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>ZIP API Name</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Country_API_Name_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Country API Name</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Return_URL_API_Name_0_0</name>
-            <dataType>String</dataType>
-            <fieldText>Return URL API Name</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Custom_1_New</name>
-            <dataType>String</dataType>
-            <fieldText>Custom 1</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Custom_2_New</name>
-            <dataType>String</dataType>
-            <fieldText>Custom 2</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Custom_3_New</name>
-            <dataType>String</dataType>
-            <fieldText>Custom 3</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Custom_4_New</name>
-            <dataType>String</dataType>
-            <fieldText>Custom 4</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>false</isRequired>
-        </fields>
-        <fields>
-            <name>Sub_Header_API_Name</name>
-            <dataType>String</dataType>
-            <fieldText>Sub Header API Name</fieldText>
-            <fieldType>InputField</fieldType>
+            <name>Payment_Service_Config_Selection_0_0_0_Section2</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>Payment_Service_Config_Selection_0_0_0_Section2_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Amount_Field_API_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Amount Field API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Unique_Record_Id_API_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Unique Record Id API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Company_API_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Company API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>First_Name_API_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>First Name API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Address_API_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Address API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>State_API_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>State API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Country_API_Name_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Country API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Sub_Header_API_Name</name>
+                    <dataType>String</dataType>
+                    <fieldText>Sub Header API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Custom_1_New</name>
+                    <dataType>String</dataType>
+                    <fieldText>Custom 1</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Custom_3_New</name>
+                    <dataType>String</dataType>
+                    <fieldText>Custom 3</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Payment_Service_Config_Selection_0_0_0_Section2_Column2</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Product_Field_API_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Product Field API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Customer_Id_API_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Customer Id API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Email_Field_API_Name_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Email Field API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Last_Name_API_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Last Name API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>City_API_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>City API</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>ZIP_API_Name_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>ZIP API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Return_URL_API_Name_0_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Return URL API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>LogoURL_API_Name_New</name>
+                    <dataType>String</dataType>
+                    <fieldText>LogoURL API Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Custom_2_New</name>
+                    <dataType>String</dataType>
+                    <fieldText>Custom 2</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <fields>
+                    <name>Custom_4_New</name>
+                    <dataType>String</dataType>
+                    <fieldText>Custom 4</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
             <isRequired>false</isRequired>
         </fields>
         <showFooter>true</showFooter>

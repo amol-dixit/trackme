@@ -35,7 +35,7 @@ public without sharing class ManagePaymentDTOService {
             public String custom2;
             public String custom3;
             public String custom4;
-
+            public String transactionkey;
 
         }
         
@@ -352,6 +352,8 @@ public without sharing class ManagePaymentDTOService {
             @AuraEnabled
             public String externalPaymentURL;
             @AuraEnabled
+            public String externalPaymentEncryptedURL;
+            @AuraEnabled
             public String custom1;
             @AuraEnabled
             public String custom2;
@@ -361,7 +363,12 @@ public without sharing class ManagePaymentDTOService {
             public String custom4;
             @AuraEnabled
             public String subheader;
-
+            
+            @AuraEnabled
+            public String transactionkey;
+            
+            @AuraEnabled
+            public Boolean enableencrption;
 
         }
         public class SubscriptionWrapper{

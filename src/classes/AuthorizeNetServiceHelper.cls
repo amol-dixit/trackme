@@ -1,8 +1,8 @@
 public without sharing class AuthorizeNetServiceHelper implements PaymentServiceInterface{
 
     public static ManagePaymentDTOService.Transaction_Reponse_Wrapper chargeTransaction(ManagePaymentDTOService.PaymentDetails paymentDetails){
-        //Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(ManagePaymentServiceHelper, paymentDetails.otherdetails.paymentserviceprovider);
-        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+        //Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(ManagePaymentServiceHelper, paymentDetails.otherdetails.paymentserviceprovider);
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
         ManagePaymentDTOService.cls_transactionRequest tr = new ManagePaymentDTOService.cls_transactionRequest();
 
@@ -151,9 +151,9 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
 
 
     public static ManagePaymentDTOService.Transaction_Reponse_Wrapper refundTransaction(Payment__c paymentObj ){
-        //Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
+        //Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
-        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
         JSONGenerator gen = JSON.createGenerator(true);
 
@@ -266,7 +266,7 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
     }
 
     public static ManagePaymentDTOService.Transaction_Reponse_Wrapper voidTransaction(Payment__c paymentObj){
-        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
         JSONGenerator gen = JSON.createGenerator(true);
         gen.writeStartObject();     
@@ -352,7 +352,7 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
 
     public static ManagePaymentDTOService.Sub_Reponse_Wrapper createSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails ){
 
-        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
         System.debug('paymentDetails===>' + paymentDetails);
         Decimal amount = paymentDetails.otherdetails.amount;
@@ -464,7 +464,7 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
     }
 
     public static ManagePaymentDTOService.Sub_Reponse_Wrapper updateSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails){
-        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
 
         System.debug('paymentDetails===>' + paymentDetails);
@@ -542,7 +542,7 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
 
 
     public static ManagePaymentDTOService.SubscriptionWrapper cancelSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails){
-        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
         System.debug('paymentDetails===>' + paymentDetails);
         Decimal amount = paymentDetails.otherdetails.amount;
@@ -594,7 +594,7 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
 
     public static ManagePaymentDTOService.SubscriptionWrapper getSubscriptions(ManagePaymentDTOService.PaymentDetails paymentDetails){
 
-        Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
         String query = 'select Amount__c,Card_Number__c,CreatedById,CreatedDate,Customer_Payment_ProfileId__c,Customer_Profile_Id__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Length__c,Name,Occurrances__c,Opportunity__c,OwnerId,Record_Id__c,Start_Date__c,Status__c,Subscription_Id__c,SystemModstamp,Unit__c from Subscription__c where '+paymentDetails.otherdetails.fieldapiname + '=\''+paymentDetails.otherdetails.refId+'\' and status__c = \'Active\'';
         List<Subscription__c> subscriptionList = Database.query(query);

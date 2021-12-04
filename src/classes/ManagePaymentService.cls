@@ -4,6 +4,7 @@ global with sharing class ManagePaymentService {
         System.debug('paymentData' + paymentData);
         ManagePaymentDTOService.ChargeTransactionResponse ctrObj = new ManagePaymentDTOService.ChargeTransactionResponse();
         ManagePaymentDTOService.PaymentDetails paymentDetails = (ManagePaymentDTOService.PaymentDetails) System.JSON.deserialize(paymentData, ManagePaymentDTOService.PaymentDetails.class);
+        System.debug('paymentDetails======>' + paymentDetails);
         Payment_Configuration__c pconfig;
         ManagePaymentDTOService.Transaction_Reponse_Wrapper values;
         if(paymentDetails.otherDetails.paymentserviceprovider == null || paymentDetails.otherDetails.paymentserviceprovider == ''){
@@ -64,6 +65,7 @@ global with sharing class ManagePaymentService {
                 paymentObj.Custom_2__c = paymentDetails.otherDetails.custom2;
                 paymentObj.Custom_3__c = paymentDetails.otherDetails.custom3;
                 paymentObj.Custom_4__c = paymentDetails.otherDetails.custom4;
+                paymentObj.Transaction_Key__c = paymentDetails.otherDetails.transactionkey;
 
                 ManagePaymentServiceHelper.handleInsertDML(paymentObj);
                 at.Payment__c = paymentObj.id;
@@ -107,7 +109,7 @@ global with sharing class ManagePaymentService {
         if(!paymentList.isempty()){
             Payment_Configuration__c pconfig;
             ManagePaymentDTOService.Transaction_Reponse_Wrapper values;
-            pconfig = getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
+            pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
 
             values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentList[0].Source__c.replace('.', '')).refundTransaction(paymentList[0]);
 
@@ -176,7 +178,7 @@ global with sharing class ManagePaymentService {
         tr.message = '';
         if(!paymentList.isempty()){
 
-             Payment_Configuration__c pconfig = getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
+             Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
              ManagePaymentDTOService.Transaction_Reponse_Wrapper values;
             values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentList[0].Source__c.replace('.', '')).voidTransaction(paymentList[0]);
 
@@ -244,7 +246,7 @@ global with sharing class ManagePaymentService {
             if(paymentDetails.otherDetails.paymentserviceprovider == null || paymentDetails.otherDetails.paymentserviceprovider == ''){
                 throw new AuthorizeNetServiceHelper.PaymentException('Payment Service Provider is not configured. Please contact system administrator.');
             }
-            pconfig = getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+            pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
             ManagePaymentDTOService.Sub_Reponse_Wrapper values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).createSubscription(paymentDetails);
 
@@ -317,7 +319,7 @@ global with sharing class ManagePaymentService {
 
         try{
             if(paymentDetails.otherDetails.paymentserviceprovider == 'Authorize.Net'){
-                pconfig = getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+                pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
             }
     
             ManagePaymentDTOService.Sub_Reponse_Wrapper values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).updateSubscription(paymentDetails);
@@ -378,7 +380,7 @@ global with sharing class ManagePaymentService {
             }
 
             if(paymentDetails.otherDetails.paymentserviceprovider == 'Authorize.Net'){
-                pconfig = getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+                pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
             }
     
             ManagePaymentDTOService.SubscriptionWrapper values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).cancelSubscription(paymentDetails);
@@ -432,10 +434,59 @@ global with sharing class ManagePaymentService {
         return ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).getSubscriptions(paymentDetails);
     }
 
+   
+    @AuraEnabled
+    public static ManagePaymentDTOService.PaymentData decryptURL(String encryptedData, String sobjectAPIName, String paymentserviceprovider){
+        System.debug('sobjectAPIName===>' + sobjectAPIName);
+        System.debug('paymentserviceprovider===>' +paymentserviceprovider);
+        
+
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(sobjectAPIName, paymentserviceprovider);
+        encryptedData = encryptedData.replaceAll(' ', '+');
+        System.debug('encryptedData===>' + encryptedData);
+        ApexPages.PageReference ref = new ApexPages.PageReference('https://?'+Util.decrypt(encryptedData, pconfig.Encryption_Key__c));
+        Map<String, String> params = ref.getParameters();
+        system.debug('params===>' + params);
+
+        ManagePaymentDTOService.PaymentData pdObj = new ManagePaymentDTOService.PaymentData();
+        pdObj.amount = Decimal.valueOf(params.get('amount'));
+        pdobj.street = params.get('street');
+        pdobj.city = params.get('city');
+        pdobj.state =  params.get('state');
+        pdobj.zip = params.get('zip');
+        pdobj.country = params.get('country');
+        pdobj.email = params.get('email');
+        pdobj.firstname =  params.get('firstname');
+        pdobj.lastname = params.get('lastname');
+        pdobj.product = params.get('product');
+        pdobj.objectapiname = params.get('objectapiname');
+        pdobj.fieldapiname = params.get('fieldapiname');
+        pdobj.refId = params.get('refId');
+        pdobj.company = params.get('company');
+        pdobj.customerid = params.get('customerid');
+        pdobj.subheader = params.get('subheader');
+
+        //Custom info
+        pdobj.custom1 = params.get('custom1');
+        pdobj.custom2 = params.get('custom2');
+        pdobj.custom3 = params.get('custom3');
+        pdobj.custom4 = params.get('custom4');
+        pdobj.transactionkey = params.get('transactionkey');
+        
+        if(ManagePaymentServiceHelper.validatePayment(pdobj.transactionkey)){
+            throw new PaymentException('Payment has been made already. Thank you.');
+        }
+        Date expirationDate = Date.valueOf(params.get('expiration'));
+        if(System.today() > expirationDate){
+            throw new PaymentException('Link has expired on '+ expirationDate);
+        }
+        return pdobj;
+    }
+
     @AuraEnabled
     public static ManagePaymentDTOService.PaymentData retrieveRecord(Id recordId, String sobjectAPIName, String paymentserviceprovider){
 
-        Payment_Configuration__c pconfig = getPaymentConfig(sobjectAPIName, paymentserviceprovider);
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(sobjectAPIName, paymentserviceprovider);
         String select1 = 'select ';
         String query =  (pconfig.Address_API_Name__c != null ? pconfig.Address_API_Name__c +',' : '');
         query += (pconfig.Amount_API_Name__c != null ? pconfig.Amount_API_Name__c +',' : '');
@@ -485,7 +536,40 @@ global with sharing class ManagePaymentService {
         pdobj.custom3 = pconfig.Custom_3__c;
         pdobj.custom4 = pconfig.Custom_4__c;
 
-        pdobj.externalPaymentURL = pconfig.Community_URL__c;
+        Map<String, Object> urlParamMap = new Map<String, Object>();
+        urlParamMap.put('amount', String.valueOf(pdObj.amount));
+        urlParamMap.put('street', pdObj.street);
+        urlParamMap.put('city', pdObj.city);
+        urlParamMap.put('state', pdObj.state);
+        urlParamMap.put('zip', pdObj.zip);
+        urlParamMap.put('email', pdObj.email);
+        urlParamMap.put('firstname', pdObj.firstname);
+        urlParamMap.put('lastname', pdObj.lastname);
+        urlParamMap.put('product', pdObj.product);
+        urlParamMap.put('objectapiname', pconfig.Object_Api_Name__c);
+        urlParamMap.put('fieldapiname', pconfig.SObject_Payment_Lookup_API_Name__c);
+        urlParamMap.put('refid', pdObj.refid);
+        urlParamMap.put('company', pdObj.company);
+        urlParamMap.put('customerid', pconfig.Customer_Id_API_Name__c);
+        urlParamMap.put('custom1', pconfig.Custom_1__c);
+        urlParamMap.put('custom2', pconfig.Custom_2__c);
+        urlParamMap.put('custom3', pconfig.Custom_3__c);
+        urlParamMap.put('custom4', pconfig.Custom_4__c);
+        urlParamMap.put('subheader', pdobj.subheader);
+        urlParamMap.put('transactionkey', pdObj.refid + system.now());
+        urlParamMap.put('expiration', String.valueOf(System.today() +  (pconfig.Expiration_Days__c == null ? 7 : Integer.valueOf(pconfig.Expiration_Days__c))));
+
+        if(pconfig.Enable_Encrypted_Payment_URL__c){
+            String encrypteddata = Util.encrypt(Util.generateURLParameters(urlParamMap), pconfig.Encryption_Key__c);
+            System.debug('Encrypted Data=====>' + encrypteddata);
+            pdobj.externalPaymentEncryptedURL = pconfig.Community_URL__c +'?data=' + encrypteddata;
+        }
+        pdobj.externalPaymentURL = pconfig.Community_URL__c +'?' + Util.generateURLParameters(urlParamMap);
+        pdobj.enableencrption = pconfig.Enable_Encrypted_Payment_URL__c;
+        System.debug('pdobj.externalPaymentURL=====>' + pdobj.externalPaymentURL);
+        System.debug('pdobj.externalPaymentEncryptedURL=====>' + pdobj.externalPaymentEncryptedURL);
+
+        /*
         pdobj.externalPaymentURL += '?amount=' + (pdObj.amount != null ? pdObj.amount : 0);
         pdobj.externalPaymentURL += '&street=' + (pdobj.street != null ? pdobj.street : '');
         pdobj.externalPaymentURL += '&city=' + (pdobj.city != null ? pdobj.city : '');
@@ -505,7 +589,7 @@ global with sharing class ManagePaymentService {
         if(!String.isEmpty(pconfig.Custom_2__c)) pdobj.externalPaymentURL += '&custom2=' + pconfig.Custom_2__c;
         if(!String.isEmpty(pconfig.Custom_3__c)) pdobj.externalPaymentURL += '&custom3=' + pconfig.Custom_3__c;
         if(!String.isEmpty(pconfig.Custom_4__c)) pdobj.externalPaymentURL += '&custom4=' + pconfig.Custom_4__c;
-        if(!String.isEmpty(pconfig.Sub_Header_API_Name__c)) pdobj.externalPaymentURL += '&subheader=' + pdobj.subheader;
+        if(!String.isEmpty(pconfig.Sub_Header_API_Name__c)) pdobj.externalPaymentURL += '&subheader=' + pdobj.subheader;*/
 
 
         return pdobj;
@@ -535,22 +619,6 @@ global with sharing class ManagePaymentService {
     }
     public static boolean hasSObjectField(String fieldName, SObject so){
         return so.getSobjectType().getDescribe().fields.getMap().keySet().contains(fieldName.toLowerCase());
-    }
-
-    static Payment_Configuration__c pconfig;
-    public static Payment_Configuration__c getPaymentConfig(String objectApiName, String paymentserviceprovider) {
-        if(pconfig == null){
-
-            List<Payment_Configuration__c> pconfiglist = [select Secret_Key__c,Sub_Header_API_Name__c, Custom_1__c, Custom_2__c, Custom_3__c, Custom_4__c, External_Payment_URL__c, Community_URL__c, Enable_Logging__c, Auth_API_Login_Id__c, Endpoint_URL__c, Auth_Transaction_Key__c, 
-            SObject_Payment_Lookup_API_Name__c, Object_Api_Name__c, Address_API_Name__c, Amount_API_Name__c,
-            City_API_Name__c,Company_API_Name__c, Country_API_Name__c, Customer_Id_API_Name__c, Email_API_Name__c,First_Name_API_Name__c, Last_Name_API_Name__c,
-                Product_API_Name__c, RefId_Api_Name__c, Return_URL__c,Return_URL_API_Name__c, State_API_Name__c, Zip_API_Name__c from Payment_Configuration__c where name = :paymentserviceprovider AND Object_Api_Name__c =: objectApiName];
-            if(pconfiglist == null || pconfiglist.size() == 0 ){
-                throw new PaymentException('Payment Service Provider details have not configured, please contact your system admnistrator for more details.');
-            }
-            pconfig = pconfiglist[0];
-        }
-        return pconfig;
     }
 
     public class PaymentException extends Exception{}

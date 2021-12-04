@@ -38,30 +38,32 @@ export default class CardInput extends LightningElement {
   }
 
   set lastName(value) {
+
+    if(value && value != null && value != undefined ){
       this.setAttribute('lastName', value);
-      this.cardHolderLastName = value;
-      this.cardHolderLastNameValid = this.getIsValid(this.cardHolderLastName, "cardHolderLastName");
-      console.log('Here is the Last Name', this.cardHolderLastName);
-      if(this.cardHolderLastName){
+        this.cardHolderLastName = value;
+        this.cardHolderLastNameValid = this.getIsValid(this.cardHolderLastName, "cardHolderLastName");
+        console.log('Here is the Last Name', this.cardHolderLastName);
         this.cardHolderLastNameTouched = true;
         //this.showFeedback();
         this.checkIfComplete();
-  
+        //this.handlefirstnamechange();
+
       }
   
   }
 
   set firstName(value) {
-    this.setAttribute('firstName', value);
-    this.cardHolderFirstName = value;
-    this.cardHolderFirstNameValid = this.getIsValid(this.cardHolderFirstName, "cardHolderFirstName");
-    console.log('Here is the First Name', this.cardHolderFirstName);
-    if(this.cardHolderFirstName && this.cardHolderFirstName != null && this.cardHolderFirstName != undefined ){
+    if(value && value != null && value != undefined ){
+      this.setAttribute('firstName', value);
+      this.cardHolderFirstName = value;
+      this.cardHolderFirstNameValid = this.getIsValid(this.cardHolderFirstName, "cardHolderFirstName");
+      console.log('Here is the First Name', this.cardHolderFirstName);
+  
       this.cardHolderFirstNameTouched = true;
       //this.showFeedback();
       this.checkIfComplete();
       this.handlefirstnamechange();
-
 
     }
 
@@ -94,53 +96,59 @@ export default class CardInput extends LightningElement {
   @api cardEmail = "";
 
   connectedCallback() {
-    //copy public attributes to private ones
-    var self = this;
-    //debugger;
-    window.setTimeout(() => {
-      self.card = new Card({
-        //reference to this object so will work with web components
-        context: self,
+    this.initCard();
+  }
 
-        form: self.template.querySelector(".cc-input"),
-        container: ".cc-wrapper", // *required*
-
-        width: 250, 
-        formatting: true, 
-
-        messages: {
-          validDate: "valid\ndate", 
-          monthYear: "mm/yyyy" 
-        },
-
-        placeholders: {
-          number: "•••• •••• •••• ••••",
-          name: "Full Name",
-          firstname: "First Name",
-          lastname: "Last Name",
-          expiry: "••/••",
-          cvc: "•••"
-        },
-
-        masks: {
-          cardNumber: "•" 
-        },
-
-        debug: true 
-      });
-      this.handlefirstnamechange();
-
-    }, 50);
-
+  initCard(){
+     //copy public attributes to private ones
+     var self = this;
+     //debugger;
+     window.setTimeout(() => {
+       self.card = new Card({
+         //reference to this object so will work with web components
+         context: self,
+ 
+         form: self.template.querySelector(".cc-input"),
+         container: ".cc-wrapper", // *required*
+ 
+         width: 250, 
+         formatting: true, 
+ 
+         messages: {
+           validDate: "valid\ndate", 
+           monthYear: "mm/yyyy" 
+         },
+ 
+         placeholders: {
+           number: "•••• •••• •••• ••••",
+           name: "Full Name",
+           firstname: "First Name",
+           lastname: "Last Name",
+           expiry: "••/••",
+           cvc: "•••"
+         },
+ 
+         masks: {
+           cardNumber: "•" 
+         },
+ 
+         debug: true 
+       });
+       //this.handlefirstnamechange();
+ 
+     }, 50);
+ 
   }
 
   handlefirstnamechange(){
     console.log('!!!!!!!!!!' , this.cardHolderFirstName);
     if(this.cardHolderFirstName && this.cardHolderFirstName != null && this.cardHolderFirstName != undefined ){
       var element = this.template.querySelector('[data-id="firstnameinput"]');
+      console.log('element===>', element);
       if(element){
         var event = new Event('change');
         element.dispatchEvent(event);
+        console.log('!!!!!!!!!! EVENT TRIGGERED');
       }
     }
   }

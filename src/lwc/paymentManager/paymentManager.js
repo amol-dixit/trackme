@@ -5,6 +5,8 @@ import retrieveRecord from '@salesforce/apex/ManagePaymentService.retrieveRecord
 import getSubscriptions from '@salesforce/apex/ManagePaymentService.getSubscriptions';
 import cancelSubscription from '@salesforce/apex/ManagePaymentService.cancelSubscription';
 import updateSubscription from '@salesforce/apex/ManagePaymentService.updateSubscription';
+import decryptURL from '@salesforce/apex/ManagePaymentService.decryptURL';
+
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { CurrentPageReference } from 'lightning/navigation';
 import { NavigationMixin } from "lightning/navigation";
@@ -30,7 +32,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
     currentPageReference = null; 
     @track urlStateParameters;
     @track amount;
-    @track hidePage = false;
+    @track hidePage = true;
     @track address = {};
     @track email;
     @api subscriptionmode = false;
@@ -57,19 +59,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
       if (currentPageReference && this.recordId == undefined ) {
         console.log('==>', currentPageReference.state.product);
         this.urlStateParameters = currentPageReference.state;
-        //this.initUrlParams();
-        if(this.urlStateParameters == undefined || this.urlStateParameters.product == undefined || this.urlStateParameters.amount == undefined || this.urlStateParameters.refid == undefined){
-          /*const event = new ShowToastEvent({
-            title: 'Error',
-            message: 'Invalid Payment URL, please contact your System Admnistrator.',
-            variant: 'error',
-            mode: 'dismissable'
-          });
-          this.dispatchEvent(event);*/
-          this.hidePage = true;
-        }
       }
-
     }
 
     initUrlParams(){
@@ -100,7 +90,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
 
       console.log('My adde', this.address,this.firstname, this.lastname, this.email);
       this.isLoaded = !this.isLoaded;
-
+      this.hidePage = false;
       //this.getSubscriptions();
     }
 
@@ -173,14 +163,44 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
         bankdetails : {} ,
         subdetails : {} 
       };
-
-      var query = "a=1&b=2&c=3";
-      var obj = JSON.parse('{"' + decodeURI(query).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
-      console.log(obj);
-
-
       if(this.urlStateParameters != undefined && this.urlStateParameters != null){
+        console.log('this.urlStateParameters.data=========>',  this.urlStateParameters.data);
+        console.log('this.objectapiname=========>',  this.objectapiname, this.paymentserviceprovider);
+
+        if(this.urlStateParameters.data != null && this.urlStateParameters.data != undefined){
+          decryptURL({ encryptedData: this.urlStateParameters.data, sobjectAPIName : this.objectapiname, paymentserviceprovider : this.paymentserviceprovider})
+          .then((result) => {
+            console.log('Result ::', result);
+              this.urlStateParameters = result;
+              this.initUrlParams();
+
+            })
+          .catch((error) => {
+            this.hidePage = true;
+            console.log('Error===>', error);
+            let message = '';
+            if(error.message == undefined){
+              message = error.body.message + ' ' + error.body.stackTrace;
+            }else{
+              message = error.name + ' ' +error.message+' ' +error.stack
+            }
+            const event = new ShowToastEvent({
+              title: 'Payment Response',
+              message: message,
+              variant: 'error',
+              mode: 'dismissable'
+          });
+          this.dispatchEvent(event);
+              this.error = error;
+              this.contacts = undefined;
+              this.isLoaded = !this.isLoaded;
+          });
+      }else{
         this.initUrlParams();
+
+      }
+
+
       }else{
         retrieveRecord({ recordId: this.recordId, sobjectAPIName : this.objectapiname, paymentserviceprovider : this.paymentserviceprovider})
         .then((result) => {
@@ -712,8 +732,8 @@ getIsValid(){
           custom1: this.urlStateParameters.custom1,
           custom2: this.urlStateParameters.custom2,
           custom3: this.urlStateParameters.custom3,
-          custom4: this.urlStateParameters.custom4
-
+          custom4: this.urlStateParameters.custom4,
+          transactionkey: this.urlStateParameters.transactionkey
         }
         if(this.showcheck){
           let bankdetails = {

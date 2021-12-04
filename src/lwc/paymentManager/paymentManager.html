@@ -1,6 +1,6 @@
 <template>
   <div class=" slds-card " style="overflow-x: hidden; min-height:60px; " if:false={hidePage}>
-    
+
     <template if:true={logourl}>
       <div class="slds-align_absolute-center" >
         <img src={logourl}/>
@@ -18,10 +18,18 @@
           </div>
           <div class="slds-col slds-size_3-of-4">
             <h3 class="title" if:true={showexternalpaymentlink}>
-              <a href={urlStateParameters.externalPaymentURL} target="_blank">{urlStateParameters.externalPaymentURL}</a>
+              <template if:true={urlStateParameters.enableencrption}>
+                <a href={urlStateParameters.externalPaymentEncryptedURL} target="_blank">{urlStateParameters.externalPaymentEncryptedURL}</a>
+
+              </template>
+              <template if:false={urlStateParameters.enableencrption}>
+                <a href={urlStateParameters.externalPaymentURL} target="_blank">{urlStateParameters.externalPaymentURL}</a>
+              </template>
+
             </h3>
           </div>
         </div>
+
       </div>
     </template>
 
@@ -35,8 +43,6 @@
     <lightning-radio-group name="paymentTypeRadio" label="Select Payment Type" options={paymentTypes} type="button"
       value="One Time" onchange={handlePaymentTypeChange} if:true={showpaymenttyperadio}></lightning-radio-group>
     <br />
-
-
 
     <template if:true={showonetimepayment}>
 

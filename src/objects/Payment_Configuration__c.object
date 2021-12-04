@@ -308,15 +308,13 @@
         <unique>false</unique>
     </fields>
     <fields>
-        <fullName>Secret_Key__c</fullName>
+        <fullName>Enable_Encrypted_Payment_URL__c</fullName>
+        <defaultValue>false</defaultValue>
         <externalId>false</externalId>
-        <label>Secret Key</label>
-        <length>255</length>
-        <required>false</required>
+        <label>Enable Encrypted Payment URL</label>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
-        <type>Text</type>
-        <unique>false</unique>
+        <type>Checkbox</type>
     </fields>
     <fields>
         <fullName>Enable_Logging__c</fullName>
@@ -328,6 +326,18 @@
         <type>Checkbox</type>
     </fields>
     <fields>
+        <fullName>Encryption_Key__c</fullName>
+        <defaultValue>&apos;trackmepaymentss&apos;</defaultValue>
+        <externalId>false</externalId>
+        <label>Encryption Key</label>
+        <length>255</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Endpoint_URL__c</fullName>
         <externalId>false</externalId>
         <label>Endpoint URL</label>
@@ -335,6 +345,18 @@
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
         <type>Url</type>
+    </fields>
+    <fields>
+        <fullName>Expiration_Days__c</fullName>
+        <externalId>false</externalId>
+        <label>Expiration Days</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
     </fields>
     <fields>
         <fullName>External_Payment_URL__c</fullName>
@@ -363,6 +385,17 @@
         <fullName>Last_Name_API_Name__c</fullName>
         <externalId>false</externalId>
         <label>Last Name API Name</label>
+        <length>255</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Logourl_API_Name__c</fullName>
+        <externalId>false</externalId>
+        <label>Logourl API Name</label>
         <length>255</length>
         <required>false</required>
         <trackHistory>false</trackHistory>
@@ -435,6 +468,17 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Secret_Key__c</fullName>
+        <externalId>false</externalId>
+        <label>Secret Key</label>
+        <length>255</length>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>State_API_Name__c</fullName>
         <externalId>false</externalId>
         <label>State API Name</label>
@@ -490,6 +534,11 @@
         <fullName>Authorize_Net</fullName>
         <active>true</active>
         <label>Authorize.Net</label>
+    </recordTypes>
+    <recordTypes>
+        <fullName>Stripe</fullName>
+        <active>true</active>
+        <label>Stripe</label>
     </recordTypes>
     <searchLayouts/>
     <sharingModel>ReadWrite</sharingModel>

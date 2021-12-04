@@ -2,7 +2,7 @@ public with sharing class StripeServiceHelper implements PaymentServiceInterface
 	public static void createCustomer(ManagePaymentDTOService.PaymentDetails paymentDetails){
 	
 	/*	Map<String, Object> parameters = createCustomerData(paymentDetails);
-		String requestbody = payload(parameters);
+		String requestbody = Util.generateURLParameters(parameters);
 		System.debug('requestbody==>' + requestbody);
 
 		HttpRequest request = new HttpRequest();
@@ -17,10 +17,10 @@ public with sharing class StripeServiceHelper implements PaymentServiceInterface
 		System.debug('GET BODY--->' + res.getBody());*/
 	}
 	public static ManagePaymentDTOService.Transaction_Reponse_Wrapper chargeTransaction(ManagePaymentDTOService.PaymentDetails paymentDetails){
-		Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+		Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
 		Map<String, Object> parameters = createChargeTransactionData(paymentDetails);
-		String requestbody = payload(parameters);
+		String requestbody = Util.generateURLParameters(parameters);
 		System.debug('requestbody==>' + requestbody);
 
 
@@ -68,10 +68,10 @@ public with sharing class StripeServiceHelper implements PaymentServiceInterface
 	}
 
 	public static ManagePaymentDTOService.Sub_Reponse_Wrapper createSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails){
-		/*Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+		/*Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
 		Map<String, Object> parameters = createSubscriptionData(paymentDetails);
-		String requestbody = payload(parameters);
+		String requestbody = Util.generateURLParameters(parameters);
 		System.debug('requestbody==>' + requestbody);
 
 
@@ -104,10 +104,10 @@ public with sharing class StripeServiceHelper implements PaymentServiceInterface
 	}
 
 	public static ManagePaymentDTOService.Transaction_Reponse_Wrapper refundTransaction(Payment__c paymentObj){
-		Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
+		Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
 		Map<String, Object> parameters = createRefundData(paymentObj);
-		String requestbody = payload(parameters);
+		String requestbody = Util.generateURLParameters(parameters);
 		System.debug('requestbody==>' + requestbody);
 
 
@@ -159,109 +159,8 @@ public with sharing class StripeServiceHelper implements PaymentServiceInterface
 		return parameters;
 	}
 
-	private static String payload( Map<String, Object> parameters) {
-
-		// Build request body/payload
-		String payload = '';
-		for (String key : parameters.keySet()) {
-
-			// Check for string value
-			if (parameters.get(key) instanceof String) {
-				payload += (EncodingUtil.urlEncode(key, 'UTF-8') + '=' + EncodingUtil.urlEncode(
-					String.valueOf(parameters.get(key)), 'UTF-8') + '&'
-				);
-			}
-
-			// Check for map nested value
-			if (parameters.get(key) instanceof Map<String, Object>) {
-				
-				// Create sub options handle
-				Map<String, Object> subOptions = (Map<String, Object>)parameters.get(key);
-				
-				// Loop through sub options
-				for (String subKey : subOptions.keySet()) {
-
-					// Check for map nested, nested value
-					if (subOptions.get(subKey) instanceof Map<String, Object>) {
-
-						// Create sub, sub options handle
-						Map<String, Object> subSubOptions = (Map<String, Object>)subOptions.get(subKey);
-
-						// Loop through sub, sub options
-						for (String subSubKey : subSubOptions.keySet()) {
-							payload += (
-								EncodingUtil.urlEncode(key + '[' + subKey + ']' + '[' + subSubKey + ']', 'UTF-8') +
-								'=' +
-								EncodingUtil.urlEncode(String.valueOf(subSubOptions.get(subSubKey)), 'UTF-8') +
-								'&'
-							);
-						}						
-					}
-
-					// Check for string nested value
-					if (subOptions.get(subKey) instanceof String) {
-						payload += (
-							EncodingUtil.urlEncode(key + '[' + subKey + ']', 'UTF-8') +
-							'=' +
-							EncodingUtil.urlEncode(String.valueOf(subOptions.get(subKey)), 'UTF-8') +
-							'&'
-						);
-					}
-				}
-			}
-
-			if (parameters.get(key) instanceof List<Map<String, Object>>) {
-				// Create sub options handle
-				List<Map<String, Object>> subOptionsList = (List<Map<String, Object>>)parameters.get(key);
-				system.debug('subOptionsList===>' + subOptionsList);
-
-				
-
-				for(Map<String, Object> subOptions : subOptionsList){
-				//Map<String, Object>> subOptions = (Map<String, Object>)parameters.get(key);
-				system.debug('subOptions===>' + subOptions);
-
-				
-				// Loop through sub options
-				for (String subKey : subOptions.keySet()) {
-
-					// Check for map nested, nested value
-					if (subOptions.get(subKey) instanceof Map<String, Object>) {
-
-						// Create sub, sub options handle
-						Map<String, Object> subSubOptions = (Map<String, Object>)subOptions.get(subKey);
-
-						// Loop through sub, sub options
-						for (String subSubKey : subSubOptions.keySet()) {
-							payload += (
-								EncodingUtil.urlEncode(key + '[' + subKey + ']' + '[' + subSubKey + ']', 'UTF-8') +
-								'=' +
-								EncodingUtil.urlEncode(String.valueOf(subSubOptions.get(subSubKey)), 'UTF-8') +
-								'&'
-							);
-						}						
-					}
-
-					// Check for string nested value
-					if (subOptions.get(subKey) instanceof String) {
-						payload += (
-							EncodingUtil.urlEncode(key + '[' + subKey + ']', 'UTF-8') +
-							'=' +
-							EncodingUtil.urlEncode(String.valueOf(subOptions.get(subKey)), 'UTF-8') +
-							'&'
-						);
-					}
-				}
-			}
-			}
-		}
-
-		// Return payload
-		return payload;
-	}
-
 	public static ManagePaymentDTOService.SubscriptionWrapper getSubscriptions(ManagePaymentDTOService.PaymentDetails paymentDetails){
-		/*Payment_Configuration__c pconfig = ManagePaymentService.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+		/*Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
 			// Make the API request
 		Http http = new Http();
