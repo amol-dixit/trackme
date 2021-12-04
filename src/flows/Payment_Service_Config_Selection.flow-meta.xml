@@ -1099,7 +1099,7 @@
                 <fields>
                     <name>Enable_Encrypted_Payment_Link_New</name>
                     <dataType>Boolean</dataType>
-                    <fieldText>Enable Encrypted Payment Link New</fieldText>
+                    <fieldText>Enable Encrypted Payment Link?</fieldText>
                     <fieldType>InputField</fieldType>
                     <isRequired>true</isRequired>
                 </fields>
@@ -1151,7 +1151,7 @@
                 <fields>
                     <name>Payment_Link_Expiration_Days_New</name>
                     <dataType>Number</dataType>
-                    <fieldText>Payment Link Expiration Days New</fieldText>
+                    <fieldText>Payment Link Expiration Days</fieldText>
                     <fieldType>InputField</fieldType>
                     <isRequired>false</isRequired>
                     <scale>0</scale>
