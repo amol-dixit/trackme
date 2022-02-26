@@ -6,10 +6,6 @@
     </types>
     <types>
         <members>*</members>
-        <name>CustomLabel</name>
-    </types>
-    <types>
-        <members>*</members>
         <name>ApexComponent</name>
     </types>
     <types>
@@ -36,39 +32,5 @@
         <members>*</members>
         <name>StaticResource</name>
     </types>
-    <types>
-
-    <members>*</members>
-    <name>Layout</name>
-    </types>
-    <types>
-        <members>*</members>
-        <name>CustomTab</name>
-    </types>
-    <types>
-        <members>*</members>
-        <name>CustomApplication</name>
-    </types>
-
-    <types>
-        <members>Payment__c.Refund</members>
-        <members>Payment__c.Void</members>
-        <name>QuickAction</name>
-    </types>
-
-    <types>
-        <members>Payment__c</members>
-        <members>Subscription__c</members>
-        <members>API_Tracker__c</members>
-        <members>Payment_Configuration__c</members>
-        <name>CustomObject</name>
-    </types>
-    <types>
-        <members>Payment_Service_Config_Selection</members>
-        <name>Flow</name>
-    </types>
-
-
     <version>52.0</version>
-
 </Package>

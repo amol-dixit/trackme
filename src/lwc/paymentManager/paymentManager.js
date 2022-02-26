@@ -37,7 +37,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
     @track email;
     @api subscriptionmode = false;
     @api fieldapiname;
-    @track singletimepaymentmode = false;
+    @api singletimepaymentmode = false;
     @track showpaymenttyperadio = false;
     @track showonetimepayment = false;
     @track showrecurringpayment = false;
