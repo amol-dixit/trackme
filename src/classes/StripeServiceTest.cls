@@ -65,19 +65,7 @@ private class StripeServiceTest {
             system.assertEquals([ SELECT Amount__c FROM Payment__c ].Amount__c, 223);
         }
 
-        /*static testMethod void Stripe_testChargeTransaction_Bank_Positive() {
-            init(true);
-            Test.setMock(HttpCalloutMock.class, new StripeChargeTransactionBankCalloutMock());
-            Test.startTest();
-            ManagePaymentDTOService.ChargeTransactionResponse response = ManagePaymentService.chargeTransaction('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"LName","cardHolderFirstName":"FName","cardCVV":"222","cardExpiry":"02 / 22","cardType":"visa","cardEmail":"test@test.com"},"addressdetails":{"BillingCountry":"United States","BillingStreet":"add1","BillingCity":"city","BillingPostalCode":"08990","BillingState":"NY"},"otherdetails":{"product":"testproduct","amount":"22","refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity", "paymentserviceprovider":"Stripe"},"bankdetails":{"accountType":"checking","routingNumber":"063100277","accountNumber":"063100277","nameOnAccount":"Test"}}');
-            Test.stopTest();
-            system.debug('LOG==>' + [ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ]);
-            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
-            system.assertEquals(true, response.success);
-            system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
-            system.assertEquals([ SELECT Amount__c FROM Payment__c ].Amount__c, 22);
-        }*/
-    
+
         static testMethod void Stripe_testChargeTransaction_Card_Negative() {
             init(true);
             Test.setMock(HttpCalloutMock.class, new StripeChargeTransactionCardCalloutMockNegative());
@@ -186,9 +174,6 @@ private class StripeServiceTest {
             ManagePaymentService.voidTransaction(payment.id);
             Test.stopTest();
     
-            //system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
-            //system.assertEquals([ SELECT Voided__c FROM Payment__c where id =: payment.id].Voided__c, false);
-
         }
 
         static testMethod void Stripe_updateSubscription_Positive() {
@@ -208,135 +193,6 @@ private class StripeServiceTest {
             StripeServiceHelper.createCustomer(null);
 
         }
-
-/*
-        static testMethod void Stripe_tesCreateSubscription_Card_Positive() {
-            init(true);
-            Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionCalloutMock());
-            Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":223,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Stripe"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"223","unit":"Monthly"}}');
-            Test.stopTest();
-            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
-            system.assertEquals(true, response.success);
-            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
-            system.assertEquals([ SELECT count() FROM Subscription__c ], 1);
-            system.assertEquals([ SELECT Subscription_Id__c FROM Subscription__c ].Subscription_Id__c, '7787847');
-        }
-
-        static testMethod void tesCreateSubscription_Card_Negative() {
-            init(true);
-            Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionErrorCalloutMock());
-            Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":223,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Stripe"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"223","unit":"Monthly"}}');
-            Test.stopTest();
-            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
-            system.assertEquals(false, response.success);
-            system.assertEquals([ SELECT count() FROM Subscription__c ], 0);
-        }
-
-        static testMethod void Stripe_tesCreateSubscription_Card_Negative_Exception() {
-            init(true);
-            Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionErrorCalloutMock());
-            Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":223,"refid":"","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":""},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"223","unit":"Monthly"}}');
-            Test.stopTest();
-            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
-            system.assertEquals(false, response.success);
-            system.assertEquals([ SELECT count() FROM Subscription__c ], 0);
-        }
-
-        static testMethod void Stripe_tesUpdateSubscription_Card_Positive() {
-            init(true);
-            Subscription__c sub = new Subscription__c();
-            sub.Subscription_Id__c = '7787847';
-            insert sub;
-            Test.setMock(HttpCalloutMock.class, new AuthorizeUpdateSubscriptionCalloutMock());
-            Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.updateSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"Stripe","refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","subscriptionId":7787847},"bankdetails":{},"subdetails":{}}');
-            Test.stopTest();
-            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
-            system.assertEquals(true, response.success);
-            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
-            system.assertEquals([ SELECT count() FROM Subscription__c ], 1);
-            system.assertEquals([ SELECT Subscription_Id__c FROM Subscription__c ].Subscription_Id__c, '7787847');
-        }
-
-        static testMethod void Stripe_tesUpdateSubscription_Card_Negative() {
-            init(true);
-            Subscription__c sub = new Subscription__c();
-            sub.Subscription_Id__c = '7787847';
-            insert sub;
-            Test.setMock(HttpCalloutMock.class, new AuthorizeUpdateSubscriptionCalloutMock());
-            Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.updateSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"","refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","subscriptionId":7787847},"bankdetails":{},"subdetails":{}}');
-            Test.stopTest();
-            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
-            system.assertEquals(false, response.success);
-        }
-
-        static testMethod void Stripe_tesCancelSubscription_Card_Positive() {
-            init(true);
-            Test.setMock(HttpCalloutMock.class, new AuthorizeCancelSubscriptionCalloutMock());
-            Subscription__c sub = new Subscription__c();
-            sub.Subscription_Id__c = '7787847';
-            insert sub;
-
-            Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.cancelSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"Stripe","refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","subscriptionId":7787847},"bankdetails":{},"subdetails":{}}');
-            Test.stopTest();
-            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
-            system.assertEquals(true, response.success);
-            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
-            system.assertEquals([ SELECT count() FROM Subscription__c ], 1);
-            system.assertEquals([ SELECT Status__c FROM Subscription__c ].Status__c, 'InActive');
-        }
-
-        static testMethod void Stripe_tesCancelSubscription_Card_Negative() {
-            init(true);
-            Test.setMock(HttpCalloutMock.class, new AuthorizeCancelSubscriptionCalloutMock());
-            Subscription__c sub = new Subscription__c();
-            sub.Subscription_Id__c = '7787847';
-            insert sub;
-
-            Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.cancelSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"","refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","subscriptionId":7787847},"bankdetails":{},"subdetails":{}}');
-            Test.stopTest();
-            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
-            system.assertEquals(false, response.success);
-        }
-
-        static testMethod void Stripe_tesGetSubscriptions_Card_Positive() {
-            init(true);
-
-            Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionCalloutMock());
-            Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":223,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Stripe"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"223","unit":"Monthly"}}');
-            Test.stopTest();
-            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
-            system.assertEquals(true, response.success);
-            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
-            system.assertEquals([ SELECT count() FROM Subscription__c ], 1);
-            system.assertEquals([ SELECT Subscription_Id__c FROM Subscription__c ].Subscription_Id__c, '7787847');
-
-
-            ManagePaymentDTOService.SubscriptionWrapper response2 = ManagePaymentService.getSubscriptions('{"carddetails":{},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"Stripe","product":"GC5000 series","amount":223,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
-            system.assert(response2.subscriptionDetails.size() >0);
-        }
-
-        static testMethod void Stripe_tesRetrieveRecord_Positive() {
-            init(true);
-            Test.startTest();
-
-            ManagePaymentDTOService.PaymentData response = ManagePaymentService.retrieveRecord([select id from Opportunity][0].id, 'Opportunity', 'Stripe');
-            Test.stopTest();
-            system.assert(response != null);
-        }
-        
-        static testMethod void Stripe_tesProcessWebhook_Positive() {
-
-        
-
-        }*/
 
         public class StripeChargeTransactionCardCalloutMock implements HttpCalloutMock {
             // Implement this interface method

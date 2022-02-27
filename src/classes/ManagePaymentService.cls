@@ -1,4 +1,12 @@
+/**
+ * This class is responsible to provide all the transaction methods and based on the payment service provider, it routes requests to approprite helper classes.
+ *
+ * 
+ */
 global with sharing class ManagePaymentService {
+    /**
+     * This method is called from LWC component to perform the charge transaction api
+     */
     @AuraEnabled
     public static ManagePaymentDTOService.ChargeTransactionResponse chargeTransaction(String paymentData){
         System.debug('paymentData' + paymentData);
@@ -99,6 +107,9 @@ global with sharing class ManagePaymentService {
         return ctrObj;
     }
 
+    /**
+     * This method is called from LWC component to perform the refund transaction api
+     */
     @AuraEnabled
     public static ManagePaymentDTOService.TransactionResponse refundTransaction(Id paymentId){
 
@@ -169,7 +180,9 @@ global with sharing class ManagePaymentService {
 
     }
 
-
+    /**
+     * This method is called from LWC component to perform the void transaction api
+     */
     @AuraEnabled
     public static ManagePaymentDTOService.TransactionResponse voidTransaction(Id paymentId){
 
@@ -233,6 +246,9 @@ global with sharing class ManagePaymentService {
         return tr;
     }
 
+   /**
+     * This method is called from LWC component to perform the create Subscription api
+     */
     @AuraEnabled
     public static ManagePaymentDTOService.SubscriptionTransactionResponse createSubscription(String paymentData){
         System.debug('paymentData' + paymentData);
@@ -307,6 +323,9 @@ global with sharing class ManagePaymentService {
         return ctrObj;
     }
 
+    /**
+     * This method is called from LWC component to perform the update Subscription api
+     */
     @AuraEnabled
     public static ManagePaymentDTOService.SubscriptionTransactionResponse updateSubscription(String paymentData){
         System.debug('paymentData' + paymentData);
@@ -364,6 +383,9 @@ global with sharing class ManagePaymentService {
         return ctrObj;
     }
 
+    /**
+     * This method is called from LWC component to perform the cancel Subscription api
+     */
     @AuraEnabled
     public static ManagePaymentDTOService.SubscriptionTransactionResponse cancelSubscription(String paymentData){
         System.debug('paymentData' + paymentData);
@@ -425,6 +447,9 @@ global with sharing class ManagePaymentService {
         return ctrObj;
     }
 
+    /**
+     * This method is called from LWC component to perform the get Subscription api
+     */
     @AuraEnabled
     public static ManagePaymentDTOService.SubscriptionWrapper getSubscriptions(String paymentData){
         System.debug('paymentData' + paymentData);
@@ -434,7 +459,9 @@ global with sharing class ManagePaymentService {
         return ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).getSubscriptions(paymentDetails);
     }
 
-   
+    /**
+     * This method is called from LWC component and returns the decrupted payment url.
+     */
     @AuraEnabled
     public static ManagePaymentDTOService.PaymentData decryptURL(String encryptedData, String sobjectAPIName, String paymentserviceprovider){
         System.debug('sobjectAPIName===>' + sobjectAPIName);
@@ -483,6 +510,10 @@ global with sharing class ManagePaymentService {
         return pdobj;
     }
 
+    /**
+     * This method is returns the data with the details. The api names are dynamic.
+     * The payment can be configured to any SObject.
+     */
     @AuraEnabled
     public static ManagePaymentDTOService.PaymentData retrieveRecord(Id recordId, String sobjectAPIName, String paymentserviceprovider){
 
@@ -568,29 +599,6 @@ global with sharing class ManagePaymentService {
         pdobj.enableencrption = pconfig.Enable_Encrypted_Payment_URL__c;
         System.debug('pdobj.externalPaymentURL=====>' + pdobj.externalPaymentURL);
         System.debug('pdobj.externalPaymentEncryptedURL=====>' + pdobj.externalPaymentEncryptedURL);
-
-        /*
-        pdobj.externalPaymentURL += '?amount=' + (pdObj.amount != null ? pdObj.amount : 0);
-        pdobj.externalPaymentURL += '&street=' + (pdobj.street != null ? pdobj.street : '');
-        pdobj.externalPaymentURL += '&city=' + (pdobj.city != null ? pdobj.city : '');
-        pdobj.externalPaymentURL += '&state=' + (pdobj.state != null ? pdobj.state : '');
-        pdobj.externalPaymentURL += '&zip=' + (pdobj.zip != null ? pdobj.zip : '');
-        pdobj.externalPaymentURL += '&country=' + (pdobj.country != null ? pdobj.country : '');
-        pdobj.externalPaymentURL += '&email=' + (pdobj.email != null ? pdobj.email : '');
-        pdobj.externalPaymentURL += '&firstname=' + (pdobj.firstname != null ? pdobj.firstname : '');
-        pdobj.externalPaymentURL += '&lastname=' + (pdobj.lastname != null ? pdobj.lastname : '');
-        pdobj.externalPaymentURL += '&product=' + (pdobj.product != null ? pdobj.product : '');
-        pdobj.externalPaymentURL += '&objectapiname=' + (pconfig.Object_Api_Name__c);
-        pdobj.externalPaymentURL += '&fieldapiname=' + (pconfig.SObject_Payment_Lookup_API_Name__c);
-        pdobj.externalPaymentURL += '&refid=' +  (pdobj.refId != null ? pdobj.refId : '');
-        pdobj.externalPaymentURL += '&company=' + (pdobj.company != null ? pdobj.company : '');
-        pdobj.externalPaymentURL += '&customerid=' + (pconfig.Customer_Id_API_Name__c != null ? pdobj.customerid : '');
-        if(!String.isEmpty(pconfig.Custom_1__c)) pdobj.externalPaymentURL += '&custom1=' + pconfig.Custom_1__c;
-        if(!String.isEmpty(pconfig.Custom_2__c)) pdobj.externalPaymentURL += '&custom2=' + pconfig.Custom_2__c;
-        if(!String.isEmpty(pconfig.Custom_3__c)) pdobj.externalPaymentURL += '&custom3=' + pconfig.Custom_3__c;
-        if(!String.isEmpty(pconfig.Custom_4__c)) pdobj.externalPaymentURL += '&custom4=' + pconfig.Custom_4__c;
-        if(!String.isEmpty(pconfig.Sub_Header_API_Name__c)) pdobj.externalPaymentURL += '&subheader=' + pdobj.subheader;*/
-
 
         return pdobj;
 

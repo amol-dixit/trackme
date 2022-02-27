@@ -1,3 +1,7 @@
+/**
+ * This class provides all the DTO wrapper methods to accept/process/return the data.
+ * 
+ */
 public without sharing class ManagePaymentDTOService {
 
     public class cls_getTransactionDetailsResponse {
@@ -83,26 +87,26 @@ public without sharing class ManagePaymentDTOService {
 
         public class cls_createTransactionRequest {
             public cls_merchantAuthentication merchantAuthentication;
-            public String refId;	//123456
+            public String refId;
             public cls_transactionRequest transactionRequest;
         }
         public class cls_merchantAuthentication {
-            public String name;	//3etUv5PvB24
-            public String transactionKey;	//9LVfY7446vGJ66qK
+            public String name;
+            public String transactionKey;
         }
         public class cls_transactionRequest {
-            public String transactionType;	//authCaptureTransaction
-            public String amount;	//5
+            public String transactionType;
+            public String amount;
             public cls_payment payment;
             public cls_lineItems lineItems;
             public cls_tax tax;
             public cls_duty duty;
             public cls_shipping shipping;
-            public String poNumber;	//456654
+            public String poNumber;
             public cls_customer customer;
             public cls_billTo billTo;
             public cls_shipTo shipTo;
-            public String customerIP;	//192.168.1.1
+            public String customerIP;
             public cls_transactionSettings transactionSettings;
             public cls_userFields userFields;
             public cls_processingOptions processingOptions;
@@ -113,90 +117,90 @@ public without sharing class ManagePaymentDTOService {
             public cls_creditCard creditCard;
         }
         public class cls_creditCard {
-            public String cardNumber;	//5424000000000015
-            public String expirationDate;	//2025-12
-            public String cardCode;	//999
-            public String cardType; //Visa
+            public String cardNumber;
+            public String expirationDate;
+            public String cardCode;
+            public String cardType;
         }
         public class cls_lineItems {
             public cls_lineItem lineItem;
         }
         public class cls_lineItem {
-            public String itemId;	//1
-            public String name;	//vase
-            public String description;	//Cannes logo
-            public String quantity;	//18
-            public String unitPrice;	//45.00
+            public String itemId;
+            public String name;
+            public String description;
+            public String quantity;
+            public String unitPrice;
         }
         public class cls_tax {
-            public String amount;	//4.26
-            public String name;	//level2 tax name
-            public String description;	//level2 tax
+            public String amount;
+            public String name;
+            public String description;
         }
         public class cls_duty {
-            public String amount;	//8.55
-            public String name;	//duty name
-            public String description;	//duty description
+            public String amount;
+            public String name;
+            public String description;
         }
         public class cls_shipping {
-            public String amount;	//4.26
-            public String name;	//level2 tax name
-            public String description;	//level2 tax
+            public String amount;
+            public String name;
+            public String description;
         }
         public class cls_customer {
-            public String id;	//99999456654
+            public String id;
         }
         public class cls_billTo {
-            public String firstName;	//Ellen
-            public String lastName;	//Johnson
-            public String company;	//Souveniropolis
-            public String address;	//14 Main Street
-            public String city;	//Pecan Springs
-            public String state;	//TX
-            public String zip;	//44628
-            public String country;	//US
-            public String phoneNumber;  //000-000-0000
+            public String firstName;
+            public String lastName;
+            public String company;
+            public String address;
+            public String city;
+            public String state;
+            public String zip;
+            public String country;
+            public String phoneNumber;
 
         }
         public class cls_shipTo {
-            public String firstName;	//China
-            public String lastName;	//Bayles
-            public String company;	//Thyme for Tea
-            public String address;	//12 Main Street
-            public String city;	//Pecan Springs
-            public String state;	//TX
-            public String zip;	//44628
-            public String country;	//US
+            public String firstName;
+            public String lastName;
+            public String company;
+            public String address;
+            public String city;
+            public String state;
+            public String zip;
+            public String country;
         }
         public class cls_transactionSettings {
             public cls_setting setting;
         }
         public class cls_setting {
-            public String settingName;	//testRequest
-            public String settingValue;	//false
+            public String settingName;
+            public String settingValue;
         }
         public class cls_userFields {
             public cls_userField[] userField;
         }
         public class cls_userField {
-            public String name;	//MerchantDefinedFieldName1
-            public String value;	//MerchantDefinedFieldValue1
+            public String name;
+            public String value;
         }
         public class cls_processingOptions {
-            public String isSubsequentAuth;	//true
+            public String isSubsequentAuth;
         }
         public class cls_subsequentAuthInformation {
-            public String originalNetworkTransId;	//123456789NNNH
-            public String originalAuthAmount;	//45.00
-            public String reason;	//resubmission
+            public String originalNetworkTransId;
+            public String originalAuthAmount;
+            public String reason;
         }
         public class cls_authorizationIndicatorType {
-            public String authorizationIndicator;	//final
+            public String authorizationIndicator;
         }
 
         public class cls_profile {
-            public String customerProfileId;	//123456789NNNH
-            public String customerPaymentProfileId;	//45.00
+            public String customerProfileId;
+            public String customerPaymentProfileId;
         }
 
         public class Transaction_Reponse_Wrapper{
@@ -242,30 +246,30 @@ public without sharing class ManagePaymentDTOService {
         }
 
         public class cls_messages {
-            public String resultCode;   //Ok
+            public String resultCode;
             public cls_message message;
         }
         public class cls_message {
-            public String code; //I00001
-            public String text; //Successful.
-            public String description; //Successful.
+            public String code;
+            public String text;
+            public String description;
             
         }
 
         public class cls_transactionResponse {
-            public String responseCode;	//1
-            public String responseMessage;	//1
-            public String authCode;	//
-            public String transId;	//40067222795
-            public String refTransID;	//40065051483
-            public String transHash;	//
-            public String testRequest;	//0
-            public String accountNumber;	//XXXX0027
-            public String accountType;	//Visa
+            public String responseCode;
+            public String responseMessage;
+            public String authCode;
+            public String transId;
+            public String refTransID;
+            public String transHash;
+            public String testRequest;
+            public String accountNumber;
+            public String accountType;
             public cls_error[] errors;
             public Transaction_response_messages[] messages;
             public String transHashSha2;
-            public Integer SupplementalDataQualificationIndicator;	//0
+            public Integer SupplementalDataQualificationIndicator;
         }
         public class cls_error {
             public String errorCode;    //1806660050
@@ -376,7 +380,7 @@ public without sharing class ManagePaymentDTOService {
             public String responseString;
             public Integer statusCode;
             public Boolean issuccess;
-            @AuraEnabled public Integer totalNumInResultSet;	//36391
+            @AuraEnabled public Integer totalNumInResultSet;
             @AuraEnabled public cls_subscriptionDetails[] subscriptionDetails;
             @AuraEnabled public String refId;
             @AuraEnabled public Transaction_messages messages;
@@ -385,99 +389,98 @@ public without sharing class ManagePaymentDTOService {
 
         public class cls_subscriptionDetails {
             @AuraEnabled
-            public Integer id;	//5517459
-            @AuraEnabled public String name;	//Sample Subscription
-            @AuraEnabled public String status;	//active
-            @AuraEnabled public String createTimeStampUTC;	//2018-12-27T07:35:22.43
-            @AuraEnabled  public String firstName;	//John
-            @AuraEnabled public String lastName;	//Smith
-            @AuraEnabled public Integer totalOccurrences;	//12
-            @AuraEnabled public Integer pastOccurrences;	//11
-            @AuraEnabled public String paymentMethod;	//creditCard
-            @AuraEnabled public String accountNumber;	//XXXX1111
-            @AuraEnabled public String invoice;	//
-            @AuraEnabled public Decimal amount;	//3972
-            @AuraEnabled public String currencyCode;	//USD
-            @AuraEnabled public Integer customerProfileId;	//1506300582
-            @AuraEnabled public Integer customerPaymentProfileId;	//1505644064
+            public Integer id;
+            @AuraEnabled public String name;
+            @AuraEnabled public String status;
+            @AuraEnabled public String createTimeStampUTC;
+            @AuraEnabled  public String firstName;
+            @AuraEnabled public String lastName;
+            @AuraEnabled public Integer totalOccurrences;
+            @AuraEnabled public Integer pastOccurrences;
+            @AuraEnabled public String paymentMethod;
+            @AuraEnabled public String accountNumber;
+            @AuraEnabled public String invoice;
+            @AuraEnabled public Decimal amount;
+            @AuraEnabled public String currencyCode;
+            @AuraEnabled public Integer customerProfileId;
+            @AuraEnabled public Integer customerPaymentProfileId;
         }
     
         public class cls_transaction {
-            public String transId;  //12345
-            public String refTransId;   //12345
-            public String splitTenderId;    //12345
-            public String submitTimeUTC;    //2010-08-30T17:49:20.757Z
-            public String submitTimeLocal;  //2010-08-30T13:49:20.757
-            public String transactionType;  //authOnlyTransaction
-            public String transactionStatus;    //settledSuccessfully
-            public String responseCode; //1
-            public String responseReasonCode;   //1
-            public String responseReasonDescription;    //Approval
-            public String authCode; //000000
-            public String AVSResponse;  //X
-            public String cardCodeResponse; //M
-            public String CAVVResponse; //2
-            public String FDSFilterAction;  //authAndHold
-            //public cls_FDSFilters FDSFilters;
+            public String transId;
+            public String refTransId;
+            public String splitTenderId; 
+            public String submitTimeUTC; 
+            public String submitTimeLocal;
+            public String transactionType;
+            public String transactionStatus; 
+            public String responseCode;
+            public String responseReasonCode;
+            public String responseReasonDescription;
+            public String authCode;
+            public String AVSResponse;
+            public String cardCodeResponse;
+            public String CAVVResponse;
+            public String FDSFilterAction;
             public cls_batch batch;
             public cls_order order;
-            public String requestedAmount;  //5.00
-            public String authAmount;   //2.00
-            public String settleAmount; //2.00
+            public String requestedAmount;
+            public String authAmount;
+            public String settleAmount;
             public cls_tax tax;
             public cls_shipping shipping;
             public cls_duty duty;
             public cls_lineItems lineItems;
-            public String prepaidBalanceRemaining;  //30.00
-            public String taxExempt;    //false
+            public String prepaidBalanceRemaining;
+            public String taxExempt;
             public cls_payment payment;
             public cls_customer customer;
             public cls_billTo billTo;
             public cls_shipTo shipTo;
-            public String recurringBilling; //false
-            public String customerIP;   //0.0.0.0
+            public String recurringBilling;
+            public String customerIP;
             public cls_subscription subscription;
             public cls_profile profile;
-            public String networkTransId;   //123456789KLNLN9H
-            public String originalNetworkTransId;   //123456789NNNH
-            public String originalAuthAmount;   //12.00
-            public String authorizationIndicator;   //pre
+            public String networkTransId;
+            public String originalNetworkTransId;
+            public String originalAuthAmount;
+            public String authorizationIndicator;
 
         }
         public class cls_batch {
-            public String batchId;  //12345
-            public String settlementTimeUTC;    //2010-08-30T17:49:20.757Z
-            public String settlementTimeLocal;  //2010-08-30T13:49:20.757
-            public String settlementState;  //settledSuccessfully
+            public String batchId;
+            public String settlementTimeUTC;
+            public String settlementTimeLocal;
+            public String settlementState;
         }
         public class cls_order {
-            public String invoiceNumber;    //INV00001
-            public String description;  //some description
-            public String purchaseOrderNumber;  //PO000001
+            public String invoiceNumber;
+            public String description;
+            public String purchaseOrderNumber;
         }
         public class cls_subscription {
-            public String id;   //145521
-            public Decimal payNum;   //1
-            public String marketType;   //eCommerce
-            public String product;  //Card Not Present
+            public String id;
+            public Decimal payNum;
+            public String marketType;
+            public String product;
             public cls_returnedItems returnedItems;
             public cls_solution solution;
-            public String mobileDeviceId;   //2354578983274523978
+            public String mobileDeviceId;
         }
         public class cls_returnedItems {
             public cls_returnedItem returnedItem;
         }
         public class cls_returnedItem {
-            public String id;   //2148878904
-            public String dateUTC;  //2014-05-12T21:22:44Z
-            public String dateLocal;    //2014-05-12T14:22:44
-            public String code; //R02
-            public String description;  //Account Closed
+            public String id;
+            public String dateUTC;
+            public String dateLocal;
+            public String code;
+            public String description;
         }
         public class cls_solution {
-            public String id;   //A1000004
-            public String name; //Shopping Cart
-            public String vendorName;   //WidgetCo
+            public String id;
+            public String name;
+            public String vendorName;
         }
         public class Notification{
             public Payload payload;

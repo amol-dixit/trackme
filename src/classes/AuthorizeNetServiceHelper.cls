@@ -1,7 +1,16 @@
+/**
+ * This class is responsible to serve all the transactions realated to Authorize.NET. 
+ * It implements the PaymentServiceInterface
+ * 
+ */
 public without sharing class AuthorizeNetServiceHelper implements PaymentServiceInterface{
 
+    /**
+     * This method is reponsible to charge the transaction for Authorize.NET. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.Transaction_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
+     */
     public static ManagePaymentDTOService.Transaction_Reponse_Wrapper chargeTransaction(ManagePaymentDTOService.PaymentDetails paymentDetails){
-        //Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(ManagePaymentServiceHelper, paymentDetails.otherdetails.paymentserviceprovider);
         Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
         ManagePaymentDTOService.cls_transactionRequest tr = new ManagePaymentDTOService.cls_transactionRequest();
@@ -149,7 +158,11 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
 
     }
 
-
+    /**
+     * This method is reponsible to refund the transaction for Authorize.NET. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.Transaction_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
+     */
     public static ManagePaymentDTOService.Transaction_Reponse_Wrapper refundTransaction(Payment__c paymentObj ){
         //Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
@@ -265,6 +278,11 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
 
     }
 
+    /**
+     * This method is reponsible to void the transaction for Authorize.NET. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.Transaction_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
+     */
     public static ManagePaymentDTOService.Transaction_Reponse_Wrapper voidTransaction(Payment__c paymentObj){
         Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
@@ -350,6 +368,11 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
     }
     public static Map<String, String> UNIT_MAPPING = new Map<String, String>{'Monthly'=>'months', 'Weekly'=>'days'};
 
+    /**
+     * This method is reponsible to create a Subscription for Authorize.NET. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.Sub_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
+     */
     public static ManagePaymentDTOService.Sub_Reponse_Wrapper createSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails ){
 
         Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
@@ -463,6 +486,11 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
 
     }
 
+    /**
+     * This method is reponsible to update a Subscription for Authorize.NET. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.PaymentDetails : It returns the wrapper with the Success/Failure response.
+     */
     public static ManagePaymentDTOService.Sub_Reponse_Wrapper updateSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails){
         Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
@@ -540,7 +568,11 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
 
     }
 
-
+    /**
+     * This method is reponsible to cancel a Subscription for Authorize.NET. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.SubscriptionWrapper : It returns the wrapper with the Success/Failure response.
+     */
     public static ManagePaymentDTOService.SubscriptionWrapper cancelSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails){
         Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
@@ -592,6 +624,11 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
 
     }
 
+    /**
+     * This method is reponsible to get a related Subscriptions for Authorize.NET. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.SubscriptionWrapper : It returns the wrapper with the Success/Failure response.
+     */
     public static ManagePaymentDTOService.SubscriptionWrapper getSubscriptions(ManagePaymentDTOService.PaymentDetails paymentDetails){
 
         Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
@@ -618,8 +655,11 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
         return wrapper;
 
     }
-
-    public static void authorizeNetProcessWebhook(String requestbody){  
+    /**
+     * This method is reponsible to get the Subscription payment updates from the Authorize.NET.
+     * @param  requestbody : This is the request body returned from the Authorize.net webhook.
+     */
+    public static void authorizeNetProcessWebhook(String requestbody){
         API_Tracker__c at = new API_Tracker__c();
         at.Response_Body__c = requestbody;
         //Payment_Config__mdt pconfig = [select API_Login_Id__c, Track_Callback_Response__c,  Endpoint_URL__c, Transaction_Key__c, Return_URL__c from Payment_Config__mdt where developername = 'Authorize_Net_Config'];
@@ -723,6 +763,7 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
         }
     }
 
+    // Payment Exceptions
     public class PaymentException extends Exception{}
 
 }
