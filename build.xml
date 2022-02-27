@@ -58,8 +58,6 @@
     <target name="deployCode">
       <!-- Upload the contents of the "src" directory, running the tests for just 1 class -->
       <sf:deploy username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" deployRoot="src" testLevel="RunLocalTests" rollbackOnError="true">
-
-
       </sf:deploy>
     </target>
 	
@@ -75,13 +73,13 @@
 	
     <!-- Shows removing code; only succeeds if done after deployCode -->
     <target name="undeployCode">
-      <sf:deploy username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" deployRoot="removecodepkg"/>
+      <sf:deploy username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" deployRoot="removesrc"/>
     </target>
 
     <!-- Shows retrieving code; only succeeds if done after deployCode -->
     <target name="retrieveCode">
-      <!-- Retrieve the contents listed in the file codepkg/package.xml into the codepkg directory -->
-      <sf:retrieve username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" retrieveTarget="src" unpackaged="codepkg/package.xml"/>
+      <!-- Retrieve the contents listed in the file src/package.xml into the src directory -->
+      <sf:retrieve username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" retrieveTarget="src" unpackaged="src/package.xml"/>
     </target>
 
     <!-- Shows deploying code, running all tests, and running tests (1 of which fails), and logging. -->
@@ -92,11 +90,7 @@
 
     <!-- Shows check only; never actually saves to the server -->
     <target name="deployCodeCheckOnly">
-      <sf:deploy username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" deployRoot="src" checkOnly="true" testLevel="RunSpecifiedTests" >
-           <runTest>AdvanceApprovalUtil_Test</runTest>
-           <runTest>DebtSettlementV2_Con_Test</runTest>
-
-      </sf:deploy>
+      <sf:deploy username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" deployRoot="src" checkOnly="true"/>
     </target>
 	
 	<!-- Shows quick deployment of recent validation. Set the property sf.recentValidationId to your recent check only deployment Id -->
@@ -106,7 +100,7 @@
 	
 	<!-- Shows cancel deployment of deploy request either pending or in progress. Set property sf.requestId to Id of pending or in progress deploy request -->
 	<target name="cancelDeploy">
-	  <sf:cancelDeploy  username="${sf.username}" password="${sf.password}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" requestId="${sf.requestId}"/>
+	  <sf:cancelDeploy  username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" requestId="${sf.requestId}"/>
 	</target>
 
 	<!-- Retrieve the information of all items of a particular metadata type -->
