@@ -1,4 +1,8 @@
-public with sharing class StripeServiceHelper implements PaymentServiceInterface{
+/**
+ * This class is responsible to serve all the transactions realated to Stripe. 
+ * It implements the PaymentServiceInterface
+ * 
+ */public with sharing class StripeServiceHelper implements PaymentServiceInterface{
 	public static void createCustomer(ManagePaymentDTOService.PaymentDetails paymentDetails){
 	
 	/*	Map<String, Object> parameters = createCustomerData(paymentDetails);
@@ -16,6 +20,12 @@ public with sharing class StripeServiceHelper implements PaymentServiceInterface
         HttpResponse res = http.send(request);
 		System.debug('GET BODY--->' + res.getBody());*/
 	}
+
+	/**
+     * This method is reponsible to charge the transaction for Stripe. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.Transaction_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
+     */
 	public static ManagePaymentDTOService.Transaction_Reponse_Wrapper chargeTransaction(ManagePaymentDTOService.PaymentDetails paymentDetails){
 		Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
@@ -59,14 +69,29 @@ public with sharing class StripeServiceHelper implements PaymentServiceInterface
 
 	}
 
+	/**
+     * This method is reponsible to update a Subscription for Stripe. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.PaymentDetails : It returns the wrapper with the Success/Failure response.
+     */
 	public static ManagePaymentDTOService.Sub_Reponse_Wrapper updateSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails){
 		return null;
 	}
 
+	/**
+     * This method is reponsible to cancel a Subscription for Stripe. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.SubscriptionWrapper : It returns the wrapper with the Success/Failure response.
+     */
 	public static ManagePaymentDTOService.SubscriptionWrapper cancelSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails){
 		return null;
 	}
-
+	
+	/**
+     * This method is reponsible to create a Subscription for Stripe. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.Sub_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
+     */
 	public static ManagePaymentDTOService.Sub_Reponse_Wrapper createSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails){
 		/*Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
@@ -99,10 +124,21 @@ public with sharing class StripeServiceHelper implements PaymentServiceInterface
 		return null;
 	}
 
+	    /**
+     * This method is reponsible to void the transaction for Stripe. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.Transaction_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
+     */
+
 	public static ManagePaymentDTOService.Transaction_Reponse_Wrapper voidTransaction(Payment__c paymentObj){
 		return refundTransaction(paymentObj);
 	}
 
+    /**
+     * This method is reponsible to refund the transaction for Stripe. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.Transaction_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
+     */
 	public static ManagePaymentDTOService.Transaction_Reponse_Wrapper refundTransaction(Payment__c paymentObj){
 		Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
@@ -138,11 +174,13 @@ public with sharing class StripeServiceHelper implements PaymentServiceInterface
 		}
 		//tr.resultCode = 
 		return tr;
-
-
 	}
 
-
+    /**
+     * This method is reponsible to void the transaction for Stripe. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.Transaction_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
+     */
 	public static Map<String, Object> createRefundData(Payment__c paymentObj){
 		Map<String, Object> parameters = new Map<String, Object>();
 
@@ -159,6 +197,11 @@ public with sharing class StripeServiceHelper implements PaymentServiceInterface
 		return parameters;
 	}
 
+	    /**
+     * This method is reponsible to get a related Subscriptions for Stripe. It accepts the PaymentDetails wrapper with all the details.
+     * @param  ManagePaymentDTOService.PaymentDetails : This wrapper contains all the required data to do the transaction.
+     * @return ManagePaymentDTOService.SubscriptionWrapper : It returns the wrapper with the Success/Failure response.
+     */
 	public static ManagePaymentDTOService.SubscriptionWrapper getSubscriptions(ManagePaymentDTOService.PaymentDetails paymentDetails){
 		/*Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 

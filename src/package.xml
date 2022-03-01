@@ -4,6 +4,10 @@
         <members>*</members>
         <name>ApexClass</name>
     </types>
+        <types>
+        <members>*</members>
+        <name>CustomApplication</name>
+    </types>
     <types>
         <members>*</members>
         <name>ApexComponent</name>
@@ -26,15 +30,36 @@
     </types>
     <types>
         <members>*</members>
-        <name>CustomObject</name>
-    </types>
-    <types>
-        <members>*</members>
         <name>LightningComponentBundle</name>
     </types>
     <types>
         <members>*</members>
         <name>StaticResource</name>
     </types>
+    <types>
+        <members>*</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>QuickAction</name>
+    </types>
+
+    <types>
+        <members>Payment__c</members>
+        <members>Subscription__c</members>
+        <members>API_Tracker__c</members>
+        <members>Payment_Configuration__c</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CustomTab</name>
+    </types>
+
     <version>52.0</version>
 </Package>

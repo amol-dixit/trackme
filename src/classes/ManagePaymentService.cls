@@ -604,10 +604,12 @@ global with sharing class ManagePaymentService {
 
     }
 
+    // Processed the Webhook
     public static void processWebhook(String requestbody){
         AuthorizeNetServiceHelper.authorizeNetProcessWebhook(requestbody);
     }
     
+    // This private method fetches the fields data for a specifed record dynamically.
     private static Object fetchRecordData(SObject record, String apiName){
         if(apiName == null || apiName == ''){
             return null;

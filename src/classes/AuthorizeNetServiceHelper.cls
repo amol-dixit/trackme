@@ -164,7 +164,6 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
      * @return ManagePaymentDTOService.Transaction_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
      */
     public static ManagePaymentDTOService.Transaction_Reponse_Wrapper refundTransaction(Payment__c paymentObj ){
-        //Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
         Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentObj.SObect_API_Name__c, paymentObj.Source__c);
 
@@ -482,8 +481,6 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
         rw.statuscode = res.getStatusCode();
         return rw;
         
-       // return (ManagePaymentDTOService.Sub_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Sub_Reponse_Wrapper.class);
-
     }
 
     /**

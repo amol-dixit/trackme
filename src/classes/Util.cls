@@ -1,4 +1,11 @@
+/**
+ * This class is responsible to provide all the util helper methods for the payment operations.
+ * 
+ */
 public with sharing class Util {
+	/**
+	 * This method generatess a payment url for dynamically.
+	 */
 	public static String generateURLParameters( Map<String, Object> parameters) {
 
 		String payload = '';
@@ -100,11 +107,13 @@ public with sharing class Util {
 		return payload;
 	}
 
+	// This method encrypts the payment url based on the encryption key
     public static String encrypt(String encryptionData, String key){
 
         return EncodingUtil.base64Encode(Crypto.encryptWithManagedIV('AES128', Blob.valueOf(key == null ? 'trackmepaymentss' : key), Blob.valueOf(encryptionData)));   
     }
 
+	// This method decrypts the payment url based on the key
     public static String decrypt(String encryptedString, String key){
 		System.debug('encryptedString====>' + encryptedString);
 		Blob decodestring = EncodingUtil.base64decode(encryptedString);

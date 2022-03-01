@@ -1,23 +1,30 @@
+/**
+ * This class is reponsible to provide helper methods to ManagePaymentService
+ * 
+ */
 public without sharing class ManagePaymentServiceHelper {
+    // It does the insert DML operation in without sharing context.
     public static void handleInsertDML(SObject sobj){
         insert sobj;
     }
+    // It does the upsert DML operation in without sharing context.
     public static void handleUpsertDML(List<SObject> sobjList){
         upsert sobjList;
     }
 
+    // This method returns the Payment Service instance dynamically. 
     public static PaymentServiceInterface getPaymentServiceInstance(String paymentserviceprovider){
         Type gatewayType = Type.forName(paymentserviceprovider + 'ServiceHelper');
         if(gatewayType == null) {
             String[] errorMsg = new String[] {
                 paymentserviceprovider + '" is not supported '
             };
-            //throw new Merchant.UnsupportedGatewayException(String.join(errorMsg, ' '));
         }
         return (PaymentServiceInterface)gatewayType.newInstance();
     
     }
     static Payment_Configuration__c pconfig;
+    // This method fetches the Payment config custom metadata for a specific object and Service Provider
     public static Payment_Configuration__c getPaymentConfig(String objectApiName, String paymentserviceprovider) {
         if(pconfig == null){
 
@@ -33,6 +40,7 @@ public without sharing class ManagePaymentServiceHelper {
         return pconfig;
     }
 
+    // This method is responsible to validate the Payment link based on the transaction id present or not.
     public static boolean validatePayment(String transacationKey){
         if([select count() from Payment__c where Transaction_Key__c =: transacationKey] > 0){
             return true;
