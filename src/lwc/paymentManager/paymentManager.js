@@ -37,7 +37,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
     @track email;
     @api subscriptionmode = false;
     @api fieldapiname;
-    @api singletimepaymentmode = false;
+    @track singletimepaymentmode = true;
     @track showpaymenttyperadio = false;
     @track showonetimepayment = false;
     @track showrecurringpayment = false;
@@ -269,7 +269,8 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
 }
 
 handleamount(event) {
-  urlStateParameters.amount = parseFloat(event.detail.value);
+  console.log('==>', event.detail.value);
+  this.urlStateParameters.amount = parseFloat(event.detail.value);
 }
 
 handleproduct(event) {
