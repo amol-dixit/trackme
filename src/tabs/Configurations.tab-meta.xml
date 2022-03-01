@@ -4,6 +4,6 @@
     <hasSidebar>false</hasSidebar>
     <label>Configurations</label>
     <motif>Custom28: Cell phone</motif>
-    <url>/flow/trackmev1__Payment_Service_Config_Selection</url>
+    <url>/flow/Payment_Service_Config_Selection</url>
     <urlEncodingKey>UTF-8</urlEncodingKey>
 </CustomTab>
