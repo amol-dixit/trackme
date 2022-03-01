@@ -45,7 +45,7 @@
         </rules>
     </decisions>
     <interviewLabel>Payment Service Config Selection {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Payment Service Config Selection v30</label>
+    <label>Payment Service Config Selection</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -1189,9 +1189,9 @@
                 <name>Payment_Service_Config_Selection_0_0_0_Section2_Column1</name>
                 <fieldType>Region</fieldType>
                 <fields>
-                    <name>Amount_Field_API_0_0</name>
+                    <name>Product_Field_API_0_0</name>
                     <dataType>String</dataType>
-                    <fieldText>Amount Field API</fieldText>
+                    <fieldText>Product Field API</fieldText>
                     <fieldType>InputField</fieldType>
                     <isRequired>false</isRequired>
                 </fields>
@@ -1270,9 +1270,9 @@
                 <name>Payment_Service_Config_Selection_0_0_0_Section2_Column2</name>
                 <fieldType>Region</fieldType>
                 <fields>
-                    <name>Product_Field_API_0_0</name>
+                    <name>Amount_Field_API_0_0</name>
                     <dataType>String</dataType>
-                    <fieldText>Product Field API</fieldText>
+                    <fieldText>Amount Field API</fieldText>
                     <fieldType>InputField</fieldType>
                     <isRequired>false</isRequired>
                 </fields>
