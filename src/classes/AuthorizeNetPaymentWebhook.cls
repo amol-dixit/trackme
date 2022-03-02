@@ -1,5 +1,5 @@
 @RestResource(urlMapping='/paymentwebhook/*')
-global  class  AuthorizeNetPaymentWebhook {
+global with sharing class AuthorizeNetPaymentWebhook {
     
     @httpPost
     global static void postPayment(){

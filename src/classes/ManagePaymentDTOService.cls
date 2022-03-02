@@ -2,7 +2,7 @@
  * This class provides all the DTO wrapper methods to accept/process/return the data.
  * 
  */
-public without sharing class ManagePaymentDTOService {
+public with sharing class ManagePaymentDTOService {
 
     public class cls_getTransactionDetailsResponse {
         public cls_transaction transaction1;
@@ -312,6 +312,17 @@ public without sharing class ManagePaymentDTOService {
             public String authCode;
             @AuraEnabled
             public Subscription__c subObj;
+
+            @AuraEnabled
+            public Date startDate;
+            @AuraEnabled
+            public String subId;
+            @AuraEnabled
+            public String unit;
+            @AuraEnabled
+            public Decimal occurance;
+            @AuraEnabled
+            public String length;
         }
 
         public class Refund_Reponse_Wrapper{

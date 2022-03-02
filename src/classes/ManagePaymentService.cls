@@ -304,6 +304,12 @@ global with sharing class ManagePaymentService {
                 System.debug('subscriptionObj==>' + subscriptionObj.id);
         
                 ctrObj.subObj = subscriptionObj;
+                ctrObj.startDate = subscriptionObj.Start_Date__c;
+                ctrObj.subId = subscriptionObj.Subscription_Id__c;
+                ctrObj.unit = subscriptionObj.Unit__c;
+                ctrObj.occurance = subscriptionObj.Occurrances__c;
+                ctrObj.length = subscriptionObj.Length__c;
+
             }else{
                 ctrObj.success = false;
                 ctrObj.responseText = responseMessage;

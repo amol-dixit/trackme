@@ -104,6 +104,12 @@
             </value>
         </inputAssignments>
         <inputAssignments>
+            <field>Community_URL__c</field>
+            <value>
+                <elementReference>Payment_Community_URL_0</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
             <field>Company_API_Name__c</field>
             <value>
                 <elementReference>Company_API_0_0</elementReference>
@@ -340,6 +346,12 @@
             <field>City_API_Name__c</field>
             <value>
                 <elementReference>City_API_0</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Community_URL__c</field>
+            <value>
+                <elementReference>Payment_Community_URL</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -1147,6 +1159,13 @@
                             </rightValue>
                         </conditions>
                     </visibilityRule>
+                </fields>
+                <fields>
+                    <name>Payment_Community_URL_0</name>
+                    <dataType>String</dataType>
+                    <fieldText>Payment Community URL</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>false</isRequired>
                 </fields>
                 <fields>
                     <name>Payment_Link_Expiration_Days_New</name>

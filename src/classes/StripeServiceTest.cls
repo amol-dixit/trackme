@@ -1,5 +1,5 @@
 @isTest
-private class StripeServiceTest {
+private with sharing class StripeServiceTest {
             
         static Opportunity opportunityObj {get;set;}
         static List<Account> accts;

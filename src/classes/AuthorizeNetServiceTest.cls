@@ -1,5 +1,5 @@
 @isTest
-private class AuthorizeNetServiceTest {
+private with sharing class AuthorizeNetServiceTest {
         
         static Opportunity opportunityObj {get;set;}
         static List<Account> accts;

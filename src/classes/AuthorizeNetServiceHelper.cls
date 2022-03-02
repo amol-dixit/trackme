@@ -3,7 +3,7 @@
  * It implements the PaymentServiceInterface
  * 
  */
-public without sharing class AuthorizeNetServiceHelper implements PaymentServiceInterface{
+public with sharing class AuthorizeNetServiceHelper implements PaymentServiceInterface{
 
     /**
      * This method is reponsible to charge the transaction for Authorize.NET. It accepts the PaymentDetails wrapper with all the details.
@@ -673,7 +673,7 @@ public without sharing class AuthorizeNetServiceHelper implements PaymentService
             ManagePaymentDTOService.Notification values = (ManagePaymentDTOService.Notification) System.JSON.deserialize(requestbody.replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Notification.class);
 
         Http http = new Http();
-        String json=		'{'+
+        String json=        '{'+
         '    "getTransactionDetailsRequest": {'+
         '        "merchantAuthentication": {'+
         '            "name": "'+pconfig.Auth_API_Login_Id__c+'",'+
