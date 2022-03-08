@@ -8,7 +8,7 @@
     <formFactors>Large</formFactors>
     <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
     <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
-    <label>Track Me</label>
+    <label>TrackPay</label>
     <navType>Standard</navType>
     <tabs>Configurations</tabs>
     <tabs>Subscription__c</tabs>
