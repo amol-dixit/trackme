@@ -598,7 +598,8 @@ getIsValid(){
           refid: this.urlStateParameters.refid,
           fieldapiname: this.urlStateParameters.fieldapiname,
           objectapiname: this.urlStateParameters.objectapiname,
-          subscriptionId: (this.selectedrow ? this.selectedrow.id : null)
+          subscriptionId: (this.selectedrow ? this.selectedrow.id : null),
+          trackPaySubscriptionId : (this.selectedrow ? this.selectedrow.trackPaySubscriptionId : null)
         }
         this.paymentdetail.otherdetails = otherDetails;
         if(this.showcheck){
@@ -837,6 +838,7 @@ getIsValid(){
         //{ label: 'Payment Method', fieldName: 'paymentMethod' },
         { label: 'Account Number', fieldName: 'accountNumber' },
         { label: 'Amount', fieldName: 'amount' },
+        { label: 'Status', fieldName: 'status' },
         {
           type: 'action',
           typeAttributes: { rowActions: actions },
@@ -860,7 +862,9 @@ getIsValid(){
         refid: this.urlStateParameters.refid,
         fieldapiname: this.urlStateParameters.fieldapiname,
         objectapiname: this.urlStateParameters.objectapiname,
-        subscriptionId:this.selectedrow.id
+        subscriptionId:this.selectedrow.id,
+        trackPaySubscriptionId : (this.selectedrow ? this.selectedrow.trackPaySubscriptionId : null)
+
       }
       this.paymentdetail.otherdetails = otherDetails;
 

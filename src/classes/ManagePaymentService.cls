@@ -13,31 +13,39 @@ global with sharing class ManagePaymentService {
         ManagePaymentDTOService.ChargeTransactionResponse ctrObj = new ManagePaymentDTOService.ChargeTransactionResponse();
         ManagePaymentDTOService.PaymentDetails paymentDetails = (ManagePaymentDTOService.PaymentDetails) System.JSON.deserialize(paymentData, ManagePaymentDTOService.PaymentDetails.class);
         System.debug('paymentDetails======>' + paymentDetails);
-        Payment_Configuration__c pconfig;
-        ManagePaymentDTOService.Transaction_Reponse_Wrapper values;
+        ManagePaymentDTOService.Transaction_Reponse_Wrapper paymentResponse;
         if(paymentDetails.otherDetails.paymentserviceprovider == null || paymentDetails.otherDetails.paymentserviceprovider == ''){
             throw new AuthorizeNetServiceHelper.PaymentException('Payment Service Provider is not configured. Please contact system administrator.');
         }
-
+        
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherDetails.paymentserviceprovider);
         API_Tracker__c at = new API_Tracker__c();
 
         try{
-            values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).chargeTransaction(paymentDetails);
+            paymentDetails.serviceChargeTransaction = false;
+            paymentResponse = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).chargeTransaction(paymentDetails);
 
-            at.Request_Body__c = values.requestString;
-            at.Response_Body__c = values.responseString;
-            at.Status_Code__c = values.statusCode;
-            System.debug('values==>' + values);
+            at.Request_Body__c = paymentResponse.requestString;
+            at.Response_Body__c = paymentResponse.responseString;
+            at.Status_Code__c = paymentResponse.statusCode;
+            at.TrackPay_Request_Body__c = paymentResponse.trackpayrequestString;
+            at.TrackPay_Response_Body__c = paymentResponse.trackpayresponseString;
+            at.TrackPay_Status_Code__c = paymentResponse.trackpaystatusCode;
 
-            if(values.issuccess){
-                ctrObj.success = true;
-                ctrObj.authCode = values.authCode;
-                ctrObj.transactionId = values.transId;
-                ctrObj.accountNumber = values.accountNumber;
-                ctrObj.accountType = values.accountType;
+            System.debug('paymentResponse==>' + paymentResponse);
 
+            if(paymentResponse.issuccess){
                 Payment__c paymentObj = new Payment__c();
-                paymentObj.Amount__c = paymentDetails.otherdetails.amount;
+                ctrObj.success = true;
+                ctrObj.authCode = paymentResponse.authCode;
+                ctrObj.transactionId = paymentResponse.transId;
+                ctrObj.accountNumber = paymentResponse.accountNumber;
+                ctrObj.accountType = paymentResponse.accountType;
+                paymentObj.Card_Services_Fee__c = paymentResponse.serviceFee;
+                paymentObj.TrackPay_Transaction_Id__c = paymentResponse.trackpayTransactionId;
+                paymentObj.Card_Services_Fee_Response__c = paymentResponse.cardServicesResponse;
+                
+                paymentObj.Amount__c = paymentResponse.amount;
                 paymentObj.put(paymentDetails.otherdetails.fieldapiname, paymentDetails.otherdetails.refId);
                 paymentObj.SObect_API_Name__c = paymentDetails.otherdetails.objectapiname;
                 paymentObj.Transaction_Id__c = ctrObj.transactionId;
@@ -47,8 +55,8 @@ global with sharing class ManagePaymentService {
                 paymentObj.RecordtypeId = Schema.SObjectType.Payment__c.getRecordTypeInfosByName().get('Individual Payment').getRecordTypeId();
 
                 paymentObj.Customer_Id__c = paymentDetails.otherdetails.refId;
-                paymentObj.Card_Type__c = values.accountType;
-                paymentObj.Card_Number__c = values.accountNumber;
+                paymentObj.Card_Type__c = paymentResponse.accountType;
+                paymentObj.Card_Number__c = paymentResponse.accountNumber;
                 paymentObj.Transaction_Status__c = 'Approved';
         
                 paymentObj.Ship_To_Address__c = paymentDetails.addressdetails.BillingStreet;
@@ -78,7 +86,6 @@ global with sharing class ManagePaymentService {
                 ManagePaymentServiceHelper.handleInsertDML(paymentObj);
                 at.Payment__c = paymentObj.id;
 
-        
                 System.debug('paymentObj==>' + paymentObj.id);
         
                 ctrObj.paymentObj = paymentObj;
@@ -90,7 +97,7 @@ global with sharing class ManagePaymentService {
                 ctrObj.country = paymentObj.Bill_To_Country__c;
             }else{
                 ctrObj.success = false;
-                ctrObj.responseText = values.responseMessage;
+                ctrObj.responseText = paymentResponse.responseMessage;
             }
 
         }catch(Exception e){
@@ -113,52 +120,63 @@ global with sharing class ManagePaymentService {
     @AuraEnabled
     public static ManagePaymentDTOService.TransactionResponse refundTransaction(Id paymentId){
 
-        List<Payment__c> paymentList = Database.query('SELECT SObect_API_Name__c, Amount__c,Bill_To_Address__c,Bill_To_City__c,Bill_To_Country__c,Bill_To_First_Name__c,Bill_To_Last_Name__c,Bill_To_Phone__c,Bill_To_State__c,Bill_To_Zip__c,Card_Number__c,Card_Type__c,CreatedById,CreatedDate,Customer_Id__c,Email__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Name,Opportunity__c,OwnerId,Payment_Date__c,Refund_Response__c,Refund_Result_Code__c,Ship_To_Address__c,Ship_To_City__c,Ship_To_Country__c,Ship_To_State__c,Ship_To_Zip__c,Source__c,SystemModstamp,Transaction_Id__c,Transaction_Status__c from Payment__c where id =: paymentId');
+        List<Payment__c> paymentList = Database.query('SELECT Card_Services_Fee__c, TrackPay_Transaction_Id__c, SObect_API_Name__c, Amount__c,Bill_To_Address__c,Bill_To_City__c,Bill_To_Country__c,Bill_To_First_Name__c,Bill_To_Last_Name__c,Bill_To_Phone__c,Bill_To_State__c,Bill_To_Zip__c,Card_Number__c,Card_Type__c,CreatedById,CreatedDate,Customer_Id__c,Email__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Name,Opportunity__c,OwnerId,Payment_Date__c,Refund_Response__c,Refund_Result_Code__c,Ship_To_Address__c,Ship_To_City__c,Ship_To_Country__c,Ship_To_State__c,Ship_To_Zip__c,Source__c,SystemModstamp,Transaction_Id__c,Transaction_Status__c from Payment__c where id =: paymentId');
         ManagePaymentDTOService.TransactionResponse tr = new ManagePaymentDTOService.TransactionResponse();
         tr.success = false;
         tr.message = '';
         if(!paymentList.isempty()){
             Payment_Configuration__c pconfig;
-            ManagePaymentDTOService.Transaction_Reponse_Wrapper values;
+            ManagePaymentDTOService.Transaction_Reponse_Wrapper paymentResponse;
             pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
 
-            values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentList[0].Source__c.replace('.', '')).refundTransaction(paymentList[0]);
+            paymentResponse = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentList[0].Source__c.replace('.', '')).refundTransaction(paymentList)[0];
 
     
             API_Tracker__c at = new API_Tracker__c();
             at.Payment__c = paymentList[0].id;
 
-			System.debug('values==>' + values);
-            at.Request_Body__c = values.requestString;
-            at.Response_Body__c = values.responseString;
-            at.Status_Code__c = values.statusCode;
+			System.debug('paymentResponse==>' + paymentResponse);
+            at.Request_Body__c = paymentResponse.requestString;
+            at.Response_Body__c = paymentResponse.responseString;
+            at.Status_Code__c = paymentResponse.statusCode;
+            at.TrackPay_Request_Body__c = paymentResponse.trackpayrequestString;
+            at.TrackPay_Response_Body__c = paymentResponse.trackpayresponseString;
+            at.TrackPay_Status_Code__c = paymentResponse.trackpaystatusCode;
+
             ManagePaymentDTOService.ChargeTransactionResponse ctrObj = new ManagePaymentDTOService.ChargeTransactionResponse();
-            if(values.issuccess){
+            if(paymentResponse.issuccess){
                 ctrObj.success = true;
-                ctrObj.authCode = values.authCode;
-                ctrObj.transactionId = values.transId;
-                ctrObj.accountNumber = values.accountNumber;
-                ctrObj.accountType = values.accountType;
+                ctrObj.authCode = paymentResponse.authCode;
+                ctrObj.transactionId = paymentResponse.transId;
+                ctrObj.accountNumber = paymentResponse.accountNumber;
+                ctrObj.accountType = paymentResponse.accountType;
             }else{
                 ctrObj.success = false;
             }
-            ctrObj.responseText = values.responseMessage;
+            ctrObj.responseText = paymentResponse.responseMessage;
             Payment__c originalPaymentObj = new Payment__c();
             List<Payment__c> upsertPaymentList = new List<Payment__c>();
             if(!ctrObj.success){
-                upsertPaymentList.add(new Payment__c (id = paymentId, Refund_Response__c = values.responseMessage, Refund_Result_Code__c = values.resultCode));
-                at.Error_Message__c = values.responseMessage;
+                upsertPaymentList.add(new Payment__c (id = paymentId, Refund_Response__c = paymentResponse.responseMessage, Refund_Result_Code__c = paymentResponse.resultCode));
+                at.Error_Message__c = paymentResponse.responseMessage;
 
             }else{
-                upsertPaymentList.add( new Payment__c (id = paymentId, Refund_Response__c = values.responseMessage, Refund_Result_Code__c = values.resultCode, Refunded__c = true));
+                upsertPaymentList.add( new Payment__c (id = paymentId, Refund_Response__c = paymentResponse.responseMessage, Refund_Result_Code__c = paymentResponse.resultCode, Refunded__c = true));
 
                 Payment__c paymentclone = (Payment__c)paymentList[0].clone(false, false, false, false);
                 paymentclone.Amount__c = -paymentclone.Amount__c;
-                paymentclone.Transaction_Id__c = values.transId;
+
+                if(paymentResponse.trackpayTransactionId != null){
+                    paymentclone.TrackPay_Transaction_Id__c = paymentResponse.trackpayTransactionId;
+                    paymentclone.Card_Services_Fee__c = -paymentclone.Card_Services_Fee__c;
+                    paymentclone.Card_Services_Fee_Response__c = paymentResponse.cardServicesResponse;
+                }
+                
+                paymentclone.Transaction_Id__c = paymentResponse.transId;
                 paymentclone.Transaction_Status__c = 'Refunded';
                 paymentclone.Original_Payment__c = paymentList[0].id;
-                paymentclone.Refund_Result_Code__c = values.resultCode;
-                paymentclone.Refund_Response__c = values.responseMessage;
+                paymentclone.Refund_Result_Code__c = paymentResponse.resultCode;
+                paymentclone.Refund_Response__c = paymentResponse.responseMessage;
                 paymentclone.Refunded__c = true;
                 upsertPaymentList.add(paymentclone);
             }
@@ -167,7 +185,7 @@ global with sharing class ManagePaymentService {
 
 
             tr.success = ctrObj.success;
-            tr.message = values.responseMessage;
+            tr.message = paymentResponse.responseMessage;
 
 
             if(pconfig == null || pconfig.Enable_Logging__c){
@@ -186,56 +204,65 @@ global with sharing class ManagePaymentService {
     @AuraEnabled
     public static ManagePaymentDTOService.TransactionResponse voidTransaction(Id paymentId){
 
-        List<Payment__c> paymentList = Database.query('SELECT SObect_API_Name__c, Amount__c,Bill_To_Address__c,Bill_To_City__c,Bill_To_Country__c,Bill_To_First_Name__c,Bill_To_Last_Name__c,Bill_To_Phone__c,Bill_To_State__c,Bill_To_Zip__c,Card_Number__c,Card_Type__c,CreatedById,CreatedDate,Customer_Id__c,Email__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Name,Opportunity__c,OwnerId,Payment_Date__c,Refund_Response__c,Refund_Result_Code__c,Ship_To_Address__c,Ship_To_City__c,Ship_To_Country__c,Ship_To_State__c,Ship_To_Zip__c,Source__c,SystemModstamp,Transaction_Id__c,Transaction_Status__c from Payment__c where id =: paymentId');
+        List<Payment__c> paymentList = Database.query('SELECT TrackPay_Transaction_Id__c, Card_Services_Fee__c, SObect_API_Name__c, Amount__c,Bill_To_Address__c,Bill_To_City__c,Bill_To_Country__c,Bill_To_First_Name__c,Bill_To_Last_Name__c,Bill_To_Phone__c,Bill_To_State__c,Bill_To_Zip__c,Card_Number__c,Card_Type__c,CreatedById,CreatedDate,Customer_Id__c,Email__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Name,Opportunity__c,OwnerId,Payment_Date__c,Refund_Response__c,Refund_Result_Code__c,Ship_To_Address__c,Ship_To_City__c,Ship_To_Country__c,Ship_To_State__c,Ship_To_Zip__c,Source__c,SystemModstamp,Transaction_Id__c,Transaction_Status__c from Payment__c where id =: paymentId');
         ManagePaymentDTOService.TransactionResponse tr = new ManagePaymentDTOService.TransactionResponse();
         tr.message = '';
         if(!paymentList.isempty()){
 
              Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
-             ManagePaymentDTOService.Transaction_Reponse_Wrapper values;
-            values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentList[0].Source__c.replace('.', '')).voidTransaction(paymentList[0]);
-
+             ManagePaymentDTOService.Transaction_Reponse_Wrapper paymentResponse;
+            paymentResponse = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentList[0].Source__c.replace('.', '')).voidTransaction(paymentList)[0];
 
             API_Tracker__c at = new API_Tracker__c();
             at.Payment__c = paymentList[0].id;
 
-			System.debug('values==>' + values);
-            at.Request_Body__c = values.requestString;
-            at.Response_Body__c = values.responseString;
-            at.Status_Code__c = values.statusCode;
+			System.debug('paymentResponse==>' + paymentResponse);
+            at.Request_Body__c = paymentResponse.requestString;
+            at.Response_Body__c = paymentResponse.responseString;
+            at.Status_Code__c = paymentResponse.statusCode;
+            at.TrackPay_Request_Body__c = paymentResponse.trackpayrequestString;
+            at.TrackPay_Response_Body__c = paymentResponse.trackpayresponseString;
+            at.TrackPay_Status_Code__c = paymentResponse.trackpaystatusCode;
+
+            System.debug('at===>' + at);
 
             ManagePaymentDTOService.ChargeTransactionResponse ctrObj = new ManagePaymentDTOService.ChargeTransactionResponse();
             
-            if(values.issuccess){
+            if(paymentResponse.issuccess){
                 ctrObj.success = true;
-                ctrObj.authCode = values.authCode;
-                ctrObj.transactionId = values.transId;
-                ctrObj.accountNumber = values.accountNumber;
-                ctrObj.accountType = values.accountType;
+                ctrObj.authCode = paymentResponse.authCode;
+                ctrObj.transactionId = paymentResponse.transId;
+                ctrObj.accountNumber = paymentResponse.accountNumber;
+                ctrObj.accountType = paymentResponse.accountType;
             }else{
                 ctrObj.success = false;
             }
-            ctrObj.responseText = values.responseMessage;
+            ctrObj.responseText = paymentResponse.responseMessage;
             Payment__c originalPaymentObj = new Payment__c();
             List<Payment__c> upsertPaymentList = new List<Payment__c>();
             if(!ctrObj.success){
-                upsertPaymentList.add(new Payment__c (id = paymentId, Void_Response__c = values.responseMessage, Void_Result_Code__c = values.resultCode));
+                upsertPaymentList.add(new Payment__c (id = paymentId, Void_Response__c = paymentResponse.responseMessage, Void_Result_Code__c = paymentResponse.resultCode));
             }else{
-                upsertPaymentList.add( new Payment__c (id = paymentId, Void_Response__c = values.responseMessage, Void_Result_Code__c = values.resultCode, Voided__c = true));
+                upsertPaymentList.add( new Payment__c (id = paymentId, Void_Response__c = paymentResponse.responseMessage, Void_Result_Code__c = paymentResponse.resultCode, Voided__c = true));
 
                 Payment__c paymentclone = (Payment__c)paymentList[0].clone(false, false, false, false);
                 paymentclone.Amount__c = -paymentclone.Amount__c;
-                paymentclone.Transaction_Id__c = values.transId;
+                paymentclone.Transaction_Id__c = paymentResponse.transId;
+                if(paymentResponse.trackpayTransactionId != null){
+                    paymentclone.TrackPay_Transaction_Id__c = paymentResponse.trackpayTransactionId;
+                    paymentclone.Card_Services_Fee__c = -paymentclone.Card_Services_Fee__c;
+                    paymentclone.Card_Services_Fee_Response__c = paymentResponse.cardServicesResponse;
+                }
                 paymentclone.Transaction_Status__c = 'Voided';
                 paymentclone.Original_Payment__c = paymentList[0].id;
-                paymentclone.Void_Result_Code__c = values.resultCode;
-                paymentclone.Void_Response__c = values.responseMessage;
+                paymentclone.Void_Result_Code__c = paymentResponse.resultCode;
+                paymentclone.Void_Response__c = paymentResponse.responseMessage;
                 paymentclone.Voided__c = true;
                 upsertPaymentList.add(paymentclone);
             }
             ManagePaymentServiceHelper.handleUpsertDML(upsertPaymentList);
-            tr.message = values.responseMessage;
-            tr.success = values.issuccess;
+            tr.message = paymentResponse.responseMessage;
+            tr.success = paymentResponse.issuccess;
 
             if(pconfig == null || pconfig.Enable_Logging__c){
                 ManagePaymentServiceHelper.handleInsertDML(at);
@@ -264,43 +291,39 @@ global with sharing class ManagePaymentService {
             }
             pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
 
-            ManagePaymentDTOService.Sub_Reponse_Wrapper values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).createSubscription(paymentDetails);
+            ManagePaymentDTOService.Sub_Reponse_Wrapper paymentResponse = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).createSubscription(paymentDetails);
 
-            at.Request_Body__c = values.requestString;
-            at.Response_Body__c = values.responseString;
-            at.Status_Code__c = values.statusCode;
+            at.Request_Body__c = paymentResponse.requestString;
+            at.Response_Body__c = paymentResponse.responseString;
+            at.Status_Code__c = paymentResponse.statusCode;
+            at.TrackPay_Request_Body__c = paymentResponse.trackpayrequestString;
+            at.TrackPay_Response_Body__c = paymentResponse.trackpayresponseString;
+            at.TrackPay_Status_Code__c = paymentResponse.trackpaystatusCode;
 
-            System.debug('values==>' + values);
-            String responseMessage = '';
+            System.debug('paymentResponse==>' + paymentResponse);
 
-            if(values.messages != null && !values.messages.message.isempty()){
-                for(ManagePaymentDTOService.cls_message message : values.messages.message){
-                    responseMessage += 'Code = ' + message.code + ' :: Description = ' + message.text + ' \n';
-                }
-            }
+            if(paymentResponse.issuccess){
 
-            responseMessage += '\n';
-
-            if(values.messages.resultCode == 'Ok' && values.messages.message[0].code == 'I00001'){
                 ctrObj.success = true;
 
                 Subscription__c subscriptionObj = new Subscription__c();
                 subscriptionObj.put(paymentDetails.otherdetails.fieldapiname, paymentDetails.otherdetails.refId);
-                subscriptionObj.Subscription_Id__c = values.subscriptionId;
+                subscriptionObj.Subscription_Id__c = paymentResponse.subscriptionId;
                 subscriptionObj.Start_Date__c = Date.valueOf(paymentDetails.subDetails.startDate);
-                subscriptionObj.Customer_Profile_Id__c = values.profile.customerProfileId;
+                subscriptionObj.Customer_Profile_Id__c = paymentResponse.profile.customerProfileId;
                 subscriptionObj.Card_Number__c = 'XXXXX'+ paymentDetails.carddetails.cardNumber.replaceAll(' ','').right(4);
                 subscriptionObj.Name = paymentDetails.subDetails.subname;
-                subscriptionObj.Customer_Profile_Id__c = values.profile.customerProfileId;
-                subscriptionObj.Customer_Payment_ProfileId__c = values.profile.customerPaymentProfileId;
+                subscriptionObj.Customer_Profile_Id__c = paymentResponse.profile.customerProfileId;
+                subscriptionObj.Customer_Payment_ProfileId__c = paymentResponse.profile.customerPaymentProfileId;
                 subscriptionObj.Length__c = paymentDetails.subdetails.unit == 'Monthly' ? '1' : (paymentDetails.subdetails.unit == 'Weekly' ? '7' : '');
                 subscriptionObj.Occurrances__c = Decimal.valueOf(paymentDetails.subDetails.occurrances);
                 subscriptionObj.Unit__c = paymentDetails.subDetails.unit;
-                subscriptionObj.Amount__c = paymentDetails.subDetails.amount;
+                subscriptionObj.Amount__c = paymentResponse.amount;
+                subscriptionObj.Card_Services_Fee__c = paymentResponse.serviceCharge;
+                subscriptionObj.TrackPay_Subscription_Id__c = paymentResponse.trackPaySubscriptionId;
                 //insert subscriptionObj;
                 ManagePaymentServiceHelper.handleInsertDML(subscriptionObj);
                 at.Subscription__c = subscriptionObj.id;
-
                 System.debug('subscriptionObj==>' + subscriptionObj.id);
         
                 ctrObj.subObj = subscriptionObj;
@@ -312,7 +335,7 @@ global with sharing class ManagePaymentService {
 
             }else{
                 ctrObj.success = false;
-                ctrObj.responseText = responseMessage;
+                ctrObj.responseText = paymentResponse.responseString;
             }
 
         }catch(Exception e){
@@ -347,32 +370,33 @@ global with sharing class ManagePaymentService {
                 pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
             }
     
-            ManagePaymentDTOService.Sub_Reponse_Wrapper values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).updateSubscription(paymentDetails);
+            ManagePaymentDTOService.Sub_Reponse_Wrapper paymentResponse = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).updateSubscription(paymentDetails);
 
-            at.Request_Body__c = values.requestString;
-            at.Response_Body__c = values.responseString;
-            at.Status_Code__c = values.statusCode;
+            at.Request_Body__c = paymentResponse.requestString;
+            at.Response_Body__c = paymentResponse.responseString;
+            at.Status_Code__c = paymentResponse.statusCode;
+            at.TrackPay_Request_Body__c = paymentResponse.trackpayrequestString;
+            at.TrackPay_Response_Body__c = paymentResponse.trackpayresponseString;
+            at.TrackPay_Status_Code__c = paymentResponse.trackpaystatusCode;
+
             at.Subscription__r = new Subscription__c(Subscription_Id__c = paymentDetails.otherdetails.subscriptionId);
 
-            System.debug('values==>' + values);
-            String responseMessage = '';
+            System.debug('paymentResponse==>' + paymentResponse);
 
-            if(values.messages != null && !values.messages.message.isempty()){
-                for(ManagePaymentDTOService.cls_message message : values.messages.message){
-                    responseMessage += 'Code = ' + message.code + ' :: Description = ' + message.text + ' \n';
-                }
-            }
-
-            responseMessage += '\n';
-
-            if(values.messages.resultCode == 'Ok' && values.messages.message[0].code == 'I00001'){
+            if(paymentResponse.issuccess){
                 upsert new Subscription__c(Card_Number__c = 'XXXXX'+ paymentDetails.carddetails.cardNumber.replaceAll(' ','').right(4), Subscription_Id__c = paymentDetails.otherdetails.subscriptionId) Subscription_Id__c;
                 ctrObj.success = true;
-                ctrObj.subObj = [select id, Start_Date__c, Subscription_Id__c, Customer_Profile_Id__c, Customer_Payment_ProfileId__c, Length__c, Occurrances__c,Unit__c, Amount__c from Subscription__c  where Subscription_Id__c =: paymentDetails.otherdetails.subscriptionId limit 1];    
-    
+                ctrObj.subObj = [select id, Start_Date__c, Subscription_Id__c, Customer_Profile_Id__c, Customer_Payment_ProfileId__c, Length__c, Occurrances__c,Unit__c, Amount__c from Subscription__c  where Subscription_Id__c =: paymentDetails.otherdetails.subscriptionId limit 1];
+                
+                ctrObj.startDate = ctrObj.subObj.Start_Date__c;
+                ctrObj.subId = ctrObj.subObj.Subscription_Id__c;
+                ctrObj.unit = ctrObj.subObj.Unit__c;
+                ctrObj.occurance = ctrObj.subObj.Occurrances__c;
+                ctrObj.length = ctrObj.subObj.Length__c;
+
             }else{
                 ctrObj.success = false;
-                ctrObj.responseText = responseMessage;
+                ctrObj.responseText = paymentResponse.responseMessage;
             }
 
         }catch(Exception e){
@@ -411,32 +435,26 @@ global with sharing class ManagePaymentService {
                 pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
             }
     
-            ManagePaymentDTOService.SubscriptionWrapper values = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).cancelSubscription(paymentDetails);
+            ManagePaymentDTOService.Sub_Reponse_Wrapper paymentResponse = ManagePaymentServiceHelper.getPaymentServiceInstance(paymentDetails.otherDetails.paymentserviceprovider.replace('.', '')).cancelSubscription(paymentDetails);
 
-            at.Request_Body__c = values.requestString;
-            at.Response_Body__c = values.responseString;
-            at.Status_Code__c = values.statusCode;
+            at.Request_Body__c = paymentResponse.requestString;
+            at.Response_Body__c = paymentResponse.responseString;
+            at.Status_Code__c = paymentResponse.statusCode;
+            at.TrackPay_Request_Body__c = paymentResponse.trackpayrequestString;
+            at.TrackPay_Response_Body__c = paymentResponse.trackpayresponseString;
+            at.TrackPay_Status_Code__c = paymentResponse.trackpaystatusCode;
+
             at.Subscription__r = new Subscription__c(Subscription_Id__c = paymentDetails.otherdetails.subscriptionId);
 
-            System.debug('values==>' + values);
-            String responseMessage = '';
+            System.debug('paymentResponse==>' + paymentResponse);
 
-            if(values.messages != null && !values.messages.message.isempty()){
-                for(ManagePaymentDTOService.cls_message message : values.messages.message){
-                    responseMessage += 'Code = ' + message.code + ' :: Description = ' + message.text + ' \n';
-                }
-            }
-
-            responseMessage += '\n';
-
-
-            if(values.messages.resultCode == 'Ok' && values.messages.message[0].code == 'I00001'){
+            if(paymentResponse.issuccess){
                 ctrObj.success = true;
                 upsert (new Subscription__c(Subscription_Id__c = paymentDetails.otherdetails.subscriptionId, Status__c = 'InActive')) Subscription_Id__c;
 
             }else{
                 ctrObj.success = false;
-                ctrObj.responseText = responseMessage;
+                ctrObj.responseText = paymentResponse.responseMessage;
             }
 
         }catch(Exception e){
@@ -498,6 +516,7 @@ global with sharing class ManagePaymentService {
         pdobj.company = params.get('company');
         pdobj.customerid = params.get('customerid');
         pdobj.subheader = params.get('subheader');
+        pdobj.returl = params.get('returl');
 
         //Custom info
         pdobj.custom1 = params.get('custom1');
@@ -566,7 +585,10 @@ global with sharing class ManagePaymentService {
         pdobj.company = (String)fetchRecordData(record, pconfig.Company_API_Name__c);
         pdobj.customerid = (String)fetchRecordData(record, pconfig.Customer_Id_API_Name__c);
         pdobj.subheader = (String)fetchRecordData(record, pconfig.Sub_Header_API_Name__c);
-
+        pdobj.returl = (String)fetchRecordData(record, pconfig.Return_URL_API_Name__c);
+        if(pdobj.returl == null){
+            pdobj.returl = pconfig.Return_URL__c;
+        }
         //Custom info
         pdobj.custom1 = pconfig.Custom_1__c;
         pdobj.custom2 = pconfig.Custom_2__c;
@@ -594,6 +616,8 @@ global with sharing class ManagePaymentService {
         urlParamMap.put('custom4', pconfig.Custom_4__c);
         urlParamMap.put('subheader', pdobj.subheader);
         urlParamMap.put('transactionkey', pdObj.refid + system.now());
+        urlParamMap.put('returl', pdobj.returl);
+        
         urlParamMap.put('expiration', String.valueOf(System.today() +  (pconfig.Expiration_Days__c == null ? 7 : Integer.valueOf(pconfig.Expiration_Days__c))));
 
         if(pconfig.Enable_Encrypted_Payment_URL__c){
@@ -612,7 +636,7 @@ global with sharing class ManagePaymentService {
 
     // Processed the Webhook
     public static void processWebhook(String requestbody){
-        AuthorizeNetServiceHelper.authorizeNetProcessWebhook(requestbody);
+        AuthorizeNetService.authorizeNetProcessWebhook(requestbody);
     }
     
     // This private method fetches the fields data for a specifed record dynamically.

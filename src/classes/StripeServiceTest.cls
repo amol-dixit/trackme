@@ -38,7 +38,8 @@ private with sharing class StripeServiceTest {
                 pconfig.Auth_API_Login_Id__c = 'Auth_API_Login_Id__c';
                 pconfig.Auth_Transaction_Key__c = 'Auth_Transaction_Key__c';
                 pconfig.Amount_API_Name__c = 'Amount';
-                
+                pconfig.Auth_License_Key__c = 'gCcQVL1tH+x6Kjo97W32Y501YXVfbCWhPONvH/LJCfD8eOG1qFyeFBm59kIwnGZriZSyMmlDhXkD1LSDnPYxChsNMcj1WicPL9E8QWqyUahP0+9H8e4UIxXI0aZXVQZs';
+
                 insert pconfig;
 
                 pconfig = new Payment_Configuration__c();
@@ -48,7 +49,8 @@ private with sharing class StripeServiceTest {
                 pconfig.Object_Api_Name__c = 'Opportunity';
                 pconfig.Secret_Key__c = 'Secret_Key__c';
                 pconfig.Amount_API_Name__c = 'Amount';
-                
+                pconfig.Auth_License_Key__c = 'gCcQVL1tH+x6Kjo97W32Y501YXVfbCWhPONvH/LJCfD8eOG1qFyeFBm59kIwnGZriZSyMmlDhXkD1LSDnPYxChsNMcj1WicPL9E8QWqyUahP0+9H8e4UIxXI0aZXVQZs';
+
                 insert pconfig;
 
         }
@@ -57,12 +59,12 @@ private with sharing class StripeServiceTest {
             init(true);
             Test.setMock(HttpCalloutMock.class, new StripeChargeTransactionCardCalloutMock());
             Test.startTest();
-            ManagePaymentDTOService.ChargeTransactionResponse response = ManagePaymentService.chargeTransaction('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 22","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{"BillingStreet":"23 Ave D","BillingCity":"Norwalk","BillingState":"CT","BillingPostalCode":"06902","BillingCountry":"USA","internationalAddress":false},"otherdetails":{"paymentserviceprovider":"Stripe","product":"GC5000 series","amount":223,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
+            ManagePaymentDTOService.ChargeTransactionResponse response = ManagePaymentService.chargeTransaction('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 22","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{"BillingStreet":"23 Ave D","BillingCity":"Norwalk","BillingState":"CT","BillingPostalCode":"06902","BillingCountry":"USA","internationalAddress":false},"otherdetails":{"paymentserviceprovider":"Stripe","product":"GC5000 series","amount":22330,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
             Test.stopTest();
             system.assertEquals(true, response.success);
             system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
             system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
-            system.assertEquals([ SELECT Amount__c FROM Payment__c ].Amount__c, 223);
+            system.assertEquals([ SELECT Amount__c FROM Payment__c ].Amount__c, 22330);
         }
 
 
@@ -173,24 +175,27 @@ private with sharing class StripeServiceTest {
 
             ManagePaymentService.voidTransaction(payment.id);
             Test.stopTest();
+            system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
     
         }
 
         static testMethod void Stripe_updateSubscription_Positive() {
-            StripeServiceHelper.updateSubscription(null);
-
+            system.assertEquals(StripeService.updateSubscription(null), null);
         }
+
         static testMethod void Stripe_createSubscription_Positive() {
-            StripeServiceHelper.createSubscription(null);
+            system.assertEquals(StripeService.createSubscription(null), null);
 
         }
+
         static testMethod void Stripe_cancelSubscription_Positive() {
-            StripeServiceHelper.cancelSubscription(null);
+            system.assertEquals(StripeService.cancelSubscription(null), null);
 
         }
 
         static testMethod void Stripe_createCustomer_Positive() {
-            StripeServiceHelper.createCustomer(null);
+
+            system.assertEquals(StripeServiceHelper.createCustomer(null), null);
 
         }
 

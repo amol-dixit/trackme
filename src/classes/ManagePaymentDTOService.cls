@@ -15,6 +15,10 @@ public with sharing class ManagePaymentDTOService {
             public BankDetails bankdetails;
             public OtherDetails otherDetails;
             public SubDetails subDetails;
+            public Boolean serviceChargeTransaction = false;
+            public PaymentDetails(){
+                this.serviceChargeTransaction  = false;
+            }
         }
 
         public class TransactionResponse{
@@ -34,6 +38,7 @@ public with sharing class ManagePaymentDTOService {
             public String objectapiname;
             //public String subId;
             public String subscriptionId;
+            public String trackPaySubscriptionId;
             public String paymentserviceprovider;
             public String custom1;
             public String custom2;
@@ -50,6 +55,7 @@ public with sharing class ManagePaymentDTOService {
             public String subscriptionname;
             public String startdate;
             public Decimal amount;
+            public Decimal serviceCharge;
         }
         public class BankDetails{
             public String accountType;
@@ -215,6 +221,14 @@ public with sharing class ManagePaymentDTOService {
             public String accountType;
             public String responseMessage;
             public String resultCode;
+            public Decimal amount;
+            public String trackpayTransactionId;
+            public Decimal serviceFee;
+            public String cardServicesResponse;
+            public String trackPayRequestString;
+            public String trackPayResponseString;
+            public String trackPayResponseMessage;
+            public Integer trackPaystatusCode;
         }
 
         public class Auth_Transaction_Reponse_Wrapper{
@@ -226,13 +240,23 @@ public with sharing class ManagePaymentDTOService {
         public class Sub_Reponse_Wrapper{
             public String requestString;
             public String responseString;
+            public String responseMessage;
             public Integer statusCode;
+
+            public String trackPayRequestString;
+            public String trackPayResponseString;
+            public String trackPayResponseMessage;
+            public Integer trackPaystatusCode;
 
             public String refId;
             public String subscriptionId;
+            public String trackPaySubscriptionId;
             public cls_profile profile;
-
+            public String cardServicesResponse;
             public Transaction_messages messages;
+            public Boolean issuccess;
+            public Decimal amount;
+            public Decimal serviceCharge;
         }
 
         public class Transaction_messages{
@@ -380,6 +404,9 @@ public with sharing class ManagePaymentDTOService {
             public String subheader;
             
             @AuraEnabled
+            public String returl;
+
+            @AuraEnabled
             public String transactionkey;
             
             @AuraEnabled
@@ -407,6 +434,7 @@ public with sharing class ManagePaymentDTOService {
             @AuraEnabled  public String firstName;
             @AuraEnabled public String lastName;
             @AuraEnabled public Integer totalOccurrences;
+            @AuraEnabled public String trackPaySubscriptionId;
             @AuraEnabled public Integer pastOccurrences;
             @AuraEnabled public String paymentMethod;
             @AuraEnabled public String accountNumber;

@@ -40,21 +40,32 @@ export default class AddressInput extends LightningElement {
     console.log('AAA', this.addressobj);
     //this.addressobj = {};
     //this.addressobj = this.addressobjtemp;
-    //this.validateAddress();
+    this.validateAddress();
   }
 
   validateAddress() {
-    const allValid = [...this.template.querySelectorAll(".address-required")].reduce(
-      (validSoFar, inputCmp) => {
-        if (this.touched.has(inputCmp.name)) {
-          console.log('**', inputCmp.name);
-          //if we have entered the field. If it's empty and has not been touched, don't show the error field
-          inputCmp.reportValidity();
-        }
-        return validSoFar && inputCmp.checkValidity();
-      },
-      true
-    );
+    //console.log('CROSS', this.template.querySelectorAll(".address-required"));
+    //console.log('ADDRESS>> ', this.addressobj.BillingStreet,  this.addressobj.BillingCity, this.addressobj.BillingState, this.addressobj.BillingPostalCode,
+      //this.addressobj.BillingCountry);
+      let allValid = false;
+
+    if(this.addressobj.BillingStreet && this.addressobj.BillingCity && this.addressobj.BillingState && this.addressobj.BillingPostalCode && this.addressobj.BillingCountry){
+      allValid = [...this.template.querySelectorAll(".address-required")].reduce(
+
+        (validSoFar, inputCmp) => {
+          console.log('>>>', inputCmp);
+
+          if (this.touched.has(inputCmp.name)) {
+            console.log('**', inputCmp.name);
+            //if we have entered the field. If it's empty and has not been touched, don't show the error field
+            inputCmp.reportValidity();
+          }
+          return validSoFar && inputCmp.checkValidity();
+        },
+        true
+      );
+    }
+
     this.validity = allValid;
     if (allValid) {
       this.despatchValidEvent();

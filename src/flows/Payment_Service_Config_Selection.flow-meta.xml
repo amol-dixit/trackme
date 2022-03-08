@@ -92,6 +92,12 @@
             </value>
         </inputAssignments>
         <inputAssignments>
+            <field>Auth_License_Key__c</field>
+            <value>
+                <elementReference>Licence_Key</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
             <field>Auth_Transaction_Key__c</field>
             <value>
                 <elementReference>Transaction_Key_0_0_0</elementReference>
@@ -334,6 +340,12 @@
             <field>Auth_API_Login_Id__c</field>
             <value>
                 <elementReference>API_Login_Id_0_0</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Auth_License_Key__c</field>
+            <value>
+                <elementReference>License_Key_Edit</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -697,6 +709,16 @@
                         <elementReference>Get_Payment_Config.Enable_Encrypted_Payment_URL__c</elementReference>
                     </defaultValue>
                     <fieldText>Enable Encrypted Payment Link</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                </fields>
+                <fields>
+                    <name>License_Key_Edit</name>
+                    <dataType>String</dataType>
+                    <defaultValue>
+                        <elementReference>Get_Payment_Config.Auth_License_Key__c</elementReference>
+                    </defaultValue>
+                    <fieldText>License Key</fieldText>
                     <fieldType>InputField</fieldType>
                     <isRequired>true</isRequired>
                 </fields>
@@ -1112,6 +1134,13 @@
                     <name>Enable_Encrypted_Payment_Link_New</name>
                     <dataType>Boolean</dataType>
                     <fieldText>Enable Encrypted Payment Link?</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                </fields>
+                <fields>
+                    <name>Licence_Key</name>
+                    <dataType>String</dataType>
+                    <fieldText>Licence Key</fieldText>
                     <fieldType>InputField</fieldType>
                     <isRequired>true</isRequired>
                 </fields>

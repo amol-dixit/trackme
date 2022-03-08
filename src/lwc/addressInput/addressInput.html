@@ -65,7 +65,7 @@
         </div>
 
         <div class="slds-form__item" role="listitem">
-          <lightning-input class=" address-form-label slds-form-element_horizontal " onchange={handlePostCodeChange}
+          <lightning-input class=" address-form-label slds-form-element_horizontal address-required" onchange={handlePostCodeChange}
             label="Postal Code" value={addressobj.BillingPostalCode} name="zip" pattern="^(?!\s*$).+" variant={variant}>
           </lightning-input>
         </div>

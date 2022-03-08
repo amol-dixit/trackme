@@ -58,11 +58,15 @@
               <template if:true={urlStateParameters}>
 
                 <div class="slds-media__body">
+                  <div class="slds-form">
+                    <div class="slds-grid slds-gutters">
+                      <div class="slds-col">
 
-                  <div class="slds-form__row slds-form_horizontal">
-                    <div class="slds-form__item" role="listitem" style="font-size: 1rem;">
+                    <div class="slds-form-element slds-form-element_horizontal">
+
+                    <div role="listitem" style="font-size: 1rem;">
                       <div if:false={readonlyproduct}>
-                        <lightning-input type="text" label="Product" value={urlStateParameters.product} required=true
+                        <lightning-input  style="slds-text-heading_medium" type="text" label="Product" value={urlStateParameters.product} required=true
                           onchange={handleproduct}>
                         </lightning-input>
                       </div>
@@ -71,11 +75,15 @@
 
                       </div>
                     </div>
+                    </div>
+                    </div>
+                    <div class="slds-col">
 
-                    <div class="slds-form__item" role="listitem" style="font-size: 1rem;">
+                    <div class="slds-form-element slds-form-element_horizontal">
+                    <div role="listitem" style="font-size: 1rem;">
                       <div if:false={readonlypaymentamount}>
 
-                        $<lightning-input type="number" label="Amount" value={urlStateParameters.amount} required=true
+                        <lightning-input type="number" style="slds-text-heading_medium" label="Amount $" value={urlStateParameters.amount} required=true
                           onchange={handleamount}>
                         </lightning-input>
                       </div>
@@ -87,6 +95,9 @@
 
                       </div>
                     </div>
+                    </div>
+                    </div>
+                  </div>
                   </div>
                   <div class="slds-form__row slds-form_horizontal">
 
@@ -263,7 +274,7 @@
               <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                 <label class="slds-form-element__label" for="single-form-element-id-02"><b>Subscription Date</b></label>
                 <div class="slds-form-element__control">
-                  <lightning-formatted-date-time value={subReponse.subObj.Start_Date__c} year="numeric" month="numeric"
+                  <lightning-formatted-date-time value={subReponse.startDate} year="numeric" month="numeric"
                     day="numeric" hour12="true">
                   </lightning-formatted-date-time>
                 </div>
@@ -288,7 +299,7 @@
               <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                 <label class="slds-form-element__label" for="single-form-element-id-02"><b>Subscription Id</b></label>
                 <div class="slds-form-element__control">
-                  {subReponse.subObj.Subscription_Id__c}
+                  {subReponse.subId}
                 </div>
               </div>
             </div>
@@ -298,7 +309,7 @@
               <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                 <label class="slds-form-element__label" for="single-form-element-id-02"><b>Unit</b></label>
                 <div class="slds-form-element__control">
-                  {subReponse.subObj.Unit__c}
+                  {subReponse.unit}
                 </div>
               </div>
             </div>
@@ -308,7 +319,7 @@
               <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                 <label class="slds-form-element__label" for="single-form-element-id-02"><b>Occurrances</b></label>
                 <div class="slds-form-element__control">
-                  {subReponse.subObj.Occurrances__c}
+                  {subReponse.occurance}
                 </div>
               </div>
             </div>
@@ -318,7 +329,7 @@
               <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
                 <label class="slds-form-element__label" for="single-form-element-id-02"><b>Length</b></label>
                 <div class="slds-form-element__control">
-                  {subReponse.subObj.Length__c}
+                  {subReponse.length}
                 </div>
               </div>
             </div>

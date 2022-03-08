@@ -15,6 +15,10 @@
                 <behavior>Edit</behavior>
                 <field>Auth_API_Login_Id__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Auth_License_Key__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>

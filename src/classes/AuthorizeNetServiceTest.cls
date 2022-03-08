@@ -37,8 +37,8 @@ private with sharing class AuthorizeNetServiceTest {
               pconfig.Object_Api_Name__c = 'Opportunity';
               pconfig.Auth_API_Login_Id__c = 'Auth_API_Login_Id__c';
               pconfig.Auth_Transaction_Key__c = 'Auth_Transaction_Key__c';
+              pconfig.Auth_License_Key__c = 'gCcQVL1tH+x6Kjo97W32Y501YXVfbCWhPONvH/LJCfD8eOG1qFyeFBm59kIwnGZriZSyMmlDhXkD1LSDnPYxChsNMcj1WicPL9E8QWqyUahP0+9H8e4UIxXI0aZXVQZs';
               pconfig.Amount_API_Name__c = 'Amount';
-              
               insert pconfig;
 
               pconfig = new Payment_Configuration__c();
@@ -48,21 +48,73 @@ private with sharing class AuthorizeNetServiceTest {
               pconfig.Object_Api_Name__c = 'Opportunity';
               pconfig.Secret_Key__c = 'Secret_Key__c';
               pconfig.Amount_API_Name__c = 'Amount';
-              
+              pconfig.Auth_License_Key__c = 'gCcQVL1tH+x6Kjo97W32Y501YXVfbCWhPONvH/LJCfD8eOG1qFyeFBm59kIwnGZriZSyMmlDhXkD1LSDnPYxChsNMcj1WicPL9E8QWqyUahP0+9H8e4UIxXI0aZXVQZs';
               insert pconfig;
 
         }
+
+        public static void initServiceCharge(Boolean log){
+            accts = new List<Account>();
+            Integer numAccts = 3;
+            Integer numOppsPerAcct = 3;
+            
+            for(Integer i=0;i<numAccts;i++) {
+                Account a = new Account(Name='TestAccount', BillingLatitude= 
+                36.8833934000, BillingLongitude=    
+                -76.2246008000);
+                accts.add(a);
+            }
+            insert accts;
     
+            Product2 prod = new Product2(Name = 'Test Product', 
+            Family = 'CampusEd', isactive = true);
+            insert prod;
+            Id pricebookId = Test.getStandardPricebookId();
+            update new Pricebook2(id = pricebookId, Name = 'Standard Price Book');
+    
+            PricebookEntry pbeid = new PricebookEntry(pricebook2id = pricebookId, product2id = prod.id,unitprice=1.0, isActive=true );
+            insert pbeid;
+  
+            opportunityObj = new Opportunity(Name=accts[0].Name + 'Parent Opportunity ',
+                            StageName='CONFIRMED',
+                            CloseDate=System.today()+20,
+                            AccountId=accts[0].Id, Amount =200);
+            insert opportunityObj;
+            Payment_Configuration__c pconfig = new Payment_Configuration__c();
+            if(log)
+            pconfig.Enable_Logging__c = true;
+            pconfig.Name = 'Authorize.Net';
+            pconfig.Object_Api_Name__c = 'Opportunity';
+            pconfig.Auth_API_Login_Id__c = 'Auth_API_Login_Id__c';
+            pconfig.Auth_Transaction_Key__c = 'Auth_Transaction_Key__c';
+            pconfig.Auth_License_Key__c = 'qhsYWRcH36jYAulA1JpaCXvS7L5TVcGDL7STpP201limguxBxt+/FXOUzI7L4qZ0HkeuSYWCshgDNYM6OMgPiwyVZQ7STILAj63OrAy+O3o5eIniRQDwDvx6so5SJV9P';
+            pconfig.Amount_API_Name__c = 'Amount';
+            
+            insert pconfig;
+
+            pconfig = new Payment_Configuration__c();
+            if(log)
+            pconfig.Enable_Logging__c = true;
+            pconfig.Name = 'Stripe';
+            pconfig.Object_Api_Name__c = 'Opportunity';
+            pconfig.Secret_Key__c = 'Secret_Key__c';
+            pconfig.Amount_API_Name__c = 'Amount';
+            pconfig.Auth_License_Key__c = 'gCcQVL1tH+x6Kjo97W32Y501YXVfbCWhPONvH/LJCfD8eOG1qFyeFBm59kIwnGZriZSyMmlDhXkD1LSDnPYxChsNMcj1WicPL9E8QWqyUahP0+9H8e4UIxXI0aZXVQZs';
+            
+            insert pconfig;
+
+      }
+
         static testMethod void testChargeTransaction_Card_Positive() {
             init(true);
             Test.setMock(HttpCalloutMock.class, new AuthorizeChargeTransactionCardCalloutMock());
             Test.startTest();
-            ManagePaymentDTOService.ChargeTransactionResponse response = ManagePaymentService.chargeTransaction('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 22","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{"BillingStreet":"23 Ave D","BillingCity":"Norwalk","BillingState":"CT","BillingPostalCode":"06902","BillingCountry":"USA","internationalAddress":false},"otherdetails":{"paymentserviceprovider":"Authorize.Net","product":"GC5000 series","amount":223,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
+            ManagePaymentDTOService.ChargeTransactionResponse response = ManagePaymentService.chargeTransaction('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 22","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{"BillingStreet":"23 Ave D","BillingCity":"Norwalk","BillingState":"CT","BillingPostalCode":"06902","BillingCountry":"USA","internationalAddress":false},"otherdetails":{"paymentserviceprovider":"Authorize.Net","product":"GC5000 series","amount":500,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
             Test.stopTest();
             system.assertEquals(true, response.success);
             system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
             system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
-            system.assertEquals([ SELECT Amount__c FROM Payment__c ].Amount__c, 223);
+            system.assertEquals([ SELECT Amount__c FROM Payment__c ].Amount__c, 500);
         }
 
         static testMethod void testChargeTransaction_Bank_Positive() {
@@ -141,7 +193,6 @@ private with sharing class AuthorizeNetServiceTest {
             init(true);
 
             Test.setMock(HttpCalloutMock.class, new AuthorizeChargeTransactionCardCalloutMock());
-            ManagePaymentDTOService.ChargeTransactionResponse response = ManagePaymentService.chargeTransaction('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 22","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{"BillingStreet":"23 Ave D","BillingCity":"Norwalk","BillingState":"CT","BillingPostalCode":"06902","BillingCountry":"USA","internationalAddress":false},"otherdetails":{"paymentserviceprovider":"Authorize.Net","product":"GC5000 series","amount":223,"refid":"0065e000002WY5QAAW","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
             Payment__c payment = new Payment__c();
             payment.Transaction_Id__c = 'Transaction_Id__c';
             payment.SObect_API_Name__c = 'Opportunity';
@@ -168,8 +219,6 @@ private with sharing class AuthorizeNetServiceTest {
             init(true);
 
             Test.setMock(HttpCalloutMock.class, new AuthorizeChargeTransactionCardCalloutMock());
-            ManagePaymentDTOService.ChargeTransactionResponse response = ManagePaymentService.chargeTransaction('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 22","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{"BillingStreet":"23 Ave D","BillingCity":"Norwalk","BillingState":"CT","BillingPostalCode":"06902","BillingCountry":"USA","internationalAddress":false},"otherdetails":{"paymentserviceprovider":"Authorize.Net","product":"GC5000 series","amount":223,"refid":"0065e000002WY5QAAW","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
-            System.debug('response====>' + response);
             Payment__c payment = new Payment__c();
             payment.Transaction_Id__c = 'Transaction_Id__c';
             payment.SObect_API_Name__c = 'Opportunity';
@@ -186,18 +235,16 @@ private with sharing class AuthorizeNetServiceTest {
             ManagePaymentService.voidTransaction(payment.id);
             Test.stopTest();
     
-            //system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
-            //system.assertEquals([ SELECT Voided__c FROM Payment__c where id =: payment.id].Voided__c, false);
+            system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
+            system.assertEquals([ SELECT Voided__c FROM Payment__c where id =: payment.id].Voided__c, false);
 
         }
-
-
 
         static testMethod void tesCreateSubscription_Card_Positive() {
             init(true);
             Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionCalloutMock());
             Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":223,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Authorize.Net"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"223","unit":"Monthly"}}');
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":500,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Authorize.Net"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"500","unit":"Monthly"}}');
             Test.stopTest();
             system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
             system.assertEquals(true, response.success);
@@ -210,7 +257,7 @@ private with sharing class AuthorizeNetServiceTest {
             init(true);
             Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionErrorCalloutMock());
             Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":223,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Authorize.Net"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"223","unit":"Monthly"}}');
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":500,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Authorize.Net"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"500","unit":"Monthly"}}');
             Test.stopTest();
             system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
             system.assertEquals(false, response.success);
@@ -221,7 +268,7 @@ private with sharing class AuthorizeNetServiceTest {
             init(true);
             Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionErrorCalloutMock());
             Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":223,"refid":"","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":""},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"223","unit":"Monthly"}}');
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":500,"refid":"","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":""},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"500","unit":"Monthly"}}');
             Test.stopTest();
             system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
             system.assertEquals(false, response.success);
@@ -293,7 +340,7 @@ private with sharing class AuthorizeNetServiceTest {
 
             Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionCalloutMock());
             Test.startTest();
-            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":223,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Authorize.Net"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"223","unit":"Monthly"}}');
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC5000 series","amount":500,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Authorize.Net"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"500","unit":"Monthly"}}');
             Test.stopTest();
             system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
             system.assertEquals(true, response.success);
@@ -302,7 +349,7 @@ private with sharing class AuthorizeNetServiceTest {
             system.assertEquals([ SELECT Subscription_Id__c FROM Subscription__c ].Subscription_Id__c, '7787847');
 
 
-            ManagePaymentDTOService.SubscriptionWrapper response2 = ManagePaymentService.getSubscriptions('{"carddetails":{},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"Authorize.Net","product":"GC5000 series","amount":223,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
+            ManagePaymentDTOService.SubscriptionWrapper response2 = ManagePaymentService.getSubscriptions('{"carddetails":{},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"Authorize.Net","product":"GC5000 series","amount":500,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
             system.assert(response2.subscriptionDetails.size() >0);
         }
 
@@ -318,7 +365,7 @@ private with sharing class AuthorizeNetServiceTest {
         static testMethod void tesProcessWebhook_Positive() {
 
             RestRequest req = new RestRequest();
-            req.requestBody = Blob.valueOf('{"notificationId":"93563fe2-5167-4748-ab8a-1711eab2d2af","eventType":"net.authorize.payment.authcapture.created","eventDate":"2021-11-05T09:32:01.4676216Z","webhookId":"f2cc88f7-a21f-4195-bb58-95c664a525ec","payload":{"responseCode":1,"authCode":"O1BSY4","avsResponse":"Y","authAmount":223.00,"entityName":"transaction","id":"60178879262"}}');
+            req.requestBody = Blob.valueOf('{"notificationId":"93563fe2-5167-4748-ab8a-1711eab2d2af","eventType":"net.authorize.payment.authcapture.created","eventDate":"2021-11-05T09:32:01.4676216Z","webhookId":"f2cc88f7-a21f-4195-bb58-95c664a525ec","payload":{"responseCode":1,"authCode":"O1BSY4","avsResponse":"Y","authAmount":500.00,"entityName":"transaction","id":"60178879262"}}');
             RestResponse res = new RestResponse();
             req.requestURI = '/services/apexrest/AuthorizeNetPaymentWebhook';
             req.httpMethod = 'POST';
@@ -333,11 +380,283 @@ private with sharing class AuthorizeNetServiceTest {
             insert sub;
             Test.startTest();
             AuthorizeNetPaymentWebhook.postPayment();
-            //ManagePaymentService.processWebhook('{"notificationId":"93563fe2-5167-4748-ab8a-1711eab2d2af","eventType":"net.authorize.payment.authcapture.created","eventDate":"2021-11-05T09:32:01.4676216Z","webhookId":"f2cc88f7-a21f-4195-bb58-95c664a525ec","payload":{"responseCode":1,"authCode":"O1BSY4","avsResponse":"Y","authAmount":223.00,"entityName":"transaction","id":"60178879262"}}');
+            //ManagePaymentService.processWebhook('{"notificationId":"93563fe2-5167-4748-ab8a-1711eab2d2af","eventType":"net.authorize.payment.authcapture.created","eventDate":"2021-11-05T09:32:01.4676216Z","webhookId":"f2cc88f7-a21f-4195-bb58-95c664a525ec","payload":{"responseCode":1,"authCode":"O1BSY4","avsResponse":"Y","authAmount":500.00,"entityName":"transaction","id":"60178879262"}}');
             Test.stopTest();
             system.assertEquals([ SELECT count() FROM Payment__c ], 1);
 
         }
+
+        static testMethod void serviceChargetestChargeTransaction_Card_Positive() {
+            initServiceCharge(true);
+            Test.setMock(HttpCalloutMock.class, new AuthorizeChargeTransactionCardCalloutMock());
+            Test.startTest();
+            ManagePaymentDTOService.ChargeTransactionResponse response = ManagePaymentService.chargeTransaction('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 22","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{"BillingStreet":"23 Ave D","BillingCity":"Norwalk","BillingState":"CT","BillingPostalCode":"06902","BillingCountry":"USA","internationalAddress":false},"otherdetails":{"paymentserviceprovider":"Authorize.Net","product":"GC4450 series","amount":445,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
+            Test.stopTest();
+            system.assertEquals(true, response.success);
+            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
+            system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
+            system.assertEquals([ SELECT Amount__c FROM Payment__c ].Amount__c, 422.75);
+            system.assertEquals([ SELECT Card_Services_Fee__c FROM Payment__c ].Card_Services_Fee__c, 22.25);
+        }
+        
+        static testMethod void serviceChargetestChargeTransaction_Bank_Positive() {
+            initServiceCharge(true);
+            Test.setMock(HttpCalloutMock.class, new AuthorizeChargeTransactionBankCalloutMock());
+            Test.startTest();
+            ManagePaymentDTOService.ChargeTransactionResponse response = ManagePaymentService.chargeTransaction('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"LName","cardHolderFirstName":"FName","cardCVV":"222","cardExpiry":"02 / 22","cardType":"visa","cardEmail":"test@test.com"},"addressdetails":{"BillingCountry":"United States","BillingStreet":"add1","BillingCity":"city","BillingPostalCode":"08990","BillingState":"NY"},"otherdetails":{"product":"testproduct","amount":"20","refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity", "paymentserviceprovider":"Authorize.Net"},"bankdetails":{"accountType":"checking","routingNumber":"063100277","accountNumber":"063100277","nameOnAccount":"Test"}}');
+            Test.stopTest();
+            system.debug('LOG==>' + [ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ]);
+            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
+            system.assertEquals(true, response.success);
+            system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
+            system.assertEquals([ SELECT Amount__c FROM Payment__c ].Amount__c, 19);
+            system.assertEquals([ SELECT Card_Services_Fee__c FROM Payment__c ].Card_Services_Fee__c, 1);
+        
+        }   
+        
+        static testMethod void serviceChargetestChargeTransaction_Bank_Negative() {
+            initServiceCharge(true);
+            Test.setMock(HttpCalloutMock.class, new AuthorizeChargeTransactionBankCalloutMockNegative());
+            Test.startTest();
+            ManagePaymentService.chargeTransaction('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"LName","cardHolderFirstName":"FName","cardCVV":"222","cardExpiry":"02 / 22","cardType":"visa","cardEmail":"test@test.com"},"addressdetails":{"BillingCountry":"United States","BillingStreet":"add1","BillingCity":"city","BillingPostalCode":"08990","BillingState":"NY"},"otherdetails":{"product":"testproduct","amount":"22","refid":"0065e000002WY5Q","fieldapiname":"Opportunity__c","objectapiname":"Opportunity", "paymentserviceprovider":"Authorize.Net"},"bankdetails":{"accountType":"checking","routingNumber":"063100277","accountNumber":"063100277","nameOnAccount":"Test"}}');
+            Test.stopTest();
+            system.assertEquals([ SELECT Id FROM Payment__c ].size(), 0);
+        }   
+        
+        static testMethod void serviceChargerefundTransaction_Positive() {
+            initServiceCharge(true);
+        
+            Payment__c payment = new Payment__c();
+            payment.Transaction_Id__c = 'Transaction_Id__c';
+            payment.SObect_API_Name__c = 'Opportunity';
+            payment.Source__c = 'Authorize.Net';
+            payment.Amount__c = 28.5;
+            payment.Card_Services_Fee__c = 1.5;
+            payment.TrackPay_Transaction_Id__c = '1223';
+            payment.Card_Number__c = '2222222222';
+        
+            insert payment;
+            Test.startTest();
+        
+            Test.setMock(HttpCalloutMock.class, new AuthorizeNetHttpRefundCalloutMock());
+        
+            ManagePaymentService.refundTransaction(payment.id);
+            Test.stopTest();
+        
+            system.assertEquals([ SELECT Id FROM Payment__c ].size(), 2);
+            system.assertEquals([ SELECT Refund_Result_Code__c FROM Payment__c where id =: payment.id].Refund_Result_Code__c, 'Ok');
+            system.assertEquals([ SELECT Refunded__c FROM Payment__c where id =: payment.id].Refunded__c, true);
+            system.assertEquals([ SELECT Refunded__c FROM Payment__c where id !=: payment.id].Refunded__c, true);
+            system.assertEquals([ SELECT Amount__c FROM Payment__c where id !=: payment.id].Amount__c, -28.5);
+            system.assertEquals([ SELECT Card_Services_Fee__c FROM Payment__c where id !=: payment.id].Card_Services_Fee__c, -1.5);
+        
+        }   
+        
+        static testMethod void serviceChargerefundTransaction_Negative() {
+            initServiceCharge(true);
+            Payment__c payment = new Payment__c();
+            payment.Transaction_Id__c = 'Transaction_Id__c';
+            payment.SObect_API_Name__c = 'Opportunity';
+            payment.Source__c = 'Authorize.Net';
+            payment.Amount__c = 30;
+            payment.Card_Number__c = '2222222222';
+        
+            insert payment;
+        
+            Test.startTest();
+        
+            Test.setMock(HttpCalloutMock.class, new AuthorizeNetHttpRefundErrorCalloutMock());
+        
+            ManagePaymentService.refundTransaction(payment.id);
+            Test.stopTest();
+        
+            system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
+            system.assertNotEquals([ SELECT Refund_Result_Code__c FROM Payment__c where id =: payment.id].Refund_Result_Code__c, 'Ok');
+            system.assertEquals([ SELECT Refunded__c FROM Payment__c where id =: payment.id].Refunded__c, false);
+        
+        }
+        
+        static testMethod void serviceChargevoidTransaction_Positive() {
+            initServiceCharge(true);
+        
+            Test.setMock(HttpCalloutMock.class, new AuthorizeChargeTransactionCardCalloutMock());
+            Payment__c payment = new Payment__c();
+            payment.Transaction_Id__c = 'Transaction_Id__c';
+            payment.TrackPay_Transaction_Id__c = 'TrackPay_Transaction_Id__c';
+            payment.SObect_API_Name__c = 'Opportunity';
+            payment.Source__c = 'Authorize.Net';
+            payment.Amount__c = 28.5;
+            payment.Card_Services_Fee__c = 1.5;
+            payment.Card_Number__c = '2222222222';
+        
+            insert payment;
+            Test.startTest();
+        
+            Test.setMock(HttpCalloutMock.class, new AuthorizeNetHttpVoidCalloutMock());
+        
+            ManagePaymentService.voidTransaction(payment.id);
+            Test.stopTest();
+        
+            system.assertEquals([ SELECT Id FROM Payment__c ].size(), 2);
+            system.assertEquals([ SELECT Voided__c FROM Payment__c where id =: payment.id].Voided__c, true);
+            system.assertEquals([ SELECT Voided__c FROM Payment__c where id !=: payment.id].Voided__c, true);
+            system.assertEquals([ SELECT Amount__c FROM Payment__c where id !=: payment.id].Amount__c, -28.5);
+            system.assertEquals([ SELECT Card_Services_Fee__c FROM Payment__c where id !=: payment.id].Card_Services_Fee__c, -1.5);
+
+        
+        }
+        
+        static testMethod void serviceChargevoidTransaction_Negative() {
+            initServiceCharge(true);
+        
+            Test.setMock(HttpCalloutMock.class, new AuthorizeChargeTransactionCardCalloutMock());
+            Payment__c payment = new Payment__c();
+            payment.Transaction_Id__c = 'Transaction_Id__c';
+            payment.SObect_API_Name__c = 'Opportunity';
+            payment.Source__c = 'Authorize.Net';
+            payment.Amount__c = 30;
+            payment.Card_Number__c = '2222222222';
+            
+            
+            insert payment;
+            Test.startTest();
+        
+            Test.setMock(HttpCalloutMock.class, new AuthorizeNetHttpVoidErrorCalloutMock());
+        
+            ManagePaymentService.voidTransaction(payment.id);
+            Test.stopTest();
+        
+            system.assertEquals([ SELECT Id FROM Payment__c ].size(), 1);
+            system.assertEquals([ SELECT Voided__c FROM Payment__c where id =: payment.id].Voided__c, false);
+        
+        }
+        
+        static testMethod void serviceChargetesCreateSubscription_Card_Positive() {
+            initServiceCharge(true);
+            Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionCalloutMock());
+            Test.startTest();
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC4450 series","amount":445,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Authorize.Net"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"445","unit":"Monthly"}}');
+            Test.stopTest();
+            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
+            system.assertEquals(true, response.success);
+            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
+            system.assertEquals([ SELECT count() FROM Subscription__c ], 1);
+            system.assertEquals([ SELECT Subscription_Id__c FROM Subscription__c ].Subscription_Id__c, '7787847');
+            system.assertEquals([ SELECT Amount__c FROM Subscription__c ].Amount__c, 422.75);
+            system.assertEquals([ SELECT Card_Services_Fee__c FROM Subscription__c ].Card_Services_Fee__c, 22.25);
+
+        }
+        
+        static testMethod void serviceChargetesCreateSubscription_Card_Negative() {
+            initServiceCharge(true);
+            Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionErrorCalloutMock());
+            Test.startTest();
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC4450 series","amount":445,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Authorize.Net"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"445","unit":"Monthly"}}');
+            Test.stopTest();
+            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
+            system.assertEquals(false, response.success);
+            system.assertEquals([ SELECT count() FROM Subscription__c ], 0);
+        }
+        
+        static testMethod void serviceChargetesCreateSubscription_Card_Negative_Exception() {
+            initServiceCharge(true);
+            Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionErrorCalloutMock());
+            Test.startTest();
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC4450 series","amount":445,"refid":"","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":""},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"445","unit":"Monthly"}}');
+            Test.stopTest();
+            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
+            system.assertEquals(false, response.success);
+            system.assertEquals([ SELECT count() FROM Subscription__c ], 0);
+        }
+        
+        static testMethod void serviceChargetesUpdateSubscription_Card_Positive() {
+            initServiceCharge(true);
+            Subscription__c sub = new Subscription__c();
+            sub.Subscription_Id__c = '7787847';
+            sub.TrackPay_Subscription_Id__c = '7787847';
+
+            insert sub;
+            Test.setMock(HttpCalloutMock.class, new AuthorizeUpdateSubscriptionCalloutMock());
+            Test.startTest();
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.updateSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"Authorize.Net","refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","subscriptionId":7787847, "trackPaySubscriptionId": 1233},"bankdetails":{},"subdetails":{}}');
+            Test.stopTest();
+            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
+            system.assertEquals(true, response.success);
+            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
+            system.assertEquals([ SELECT count() FROM Subscription__c ], 1);
+            system.assertEquals([ SELECT Subscription_Id__c FROM Subscription__c ].Subscription_Id__c, '7787847');
+
+
+        }
+        
+        static testMethod void serviceChargetesUpdateSubscription_Card_Negative() {
+            initServiceCharge(true);
+            Subscription__c sub = new Subscription__c();
+            sub.Subscription_Id__c = '7787847';
+            sub.TrackPay_Subscription_Id__c = '7787847';
+
+            insert sub;
+            Test.setMock(HttpCalloutMock.class, new AuthorizeUpdateSubscriptionCalloutMock());
+            Test.startTest();
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.updateSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"","refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","subscriptionId":7787847, "trackPaySubscriptionId": 1233},"bankdetails":{},"subdetails":{}}');
+            Test.stopTest();
+            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
+            system.assertEquals(false, response.success);
+        }
+        
+        static testMethod void serviceChargetesCancelSubscription_Card_Positive() {
+            initServiceCharge(true);
+            Test.setMock(HttpCalloutMock.class, new AuthorizeCancelSubscriptionCalloutMock());
+            Subscription__c sub = new Subscription__c();
+            sub.Subscription_Id__c = '7787847';
+            sub.TrackPay_Subscription_Id__c = '7787847';
+
+            insert sub;
+        
+            Test.startTest();
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.cancelSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"Authorize.Net","refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","subscriptionId":7787847, "trackPaySubscriptionId": 1233},"bankdetails":{},"subdetails":{}}');
+            Test.stopTest();
+            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
+            system.assertEquals(true, response.success);
+            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
+            system.assertEquals([ SELECT count() FROM Subscription__c ], 1);
+            system.assertEquals([ SELECT Status__c FROM Subscription__c ].Status__c, 'InActive');
+        }
+        
+        static testMethod void serviceChargetesCancelSubscription_Card_Negative() {
+            initServiceCharge(true);
+            Test.setMock(HttpCalloutMock.class, new AuthorizeCancelSubscriptionCalloutMock());
+            Subscription__c sub = new Subscription__c();
+            sub.Subscription_Id__c = '7787847';
+            sub.TrackPay_Subscription_Id__c = '7787847';
+
+            insert sub;
+        
+            Test.startTest();
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.cancelSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"222","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"","refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","subscriptionId":7787847, "trackPaySubscriptionId": 1233},"bankdetails":{},"subdetails":{}}');
+            Test.stopTest();
+            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
+            system.assertEquals(false, response.success);
+        }
+        
+        static testMethod void serviceChargetesGetSubscriptions_Card_Positive() {
+            initServiceCharge(true);
+        
+            Test.setMock(HttpCalloutMock.class, new AuthorizeCreateSubscriptionCalloutMock());
+            Test.startTest();
+            ManagePaymentDTOService.SubscriptionTransactionResponse response = ManagePaymentService.createSubscription('{"carddetails":{"cardNumber":"4007 0000 0002 7","cardHolderLastName":"May","cardHolderFirstName":"Norm","cardCVV":"333","cardExpiry":"02 / 23","cardType":"visa","cardEmail":"norm_may@greenwich.net"},"addressdetails":{},"otherdetails":{"product":"GC4450 series","amount":445,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity","paymentserviceprovider":"Authorize.Net"},"bankdetails":{},"subdetails":{"subname":"Hello","startdate":"2021-11-05","occurrances":"12","amount":"445","unit":"Monthly"}}');
+            Test.stopTest();
+            system.debug('LOGGG===>'+[ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c);
+            system.assertEquals(true, response.success);
+            system.assertEquals([ SELECT Error_Message__c, Request_Body__c, Response_Body__c, Status_Code__c FROM API_Tracker__c ].Error_Message__c, null);
+            system.assertEquals([ SELECT count() FROM Subscription__c ], 1);
+            system.assertEquals([ SELECT Subscription_Id__c FROM Subscription__c ].Subscription_Id__c, '7787847');
+        
+        
+            ManagePaymentDTOService.SubscriptionWrapper response2 = ManagePaymentService.getSubscriptions('{"carddetails":{},"addressdetails":{},"otherdetails":{"paymentserviceprovider":"Authorize.Net","product":"GC4450 series","amount":445,"refid":"'+opportunityObj.id+'","fieldapiname":"Opportunity__c","objectapiname":"Opportunity"},"bankdetails":{},"subdetails":{}}');
+            system.assert(response2.subscriptionDetails.size() >0);
+        }
+        
 
         public class AuthorizeChargeTransactionCardCalloutMock implements HttpCalloutMock {
             // Implement this interface method
@@ -489,7 +808,7 @@ private with sharing class AuthorizeNetServiceTest {
                 // Create a fake response
                 HttpResponse response = new HttpResponse();
                 response.setHeader('Content-Type', 'application/json');
-                response.setBody('{"totalNumInResultSet":1,"subscriptionDetails":[{"id":7788411,"name":"test","status":"active","createTimeStampUTC":"2021-11-05T13:56:50.55","firstName":"Norm","lastName":"May","totalOccurrences":1,"pastOccurrences":0,"paymentMethod":"creditCard","accountNumber":"XXXX0027","invoice":"","amount":223.00,"currencyCode":"USD","customerProfileId":902338860,"customerPaymentProfileId":902162688}],"refId":"00Q5e0000050XnjEAE","messages":{"resultCode":"Ok","message":[{"code":"I00001","text":"Successful."}]}}');
+                response.setBody('{"totalNumInResultSet":1,"subscriptionDetails":[{"id":7788411,"name":"test","status":"active","createTimeStampUTC":"2021-11-05T13:56:50.55","firstName":"Norm","lastName":"May","totalOccurrences":1,"pastOccurrences":0,"paymentMethod":"creditCard","accountNumber":"XXXX0027","invoice":"","amount":500.00,"currencyCode":"USD","customerProfileId":902338860,"customerPaymentProfileId":902162688}],"refId":"00Q5e0000050XnjEAE","messages":{"resultCode":"Ok","message":[{"code":"I00001","text":"Successful."}]}}');
                 response.setStatusCode(200);
                 return response; 
             }
@@ -502,7 +821,7 @@ private with sharing class AuthorizeNetServiceTest {
                 // Create a fake response
                 HttpResponse response = new HttpResponse();
                 response.setHeader('Content-Type', 'application/json');
-                response.setBody('{"transaction1":{"transId":"60178879262","submitTimeUTC":"2021-11-05T09:32:01.38Z","submitTimeLocal":"2021-11-05T02:32:01.38","transactionType":"authCaptureTransaction","transactionStatus":"capturedPendingSettlement","responseCode":1,"responseReasonCode":1,"subscription":{"id":7787427,"payNum":1},"responseReasonDescription":"Approval","authCode":"O1BSY4","AVSResponse":"Y","cardCodeResponse":"P","authAmount":223.00,"settleAmount":223.00,"taxExempt":false,"payment":{"creditCard":{"cardNumber":"XXXX0027","expirationDate":"XXXX","cardType":"Visa"}},"billTo":{"firstName":"Norm","lastName":"May"},"recurringBilling":false,"product":"Card Not Present","marketType":"eCommerce","networkTransId":"QMJLQWUM0ONVWPFMPJUSDNF","authorizationIndicator":"final"},"messages":{"resultCode":"Ok","message":[{"code":"I00001","text":"Successful."}]}}');
+                response.setBody('{"transaction1":{"transId":"60178879262","submitTimeUTC":"2021-11-05T09:32:01.38Z","submitTimeLocal":"2021-11-05T02:32:01.38","transactionType":"authCaptureTransaction","transactionStatus":"capturedPendingSettlement","responseCode":1,"responseReasonCode":1,"subscription":{"id":7787427,"payNum":1},"responseReasonDescription":"Approval","authCode":"O1BSY4","AVSResponse":"Y","cardCodeResponse":"P","authAmount":500.00,"settleAmount":500.00,"taxExempt":false,"payment":{"creditCard":{"cardNumber":"XXXX0027","expirationDate":"XXXX","cardType":"Visa"}},"billTo":{"firstName":"Norm","lastName":"May"},"recurringBilling":false,"product":"Card Not Present","marketType":"eCommerce","networkTransId":"QMJLQWUM0ONVWPFMPJUSDNF","authorizationIndicator":"final"},"messages":{"resultCode":"Ok","message":[{"code":"I00001","text":"Successful."}]}}');
                 response.setStatusCode(200);
                 return response; 
             }

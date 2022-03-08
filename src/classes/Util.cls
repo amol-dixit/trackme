@@ -3,6 +3,8 @@
  * 
  */
 public with sharing class Util {
+
+	private static String licencekey = '2J<4QXFbws4Kh|J2';
 	/**
 	 * This method generatess a payment url for dynamically.
 	 */
@@ -110,7 +112,7 @@ public with sharing class Util {
 	// This method encrypts the payment url based on the encryption key
     public static String encrypt(String encryptionData, String key){
 
-        return EncodingUtil.base64Encode(Crypto.encryptWithManagedIV('AES128', Blob.valueOf(key == null ? 'trackmepaymentss' : key), Blob.valueOf(encryptionData)));   
+        return EncodingUtil.base64Encode(Crypto.encryptWithManagedIV('AES128', Blob.valueOf(key == null ? licencekey : key), Blob.valueOf(encryptionData)));   
     }
 
 	// This method decrypts the payment url based on the key
@@ -118,7 +120,7 @@ public with sharing class Util {
 		System.debug('encryptedString====>' + encryptedString);
 		Blob decodestring = EncodingUtil.base64decode(encryptedString);
 
-        return Crypto.decryptWithManagedIV('AES128', Blob.valueOf(key == null ? 'trackmepaymentss' : key), decodestring).toString();  
+        return Crypto.decryptWithManagedIV('AES128', Blob.valueOf(key == null ? licencekey : key), decodestring).toString();  
     }
 
 
