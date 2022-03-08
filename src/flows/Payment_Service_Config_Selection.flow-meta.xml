@@ -575,7 +575,7 @@
         </connector>
         <fields>
             <name>HomeHeader</name>
-            <fieldText>&lt;p&gt;&lt;b style=&quot;font-size: 22px;&quot;&gt;TrackMe - Payment Configurations&lt;/b&gt;&lt;/p&gt;</fieldText>
+            <fieldText>&lt;p&gt;&lt;b style=&quot;font-size: 22px;&quot;&gt;TrackPay - Payment Configurations&lt;/b&gt;&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
         </fields>
         <fields>
@@ -1208,7 +1208,7 @@
                     <name>Encryption_Key_New</name>
                     <dataType>String</dataType>
                     <defaultValue>
-                        <stringValue>trackmepaymentss</stringValue>
+                        <stringValue>TrackPaypaymentss</stringValue>
                     </defaultValue>
                     <fieldText>Encryption Key</fieldText>
                     <fieldType>InputField</fieldType>
