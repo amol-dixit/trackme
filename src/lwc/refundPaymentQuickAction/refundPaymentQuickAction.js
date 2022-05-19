@@ -26,7 +26,6 @@ export default class RefundPaymentQuickAction extends LightningElement {
 
         refundTransaction({ paymentId: this.recordId })
 		.then(result => {
-      console.log('result', result);
       this.paymentResult = result;
       if(result.success == true){
           const event = new ShowToastEvent({

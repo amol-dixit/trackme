@@ -83,7 +83,7 @@ global with sharing class ManagePaymentService {
                 paymentObj.Custom_4__c = paymentDetails.otherDetails.custom4;
                 paymentObj.Transaction_Key__c = paymentDetails.otherDetails.transactionkey;
 
-                ManagePaymentServiceHelper.handleInsertDML(paymentObj);
+                ManagePaymentServiceHelper.handleInsertDML(new List<Payment__c> { paymentObj });
                 at.Payment__c = paymentObj.id;
 
                 System.debug('paymentObj==>' + paymentObj.id);
@@ -107,7 +107,7 @@ global with sharing class ManagePaymentService {
 
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
-                ManagePaymentServiceHelper.handleInsertDML(at);
+                ManagePaymentServiceHelper.handleInsertDML(new List<API_Tracker__c> { at } );
             }
 
         }
@@ -120,7 +120,7 @@ global with sharing class ManagePaymentService {
     @AuraEnabled
     public static ManagePaymentDTOService.TransactionResponse refundTransaction(Id paymentId){
 
-        List<Payment__c> paymentList = Database.query('SELECT Card_Services_Fee__c, TrackPay_Transaction_Id__c, SObect_API_Name__c, Amount__c,Bill_To_Address__c,Bill_To_City__c,Bill_To_Country__c,Bill_To_First_Name__c,Bill_To_Last_Name__c,Bill_To_Phone__c,Bill_To_State__c,Bill_To_Zip__c,Card_Number__c,Card_Type__c,CreatedById,CreatedDate,Customer_Id__c,Email__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Name,Opportunity__c,OwnerId,Payment_Date__c,Refund_Response__c,Refund_Result_Code__c,Ship_To_Address__c,Ship_To_City__c,Ship_To_Country__c,Ship_To_State__c,Ship_To_Zip__c,Source__c,SystemModstamp,Transaction_Id__c,Transaction_Status__c from Payment__c where id =: paymentId');
+        List<Payment__c> paymentList = Database.query('SELECT Subscription__r.TrackPay_Subscription_Id__c, Payment_Number__c, Subscription__r.TrackPay_Customer_Profile_Id__c, Subscription__r.TrackPay_Customer_Payment_Profile_Id__c, Subscription__c, Subscription__r.Routing_Number__c, Subscription__r.Account_Number__c, Subscription__r.Name_on_Account__c, Routing_Number__c, Account_Number__c, Name_on_Account__c, Card_Services_Fee__c, TrackPay_Transaction_Id__c, SObect_API_Name__c, Amount__c,Bill_To_Address__c,Bill_To_City__c,Bill_To_Country__c,Bill_To_First_Name__c,Bill_To_Last_Name__c,Bill_To_Phone__c,Bill_To_State__c,Bill_To_Zip__c,Card_Number__c,Card_Type__c,CreatedById,CreatedDate,Customer_Id__c,Email__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Name,Opportunity__c,OwnerId,Payment_Date__c,Refund_Response__c,Refund_Result_Code__c,Ship_To_Address__c,Ship_To_City__c,Ship_To_Country__c,Ship_To_State__c,Ship_To_Zip__c,Source__c,SystemModstamp,Transaction_Id__c,Transaction_Status__c from Payment__c where id =: paymentId');
         ManagePaymentDTOService.TransactionResponse tr = new ManagePaymentDTOService.TransactionResponse();
         tr.success = false;
         tr.message = '';
@@ -189,7 +189,7 @@ global with sharing class ManagePaymentService {
 
 
             if(pconfig == null || pconfig.Enable_Logging__c){
-                ManagePaymentServiceHelper.handleInsertDML(at);
+                ManagePaymentServiceHelper.handleInsertDML(new List<API_Tracker__c> { at } );
             }
 
 
@@ -204,7 +204,7 @@ global with sharing class ManagePaymentService {
     @AuraEnabled
     public static ManagePaymentDTOService.TransactionResponse voidTransaction(Id paymentId){
 
-        List<Payment__c> paymentList = Database.query('SELECT TrackPay_Transaction_Id__c, Card_Services_Fee__c, SObect_API_Name__c, Amount__c,Bill_To_Address__c,Bill_To_City__c,Bill_To_Country__c,Bill_To_First_Name__c,Bill_To_Last_Name__c,Bill_To_Phone__c,Bill_To_State__c,Bill_To_Zip__c,Card_Number__c,Card_Type__c,CreatedById,CreatedDate,Customer_Id__c,Email__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Name,Opportunity__c,OwnerId,Payment_Date__c,Refund_Response__c,Refund_Result_Code__c,Ship_To_Address__c,Ship_To_City__c,Ship_To_Country__c,Ship_To_State__c,Ship_To_Zip__c,Source__c,SystemModstamp,Transaction_Id__c,Transaction_Status__c from Payment__c where id =: paymentId');
+        List<Payment__c> paymentList = Database.query('SELECT Subscription__c, Account_Type__c, Routing_Number__c, Account_Number__c, Name_on_Account__c, TrackPay_Transaction_Id__c, Card_Services_Fee__c, SObect_API_Name__c, Amount__c,Bill_To_Address__c,Bill_To_City__c,Bill_To_Country__c,Bill_To_First_Name__c,Bill_To_Last_Name__c,Bill_To_Phone__c,Bill_To_State__c,Bill_To_Zip__c,Card_Number__c,Card_Type__c,CreatedById,CreatedDate,Customer_Id__c,Email__c,Id,IsDeleted,LastActivityDate,LastModifiedById,LastModifiedDate,Lead__c,Name,Opportunity__c,OwnerId,Payment_Date__c,Refund_Response__c,Refund_Result_Code__c,Ship_To_Address__c,Ship_To_City__c,Ship_To_Country__c,Ship_To_State__c,Ship_To_Zip__c,Source__c,SystemModstamp,Transaction_Id__c,Transaction_Status__c from Payment__c where id =: paymentId');
         ManagePaymentDTOService.TransactionResponse tr = new ManagePaymentDTOService.TransactionResponse();
         tr.message = '';
         if(!paymentList.isempty()){
@@ -265,7 +265,7 @@ global with sharing class ManagePaymentService {
             tr.success = paymentResponse.issuccess;
 
             if(pconfig == null || pconfig.Enable_Logging__c){
-                ManagePaymentServiceHelper.handleInsertDML(at);
+                ManagePaymentServiceHelper.handleInsertDML(new List<API_Tracker__c> { at } );
             }
 
         }
@@ -310,7 +310,7 @@ global with sharing class ManagePaymentService {
                 subscriptionObj.put(paymentDetails.otherdetails.fieldapiname, paymentDetails.otherdetails.refId);
                 subscriptionObj.Subscription_Id__c = paymentResponse.subscriptionId;
                 subscriptionObj.Start_Date__c = Date.valueOf(paymentDetails.subDetails.startDate);
-                subscriptionObj.Customer_Profile_Id__c = paymentResponse.profile.customerProfileId;
+                if(paymentDetails.carddetails.cardNumber != null)
                 subscriptionObj.Card_Number__c = 'XXXXX'+ paymentDetails.carddetails.cardNumber.replaceAll(' ','').right(4);
                 subscriptionObj.Name = paymentDetails.subDetails.subname;
                 subscriptionObj.Customer_Profile_Id__c = paymentResponse.profile.customerProfileId;
@@ -321,8 +321,17 @@ global with sharing class ManagePaymentService {
                 subscriptionObj.Amount__c = paymentResponse.amount;
                 subscriptionObj.Card_Services_Fee__c = paymentResponse.serviceCharge;
                 subscriptionObj.TrackPay_Subscription_Id__c = paymentResponse.trackPaySubscriptionId;
+                subscriptionObj.TrackPay_Customer_Profile_Id__c = paymentResponse.trackPayCustomerProfileId;
+                subscriptionObj.TrackPay_Customer_Payment_Profile_Id__c = paymentResponse.trackPayCustomerPaymentProfileId;
+
+                subscriptionObj.Account_Type__c = paymentDetails.bankdetails.accountType;
+                subscriptionObj.Routing_Number__c = paymentDetails.bankdetails.routingNumber;
+                subscriptionObj.Account_Number__c = paymentDetails.bankdetails.accountNumber;
+                subscriptionObj.Name_on_Account__c = paymentDetails.bankdetails.nameOnAccount;
+
+
                 //insert subscriptionObj;
-                ManagePaymentServiceHelper.handleInsertDML(subscriptionObj);
+                ManagePaymentServiceHelper.handleInsertDML(new List<Subscription__c> { subscriptionObj });
                 at.Subscription__c = subscriptionObj.id;
                 System.debug('subscriptionObj==>' + subscriptionObj.id);
         
@@ -345,7 +354,7 @@ global with sharing class ManagePaymentService {
 
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
-                ManagePaymentServiceHelper.handleInsertDML(at);
+                ManagePaymentServiceHelper.handleInsertDML(new List<API_Tracker__c> { at } );
             }
 
         }
@@ -406,7 +415,7 @@ global with sharing class ManagePaymentService {
 
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
-                ManagePaymentServiceHelper.handleInsertDML(at);
+                ManagePaymentServiceHelper.handleInsertDML(new List<API_Tracker__c> { at } );
             }
 
         }
@@ -464,7 +473,7 @@ global with sharing class ManagePaymentService {
 
         }finally{
             if(pconfig == null || pconfig.Enable_Logging__c){
-                ManagePaymentServiceHelper.handleInsertDML(at);
+                ManagePaymentServiceHelper.handleInsertDML(new List<API_Tracker__c> { at } );
             }
 
         }

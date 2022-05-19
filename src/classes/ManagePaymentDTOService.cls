@@ -121,12 +121,19 @@ public with sharing class ManagePaymentDTOService {
         }
         public class cls_payment {
             public cls_creditCard creditCard;
+            public cls_bankAccount bankAccount;
         }
         public class cls_creditCard {
             public String cardNumber;
             public String expirationDate;
             public String cardCode;
             public String cardType;
+        }
+        public class cls_bankAccount {
+            public String routingNumber;
+            public String accountNumber;
+            public String nameOnAccount;
+            public String echeckType;
         }
         public class cls_lineItems {
             public cls_lineItem lineItem;
@@ -251,6 +258,9 @@ public with sharing class ManagePaymentDTOService {
             public String refId;
             public String subscriptionId;
             public String trackPaySubscriptionId;
+            public String trackPayCustomerProfileId;
+            public String trackPayCustomerPaymentProfileId;
+
             public cls_profile profile;
             public String cardServicesResponse;
             public Transaction_messages messages;
@@ -269,10 +279,20 @@ public with sharing class ManagePaymentDTOService {
             public String description;
         }
 
+        public class cls_messages_custinfo {
+            public List<cls_message> message;
+        }
+
         public class cls_messages {
             public String resultCode;
             public cls_message message;
         }
+
+        public class cls_messages_getsubscritption {
+            public String resultCode;
+            public List<cls_message> message;
+        }
+
         public class cls_message {
             public String code;
             public String text;
@@ -531,5 +551,44 @@ public with sharing class ManagePaymentDTOService {
             public String merchantReferenceId;
             public Decimal authAmount;
         }
-    
+
+
+        public class GetSubscriptionResponse{
+            public cls_getsubscription subscription;
+            public String refId;	//a038c00001ci6o8AAA
+            public cls_messages_getsubscritption messages;    
+        }
+        public class cls_getsubscription {
+            public String name;	//BEST
+            public cls_paymentSchedule paymentSchedule;
+            public Double amount;	//6.65
+            //public Integer trialAmount;	//0
+            public String status;	//active
+            public cls_profile profile;
+            public cls_arbTransactions[] arbTransactions;
+        }
+        public class cls_paymentSchedule {
+            public cls_interval interval;
+            public String startDate;	//2022-03-09T00:00:00
+            public Integer totalOccurrences;	//32
+            public Integer trialOccurrences;	//0
+        }
+        public class cls_interval {
+            public Integer length;	//1
+            public String unit;	//months
+        }
+        public class cls_paymentProfile {
+            public String customerPaymentProfileId;	//903930720
+            public cls_payment payment;
+            public String customerType;	//individual
+            public cls_billTo billTo;
+        }
+        public class cls_arbTransactions {
+            public String transId;	//60188765324
+            public String response;	//This transaction has been approved.
+            public String submitTimeUTC;	//2022-03-10T08:51:42.88
+            public Integer payNum;	//1
+            public Integer attemptNum;	//1
+        }
+
 }

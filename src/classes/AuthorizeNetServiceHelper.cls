@@ -1,5 +1,5 @@
 /**
- * This class is responsible to serve all the transactions realated to Authorize.NET. 
+ * This class is responsible to serve all the hepler method for transactions related to Authorize.NET. 
  * It implements the PaymentServiceInterface
  * 
  */
@@ -113,7 +113,7 @@ public with sharing class AuthorizeNetServiceHelper {
             System.debug('JSON Response :: ' + res.getBody());
     
             ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper rw = (ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper.class);
-            trw.requestString = jsonData;
+            //trw.requestString = jsonData;
             trw.responseString = res.getBody();
             trw.statuscode = res.getStatusCode();
             String responseMessage = '';
@@ -160,7 +160,7 @@ public with sharing class AuthorizeNetServiceHelper {
             JSONGenerator gen = JSON.createGenerator(true);
 
             Boolean creditcard = true;
-            if(pdw.paymentObj.Card_Type__c == 'eCheck'){
+            if(pdw.paymentObj.Card_Number__c == null){
                 creditcard = false;
             }
             gen.writeStartObject();
@@ -171,7 +171,7 @@ public with sharing class AuthorizeNetServiceHelper {
                     gen.writeStringField('name', pdw.apilogin);
                     gen.writeStringField('transactionKey', pdw.authKey);
                     gen.writeEndObject();
-                gen.writeStringField('refTransId', pdw.transactionId);
+                gen.writeStringField('refId', pdw.transactionId);
                 gen.writeFieldName('transactionRequest');
                 gen.writeStartObject();
                 gen.writeStringField('transactionType', 'refundTransaction');
@@ -187,14 +187,15 @@ public with sharing class AuthorizeNetServiceHelper {
                         }else{
                             gen.writeFieldName('bankAccount');
                             gen.writeStartObject();
-                            gen.writeStringField('accountType', pdw.paymentObj.Account_Type__c);
-                            gen.writeStringField('routingNumber', pdw.paymentObj.Routing_Number__c);
-                            gen.writeStringField('accountNumber', pdw.paymentObj.Account_Number__c);
-                            gen.writeStringField('nameOnAccount', pdw.paymentObj.Name_on_Account__c);
+                            //gen.writeStringField('accountType', pdw.paymentObj.Account_Type__c);
+                                gen.writeStringField('routingNumber', pdw.paymentObj.Subscription__c == null ? pdw.paymentObj.Routing_Number__c : pdw.paymentObj.Subscription__r.Routing_Number__c);
+                                gen.writeStringField('accountNumber', pdw.paymentObj.Subscription__c == null ? pdw.paymentObj.Account_Number__c : pdw.paymentObj.Subscription__r.Routing_Number__c);
+                                gen.writeStringField('nameOnAccount', pdw.paymentObj.Subscription__c == null ? pdw.paymentObj.Name_on_Account__c : pdw.paymentObj.Subscription__r.Routing_Number__c);
+
                             gen.writeEndObject();
                         }
                     gen.writeEndObject();
-                    //gen.writeStringField('refTransId', transactionId);
+                    gen.writeStringField('refTransId', pdw.transactionId);
                 
                     gen.writeEndObject();
 
@@ -223,7 +224,7 @@ public with sharing class AuthorizeNetServiceHelper {
 
             ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper values = (ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper.class);
             ManagePaymentDTOService.Transaction_Reponse_Wrapper trw = new ManagePaymentDTOService.Transaction_Reponse_Wrapper();
-            trw.requestString = json;
+            //trw.requestString = json;
             trw.responseString = res.getBody();
             trw.statuscode = res.getStatusCode();
 
@@ -308,7 +309,7 @@ public with sharing class AuthorizeNetServiceHelper {
 
         ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper values = (ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Auth_Transaction_Reponse_Wrapper.class);
         ManagePaymentDTOService.Transaction_Reponse_Wrapper trw = new ManagePaymentDTOService.Transaction_Reponse_Wrapper();
-        trw.requestString = json;
+        //trw.requestString = json;
         trw.responseString = res.getBody();
         trw.statuscode = res.getStatusCode();
         String responseMessage = '';
@@ -454,7 +455,7 @@ public with sharing class AuthorizeNetServiceHelper {
         System.debug('JSON Response :: ' + res.getBody());
 
         ManagePaymentDTOService.Sub_Reponse_Wrapper rw = (ManagePaymentDTOService.Sub_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Sub_Reponse_Wrapper.class);
-        rw.requestString = jsonData;
+        //rw.requestString = jsonData;
         rw.responseString = res.getBody();
         rw.statuscode = res.getStatusCode();
         String responseMessage = '';
@@ -551,7 +552,7 @@ public with sharing class AuthorizeNetServiceHelper {
 
         //return (ManagePaymentDTOService.Sub_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Sub_Reponse_Wrapper.class);
         ManagePaymentDTOService.Sub_Reponse_Wrapper rw = (ManagePaymentDTOService.Sub_Reponse_Wrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Sub_Reponse_Wrapper.class);
-        rw.requestString = jsonData;
+        //rw.requestString = jsonData;
         rw.responseString = res.getBody();
         rw.statuscode = res.getStatusCode();
 
@@ -623,7 +624,7 @@ public with sharing class AuthorizeNetServiceHelper {
        //return (ManagePaymentDTOService.SubscriptionWrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.SubscriptionWrapper.class);
         ManagePaymentDTOService.SubscriptionWrapper rw1 = (ManagePaymentDTOService.SubscriptionWrapper) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.SubscriptionWrapper.class);
         ManagePaymentDTOService.Sub_Reponse_Wrapper srw = new ManagePaymentDTOService.Sub_Reponse_Wrapper();
-        srw.requestString = jsonData;
+        //srw.requestString = jsonData;
         srw.responseString = res.getBody();
         srw.statuscode = res.getStatusCode();
         String responseMessage = '';
@@ -643,6 +644,80 @@ public with sharing class AuthorizeNetServiceHelper {
 
         return srw;
 
+    }
+
+    public static Boolean getTrackPayTransactionDetails(List<Payment__c> paymentList){
+
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
+        system.debug('pconfig=====>'+ pconfig);
+        List<String> licenseKeys = Util.decrypt(pconfig.Auth_License_Key__c, null).split('-');
+
+        List<Payment__c> updatePaymentList = new List<Payment__c>();
+        for(Payment__c paymentObj : paymentList){
+            JSONGenerator gen = JSON.createGenerator(true);
+            gen.writeStartObject();
+            gen.writeFieldName('ARBGetSubscriptionRequest');
+            gen.writeStartObject();
+                gen.writeFieldName('merchantAuthentication');
+                    gen.writeStartObject();   
+                        gen.writeStringField('name', licenseKeys[2]);
+                        gen.writeStringField('transactionKey', licenseKeys[3]);
+                    gen.writeEndObject();
+                    gen.writeStringField('refId', paymentObj.Subscription__c);
+                    gen.writeStringField('subscriptionId', paymentObj.Subscription__r.TrackPay_Subscription_Id__c);
+                gen.writeBooleanField('includeTransactions', true);
+
+                gen.writeEndObject();
+            gen.writeEndObject();
+
+            String json = gen.getAsString();
+
+            System.debug('MyData===>' + json);
+
+            Http http = new Http();
+
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(pconfig.Endpoint_URL__c + '/xml/v1/request.api');
+            req.setMethod('POST');
+            req.setBody(json);
+            req.setHeader('Content-Type', 'application/json');
+            req.setHeader('Accept','application/json');
+
+            HttpResponse res = http.send(req);
+            String response = res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿','');
+            System.debug('res==>' + response);
+
+            ManagePaymentDTOService.GetSubscriptionResponse values = (ManagePaymentDTOService.GetSubscriptionResponse) System.JSON.deserialize(res.getBody().replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.GetSubscriptionResponse.class);
+            ManagePaymentDTOService.Transaction_Reponse_Wrapper trw = new ManagePaymentDTOService.Transaction_Reponse_Wrapper();
+            //trw.requestString = json;
+            trw.responseString = res.getBody();
+            trw.statuscode = res.getStatusCode();
+            String responseMessage = '';
+            trw.issuccess = false;
+            System.debug('values==>' + values);
+            if( values.subscription != null && values.subscription.arbTransactions.size() != 0){
+
+                if(values.subscription.amount == paymentObj.Subscription__r.Card_Services_Fee__c){
+                    for(ManagePaymentDTOService.cls_arbTransactions clsarb :values.subscription.arbTransactions ){
+                        if(clsarb.payNum == paymentList[0].Payment_Number__c){
+                            paymentObj.TrackPay_Transaction_Id__c = clsarb.transId;
+                            paymentObj.Card_Services_Fee__c = values.subscription.amount;
+                            updatePaymentList.add(paymentObj);
+                        }
+                    }    
+                }
+            }
+        }
+        System.debug('updatePaymentList==>' + updatePaymentList);
+
+        if(!updatePaymentList.isempty() ){
+            SObjectType objType = updatePaymentList[0].getSObjectType();
+            if ( objType.getDescribe().isUpdateable()) {
+                update updatePaymentList;
+            }
+        }
+
+        return true;
     }
 
     public class PaymentDataWrapper{

@@ -39,6 +39,9 @@ private with sharing class AuthorizeNetServiceTest {
               pconfig.Auth_Transaction_Key__c = 'Auth_Transaction_Key__c';
               pconfig.Auth_License_Key__c = 'gCcQVL1tH+x6Kjo97W32Y501YXVfbCWhPONvH/LJCfD8eOG1qFyeFBm59kIwnGZriZSyMmlDhXkD1LSDnPYxChsNMcj1WicPL9E8QWqyUahP0+9H8e4UIxXI0aZXVQZs';
               pconfig.Amount_API_Name__c = 'Amount';
+              pconfig.Company_API_Name__c = 'Account.Name';
+              pconfig.Enable_Encrypted_Payment_URL__c = true;
+              
               insert pconfig;
 
               pconfig = new Payment_Configuration__c();
@@ -48,6 +51,9 @@ private with sharing class AuthorizeNetServiceTest {
               pconfig.Object_Api_Name__c = 'Opportunity';
               pconfig.Secret_Key__c = 'Secret_Key__c';
               pconfig.Amount_API_Name__c = 'Amount';
+              pconfig.Company_API_Name__c = 'Account.Name';
+              pconfig.Enable_Encrypted_Payment_URL__c = true;
+
               pconfig.Auth_License_Key__c = 'gCcQVL1tH+x6Kjo97W32Y501YXVfbCWhPONvH/LJCfD8eOG1qFyeFBm59kIwnGZriZSyMmlDhXkD1LSDnPYxChsNMcj1WicPL9E8QWqyUahP0+9H8e4UIxXI0aZXVQZs';
               insert pconfig;
 
@@ -358,6 +364,9 @@ private with sharing class AuthorizeNetServiceTest {
             Test.startTest();
 
             ManagePaymentDTOService.PaymentData response = ManagePaymentService.retrieveRecord([select id from Opportunity][0].id, 'Opportunity', 'Authorize.Net');
+            system.debug('MY RESPONSE==>' + response.externalPaymentEncryptedURL.split('data=')[1]);
+            response = ManagePaymentService.decryptURL(response.externalPaymentEncryptedURL.split('data=')[1], 'Opportunity', 'Authorize.Net');
+
             Test.stopTest();
             system.assert(response != null);
         }
@@ -385,6 +394,44 @@ private with sharing class AuthorizeNetServiceTest {
             system.assertEquals([ SELECT count() FROM Payment__c ], 1);
 
         }
+
+
+        static testMethod void tesPostPaymentProcessing_Positive() {
+
+            init(true);
+            Test.setMock(HttpCalloutMock.class, new AuthorizeGetSubscriptionDetailsCalloutMock());
+            Subscription__c sub = new Subscription__c();
+            sub.Subscription_Id__c = 'Subscription_Id__c';
+            sub.TrackPay_Subscription_Id__c = '7787427';
+            sub.Card_Services_Fee__c = 32.15;
+            insert sub;
+
+            Payment__c payment = new Payment__c();
+            payment.Transaction_Id__c = 'Transaction_Id__c';
+            //payment.TrackPay_Subscription_Id__c = 'Transaction_Id__c';
+            payment.Payment_Number__c = 1;
+            payment.SObect_API_Name__c = 'Opportunity';
+            payment.Source__c = 'Authorize.Net';
+            payment.Amount__c = 28.5;
+            payment.Card_Services_Fee__c = 1.5;
+            payment.Card_Number__c = '2222222222';
+            payment.Subscription__c = sub.id;
+            payment.RecordtypeId = Schema.SObjectType.Payment__c.getRecordTypeInfosByDeveloperName().get('Subscription_Payment').getRecordTypeId();
+            insert payment;
+
+            Test.startTest();
+            String CRON_EXP = '0 0 0 3 9 ? 2022';
+            String jobId = System.schedule('PostPaymentProcessingBatch', CRON_EXP, new PostPaymentProcessingBatch());
+            CronTrigger ct = [SELECT Id, CronExpression, TimesTriggered, NextFireTime FROM CronTrigger WHERE id =: jobId]; 
+            Database.executeBatch(new PostPaymentProcessingBatch());
+
+            Test.stopTest();
+            System.assertEquals(0, ct.TimesTriggered);
+
+            system.assertEquals([ SELECT TrackPay_Transaction_Id__c FROM Payment__c ].TrackPay_Transaction_Id__c, '60189034337');
+
+        }
+
 
         static testMethod void serviceChargetestChargeTransaction_Card_Positive() {
             initServiceCharge(true);
@@ -827,5 +874,16 @@ private with sharing class AuthorizeNetServiceTest {
             }
         }
 
-        
+        public class AuthorizeGetSubscriptionDetailsCalloutMock implements HttpCalloutMock {
+            // Implement this interface method
+             public HTTPResponse respond(HTTPRequest request) {
+                // Create a fake response
+                HttpResponse response = new HttpResponse();
+                response.setHeader('Content-Type', 'application/json');
+                response.setBody('{"subscription":{"name":"4007000000027","paymentSchedule":{"interval":{"length":1,"unit":"months"},"startDate":"2022-03-13T00:00:00","totalOccurrences":432,"trialOccurrences":0},"amount":32.15,"trialAmount":0.00,"status":"active","profile":{"paymentProfile":{"customerPaymentProfileId":"904100867","payment":{"creditCard":{"cardNumber":"XXXX0027","expirationDate":"XXXX"}},"customerType":"individual","billTo":{"firstName":"Kristen","lastName":"Akin"}},"customerProfileId":"904203902","merchantCustomerId":"00Q8c00000yhBkkEAE","description":"Profile created by Subscription: 7986994"},"arbTransactions":[{"transId":"60189034337","response":"This transaction has been approved.","submitTimeUTC":"2022-03-13T09:05:56.03","payNum":1,"attemptNum":1}]},"refId":"a038c00001ciAtBAAU","messages":{"resultCode":"Ok","message":[{"code":"I00001","text":"Successful."}]}}');
+                response.setStatusCode(200);
+                return response; 
+            }
+        }
+
 }

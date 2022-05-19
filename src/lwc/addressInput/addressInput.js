@@ -8,10 +8,8 @@ export default class AddressInput extends LightningElement {
     return this.addressobj;
   }
   set address(value) {
-    console.log('JSON.stringify(value)', JSON.stringify(value));
     //this.addressobj = JSON.parse(JSON.stringify(value));
     this.addressobj = value;
-    console.log('1value==>' , this.addressobj.BillingStreet);
     //this.addressobj = {};
    /* if(this.addressobj != null){
       if (this.addressobj.BillingCountry === "USA") {
@@ -37,26 +35,20 @@ export default class AddressInput extends LightningElement {
   touched = new Set();
 
   connectedCallback() {
-    console.log('AAA', this.addressobj);
     //this.addressobj = {};
     //this.addressobj = this.addressobjtemp;
     this.validateAddress();
   }
 
   validateAddress() {
-    //console.log('CROSS', this.template.querySelectorAll(".address-required"));
-    //console.log('ADDRESS>> ', this.addressobj.BillingStreet,  this.addressobj.BillingCity, this.addressobj.BillingState, this.addressobj.BillingPostalCode,
-      //this.addressobj.BillingCountry);
       let allValid = false;
 
     if(this.addressobj.BillingStreet && this.addressobj.BillingCity && this.addressobj.BillingState && this.addressobj.BillingPostalCode && this.addressobj.BillingCountry){
       allValid = [...this.template.querySelectorAll(".address-required")].reduce(
 
         (validSoFar, inputCmp) => {
-          console.log('>>>', inputCmp);
 
           if (this.touched.has(inputCmp.name)) {
-            console.log('**', inputCmp.name);
             //if we have entered the field. If it's empty and has not been touched, don't show the error field
             inputCmp.reportValidity();
           }
@@ -94,7 +86,6 @@ export default class AddressInput extends LightningElement {
     this.touched.add("street");
     this.addressobj = this.cloneAdd();
     this.addressobj.BillingStreet = event.detail.value;
-    console.log('street' +event.detail.value);
     this.validateAddress();
   }
   handleStreet2Change(event) {
@@ -156,7 +147,6 @@ export default class AddressInput extends LightningElement {
       }
     };
 
-    console.log('Address Valid',detail);
     const changeEvent = new CustomEvent("addressvalid", { detail: detail });
     this.dispatchEvent(changeEvent);
   }

@@ -4,8 +4,6 @@
  * 
  */public with sharing class StripeServiceHelper {
 	public static ManagePaymentDTOService.Transaction_Reponse_Wrapper createCustomer(ManagePaymentDTOService.PaymentDetails paymentDetails){
-	
-
 		return null;
 	}
 }

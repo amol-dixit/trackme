@@ -15,7 +15,6 @@ export default class SubscriptionInput extends NavigationMixin(LightningElement)
         /*if(!this.startdate){
             this.startdate = new Date();
         }*/
-        console.log('11Start Date==', this.startdate);
     }
 
     unitoptions = [
@@ -45,7 +44,6 @@ export default class SubscriptionInput extends NavigationMixin(LightningElement)
 
     handleSubName(event){
         this.subname = event.target.value;
-        console.log('TEST');
         this.validateData();
     }
 
@@ -74,7 +72,6 @@ export default class SubscriptionInput extends NavigationMixin(LightningElement)
                 unit: this.unit
             }
         };
-        console.log('cardData', detail);
         const changeEvent = new CustomEvent("subscriptioncomplete", { detail: detail });
         this.dispatchEvent(changeEvent);
     }
@@ -91,7 +88,6 @@ export default class SubscriptionInput extends NavigationMixin(LightningElement)
                 unit: this.unit
             }
         };
-        console.log('Incomplete', detail);
         const changeEvent = new CustomEvent("subscriptionincomplete", { detail: detail });
         this.dispatchEvent(changeEvent);
     }

@@ -16,16 +16,9 @@ export default class VoidPaymentQuickAction extends LightningElement {
     payment;*/
 
     @api invoke() {
-        console.log('Hello, world!', this.recordId);
-        /*if(this.payment.Voided__c){
-            this.paymentdisabled = true;
-            this.paymentResult = {};
-            this.paymentResult.message = 'This payment is already voided';
-
-        }*/
+        
         VoidTransaction({ paymentId: this.recordId })
 		.then(result => {
-            console.log('result', result);
             this.paymentResult = result;
             if(result.success == true){
                 const event = new ShowToastEvent({

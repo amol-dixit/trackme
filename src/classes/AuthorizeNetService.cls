@@ -35,7 +35,6 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
                         trw.cardServicesResponse = serviceChargeResponse.cardServicesResponse;
                         trw.issuccess = false;
                     }
-                    trw.trackPayRequestString = serviceChargeResponse.requestString;
                     trw.trackPayResponseString = serviceChargeResponse.responseString;
                     trw.trackPaystatusCode = serviceChargeResponse.statuscode;
                 }
@@ -59,7 +58,6 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
             if(trw.issuccess){
 
                 if(paymentObj.Card_Services_Fee__c != 0 && paymentObj.TrackPay_Transaction_Id__c != null){
-
                     ManagePaymentDTOService.Transaction_Reponse_Wrapper serviceChargeResponse = AuthorizeNetServiceHelper.processRefundTransaction(new AuthorizeNetServiceHelper.PaymentDataWrapper(paymentObj, licenseKeys[0], paymentObj.Card_Services_Fee__c, licenseKeys[2] , licenseKeys[3], paymentObj.TrackPay_Transaction_Id__c));
 
                     if(serviceChargeResponse.issuccess){
@@ -72,7 +70,6 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
                     }
                     trw.cardServicesResponse = serviceChargeResponse.responseString;
 
-                    trw.trackPayRequestString = serviceChargeResponse.requestString;
                     trw.trackPayResponseString = serviceChargeResponse.responseString;
                     trw.trackPaystatusCode = serviceChargeResponse.statuscode;
                 }
@@ -112,7 +109,6 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
                         trw.issuccess = false;
                     }
 
-                    trw.trackPayRequestString = serviceChargeResponse.requestString;
                     trw.trackPayResponseString = serviceChargeResponse.responseString;
                     trw.trackPaystatusCode = serviceChargeResponse.statuscode;
                 }
@@ -147,10 +143,12 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
                     if(serviceChargeResponse.issuccess){
                         trw.serviceCharge = serviceChargeAmount;
                         trw.trackPaySubscriptionId = serviceChargeResponse.subscriptionId;
+                        trw.trackPayCustomerProfileId = serviceChargeResponse.profile.customerProfileId;
+                        trw.trackPayCustomerPaymentProfileId = serviceChargeResponse.profile.customerPaymentProfileId;
+
                     }else{
                         trw.cardServicesResponse = serviceChargeResponse.responseString;
                     }
-                    trw.trackPayRequestString = serviceChargeResponse.requestString;
                     trw.trackPayResponseString = serviceChargeResponse.responseString;
                     trw.trackPaystatusCode = serviceChargeResponse.statuscode;                }
             }
@@ -180,7 +178,6 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
                         trw.cardServicesResponse = serviceChargeResponse.responseString;
                         trw.issuccess = false;
                     }
-                    trw.trackPayRequestString = serviceChargeResponse.requestString;
                     trw.trackPayResponseString = serviceChargeResponse.responseString;
                     trw.trackPaystatusCode = serviceChargeResponse.statuscode;
             
@@ -213,7 +210,6 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
                         trw.cardServicesResponse = serviceChargeResponse.responseString;
                         trw.issuccess = false;
                     }
-                    trw.trackPayRequestString = serviceChargeResponse.requestString;
                     trw.trackPayResponseString = serviceChargeResponse.responseString;
                     trw.trackPaystatusCode = serviceChargeResponse.statuscode;
 
@@ -262,16 +258,9 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
     public static void authorizeNetProcessWebhook(String requestbody){
         API_Tracker__c at = new API_Tracker__c();
         at.Response_Body__c = requestbody;
-        //Payment_Config__mdt pconfig = [select API_Login_Id__c, Track_Callback_Response__c,  Endpoint_URL__c, Transaction_Key__c, Return_URL__c from Payment_Config__mdt where developername = 'Authorize_Net_Config'];
-        Payment_Configuration__c pconfig;
 
-        List<Payment_Configuration__c> pconfiglist = [select External_Payment_URL__c, Community_URL__c, Enable_Logging__c, Auth_API_Login_Id__c, Endpoint_URL__c, Auth_Transaction_Key__c, 
-        SObject_Payment_Lookup_API_Name__c, Object_Api_Name__c, Address_API_Name__c, Amount_API_Name__c,
-        City_API_Name__c,Company_API_Name__c, Country_API_Name__c, Customer_Id_API_Name__c, Email_API_Name__c,First_Name_API_Name__c, Last_Name_API_Name__c,
-            Product_API_Name__c, RefId_Api_Name__c, Return_URL__c,Return_URL_API_Name__c, State_API_Name__c, Zip_API_Name__c from Payment_Configuration__c where name = 'Authorize.Net'];
-        if(pconfiglist != null && pconfiglist.size() > 0){
-            pconfig = pconfiglist[0];
-        }
+        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(null, 'Authorize.Net');
+
         try{
             ManagePaymentDTOService.Notification values = (ManagePaymentDTOService.Notification) System.JSON.deserialize(requestbody.replaceall('uFEFF','').replaceall('\\\\','').replaceall('﻿',''), ManagePaymentDTOService.Notification.class);
 
@@ -310,6 +299,13 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
             paymentObj.Event_Type__c = values.eventType;
             
             paymentObj.Transaction_Id__c = values.payload.Id;
+            List<Subscription__c> subList = [select Contact__c,Lead__c, Opportunity__c  from Subscription__c where Subscription_Id__c =: tdresp.transaction1.subscription.id];
+            if(!subList.isempty()){
+                paymentObj.Contact__c = subList[0].Contact__c;
+                paymentObj.Lead__c = subList[0].Lead__c;
+                paymentObj.Opportunity__c = subList[0].Opportunity__c;
+            }
+
             paymentObj.Subscription__r = new Subscription__c(Subscription_Id__c = tdresp.transaction1.subscription.id);
             paymentObj.Payment_Number__c = tdresp.transaction1.subscription.payNum;
             
@@ -319,8 +315,16 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
             if(tdresp.transaction1.customer != null){
                 paymentObj.Customer_Id__c = tdresp.transaction1.customer.id;
             }
-            paymentObj.Card_Type__c = tdresp.transaction1.payment.creditCard.cardType;
-            paymentObj.Card_Number__c = tdresp.transaction1.payment.creditCard.cardNumber;
+            System.debug('tdresp.transaction1===>' + tdresp.transaction1);
+            if(tdresp.transaction1.payment.creditCard != null){
+                paymentObj.Card_Type__c = tdresp.transaction1.payment.creditCard.cardType;
+                paymentObj.Card_Number__c = tdresp.transaction1.payment.creditCard.cardNumber;
+            }
+            if(tdresp.transaction1.payment.bankAccount != null){
+                paymentObj.Account_Number__c = tdresp.transaction1.payment.bankAccount.accountNumber;
+                paymentObj.Routing_Number__c = tdresp.transaction1.payment.bankAccount.routingNumber;
+                paymentObj.Name_on_Account__c = tdresp.transaction1.payment.bankAccount.nameOnAccount;
+            }
             paymentObj.Transaction_Status__c = tdresp.transaction1.transactionStatus;
             paymentObj.RecordtypeId = Schema.SObjectType.Payment__c.getRecordTypeInfosByName().get('Subscription Payment').getRecordTypeId();
 
@@ -346,8 +350,7 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
             if(tdresp.messages.resultCode == 'Ok' && tdresp.messages.message[0].code == 'I00001'){
                 paymentObj.Status_Code__c = 200;
             }
-
-            insert paymentObj;
+            ManagePaymentServiceHelper.handleInsertDML(new List<Payment__c> { paymentObj});
             at.Payment__c = paymentObj.id;
             
         }
@@ -357,8 +360,7 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
             at.Error_Message__c = e.getMessage()+ '::'+ e.getStackTraceString();
         }finally{
             if(pconfig.Enable_Logging__c){
-
-                insert at;
+                ManagePaymentServiceHelper.handleInsertDML(new List<API_Tracker__c> { at });
             }
         }
     }

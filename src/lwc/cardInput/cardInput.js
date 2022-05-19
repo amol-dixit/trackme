@@ -43,7 +43,6 @@ export default class CardInput extends LightningElement {
       this.setAttribute('lastName', value);
         this.cardHolderLastName = value;
         this.cardHolderLastNameValid = this.getIsValid(this.cardHolderLastName, "cardHolderLastName");
-        console.log('Here is the Last Name', this.cardHolderLastName);
         this.cardHolderLastNameTouched = true;
         //this.showFeedback();
         this.checkIfComplete();
@@ -58,7 +57,6 @@ export default class CardInput extends LightningElement {
       this.setAttribute('firstName', value);
       this.cardHolderFirstName = value;
       this.cardHolderFirstNameValid = this.getIsValid(this.cardHolderFirstName, "cardHolderFirstName");
-      console.log('Here is the First Name', this.cardHolderFirstName);
   
       this.cardHolderFirstNameTouched = true;
       //this.showFeedback();
@@ -141,14 +139,11 @@ export default class CardInput extends LightningElement {
   }
 
   handlefirstnamechange(){
-    console.log('!!!!!!!!!!' , this.cardHolderFirstName);
     if(this.cardHolderFirstName && this.cardHolderFirstName != null && this.cardHolderFirstName != undefined ){
       var element = this.template.querySelector('[data-id="firstnameinput"]');
-      console.log('element===>', element);
       if(element){
         var event = new Event('change');
         element.dispatchEvent(event);
-        console.log('!!!!!!!!!! EVENT TRIGGERED');
       }
     }
   }
@@ -279,7 +274,6 @@ export default class CardInput extends LightningElement {
 
   //this syntax means we should be able to leave off 'this'
   checkIfComplete = () => {
-    console.log(this.cardNumberValid,  this.cardHolderFirstNameValid, this.cardHolderLastNameValid, this.cardExpiryValid, this.cardCVCValid, this.cardEmailValid);
     if (
       this.cardNumberValid &&
       this.cardHolderFirstNameValid &&
@@ -309,7 +303,6 @@ export default class CardInput extends LightningElement {
   };
 
   dispatchCompleteEvent(cardData) {
-    console.log('cardData', cardData);
     const changeEvent = new CustomEvent("cardcomplete", { detail: cardData });
     this.dispatchEvent(changeEvent);
   }
@@ -317,7 +310,6 @@ export default class CardInput extends LightningElement {
   dispatchIncompleteEvent() {
     const changeEvent = new CustomEvent("cardincomplete", { detail: {} });
     this.dispatchEvent(changeEvent);
-    console.log('cccc');
   }
 
   handlePaymentMethodChange(event) {
@@ -346,14 +338,12 @@ export default class CardInput extends LightningElement {
     }else if (validatorName === "cardHolderLastName") {
       isValid = val !== "";
     }else if (validatorName === "cardEmail") {
-      //console.log('val', val, this.validateEmail(val));
       if(val){
         isValid = (val !== "" && this.validateEmail(val));
       }else{
         isValid = val !== "";
       }
     }
-    //console.log('VALIDATOR', validatorName, val, isValid);
     
     return isValid;
   };

@@ -5,6 +5,5 @@ public interface PaymentServiceInterface {
     ManagePaymentDTOService.Sub_Reponse_Wrapper createSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails);
     ManagePaymentDTOService.Sub_Reponse_Wrapper updateSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails);
     ManagePaymentDTOService.Sub_Reponse_Wrapper cancelSubscription(ManagePaymentDTOService.PaymentDetails paymentDetails);
-
     ManagePaymentDTOService.SubscriptionWrapper getSubscriptions(ManagePaymentDTOService.PaymentDetails paymentDetails);
 }

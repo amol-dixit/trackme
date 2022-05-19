@@ -55,9 +55,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
   
     @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
-      console.log('Here..>', this.recordId, this.subscriptionmode);
       if (currentPageReference && this.recordId == undefined ) {
-        console.log('==>', currentPageReference.state.product);
         this.urlStateParameters = currentPageReference.state;
       }
     }
@@ -66,7 +64,6 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
 
       this.amount = this.urlStateParameters.amount;
       this.logourl = this.urlStateParameters.logourl;
-      console.log('INIT==>', this.urlStateParameters);
 
       this.address.BillingStreet = this.urlStateParameters.street;
       this.address.BillingCity = this.urlStateParameters.city;
@@ -88,7 +85,6 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
       this.custom3 = this.urlStateParameters.custom3;
       this.custom4 = this.urlStateParameters.custom4;
 
-      console.log('My adde', this.address,this.firstname, this.lastname, this.email);
       this.isLoaded = !this.isLoaded;
       this.hidePage = false;
       //this.getSubscriptions();
@@ -137,7 +133,6 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
     @track subscriptionOptions;
     connectedCallback() {
       this.isLoaded = !this.isLoaded;
-      console.log('singletimepaymentmode', this.singletimepaymentmode);
       if(this.subscriptionmode && this.singletimepaymentmode){
         this.showpaymenttyperadio = true;
       }
@@ -164,13 +159,10 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
         subdetails : {} 
       };
       if(this.urlStateParameters != undefined && this.urlStateParameters != null){
-        console.log('this.urlStateParameters.data=========>',  this.urlStateParameters.data);
-        console.log('this.objectapiname=========>',  this.objectapiname, this.paymentserviceprovider);
 
         if(this.urlStateParameters.data != null && this.urlStateParameters.data != undefined){
           decryptURL({ encryptedData: this.urlStateParameters.data, sobjectAPIName : this.objectapiname, paymentserviceprovider : this.paymentserviceprovider})
           .then((result) => {
-            console.log('Result ::', result);
               this.urlStateParameters = result;
               this.initUrlParams();
 
@@ -204,7 +196,6 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
       }else{
         retrieveRecord({ recordId: this.recordId, sobjectAPIName : this.objectapiname, paymentserviceprovider : this.paymentserviceprovider})
         .then((result) => {
-          //console.log('result===>', result);
             this.urlStateParameters = result;
             this.initUrlParams();
 
@@ -269,7 +260,6 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
 }
 
 handleamount(event) {
-  console.log('==>', event.detail.value);
   this.urlStateParameters.amount = parseFloat(event.detail.value);
 }
 
@@ -317,7 +307,6 @@ onchangeroutingnumber(event) {
 }
 
 getIsValid(){
-  console.log(this.bankname, this.accountnumber, this.accountname,  this.accountlastname, this.accountnumber, this.routingnumber,);
 
   if(this.bankname != undefined && this.accountnumber != undefined && this.accountname != undefined && this.routingnumber != undefined && this.bankname != "" && this.accountnumber != "" && this.accountname != "" && this.routingnumber != ""  ){
     return true
@@ -422,7 +411,6 @@ getIsValid(){
       @track addressvalid = false;
       @track cardvalid = false;
       handleAddressValid(event){
-        console.log('handleAddressValid event.detail==>', event.detail.value.BillingCity, this.showcc, this.cardvalid);
         this.addressvalid = true;
         if(this.showcc){
           if(this.cardvalid){
@@ -435,7 +423,6 @@ getIsValid(){
         }
         
         this.paymentdetail.addressdetails= event.detail.value;
-        console.log('handleAddressValid event.detail==>', event.detail.value.BillingCity, this.showcc, this.cardvalid, this.disablepay);
 
       }
 
@@ -443,7 +430,6 @@ getIsValid(){
       @track showdonebutton = false;
       
       handleSubscriptionComplete(event){
-        console.log('Subscription event.detail==>', event.detail.value.subname);
         
         if((this.cardvalid)){
           this.disablepay = false;
@@ -458,13 +444,11 @@ getIsValid(){
       }
       
       handleAddressInvalid(event){
-        console.log('handleAddressInvalid event.detail==>');
         this.addressvalid = false;
         this.disablepay = true;
       }
 
       handleCardComplete(event){
-        console.log('HandleCardComplete Event ==>', event.detail.value, this.addressvalid, this.subvalid, this.showNewSubcription);
         this.cardvalid = true;
         if((this.addressvalid || this.subvalid)){
 
@@ -488,13 +472,11 @@ getIsValid(){
       }
 
       handleCardIncomplete(event){
-        console.log('handleCardIncomplete event.detail==>');
         this.cardvalid = false;
         this.disablepay = true;
       }
 
       handleSubIncomplete(event){
-        console.log('handleCardIncomplete event.detail==>');
         this.subvalid = false;
         this.disablepay = true;
       }
@@ -533,11 +515,9 @@ getIsValid(){
 
         }
         //this.paymentdetail.subDetails = this.subDetails;
-        console.log('Payment Details : ', JSON.stringify(this.paymentdetail));
 
         createSubscription({ paymentData: JSON.stringify(this.paymentdetail)})
         .then((result) => {
-          //console.log('result===>', result);
           if(result.success){
               const event = new ShowToastEvent({
                 title: 'Payment Response',
@@ -590,7 +570,6 @@ getIsValid(){
 
       editSub(){
         this.isLoaded = !this.isLoaded;
-        console.log('Handle Sub' , this.recordId);
         let otherDetails = {
           //product: this.urlStateParameters.product,
           //amount: this.urlStateParameters.amount,
@@ -613,11 +592,9 @@ getIsValid(){
 
         }
         //this.paymentdetail.subDetails = this.subDetails;
-        console.log('Payment Details : ', JSON.stringify(this.paymentdetail));
 
         updateSubscription({ paymentData: JSON.stringify(this.paymentdetail)})
         .then((result) => {
-          console.log('result===>', result);
           if(result.success){
               const event = new ShowToastEvent({
                 title: 'Payment Response',
@@ -689,12 +666,10 @@ getIsValid(){
         }
         this.paymentdetail.otherdetails = otherDetails;
 
-        console.log('Subscription Payment Details : ', JSON.stringify(this.paymentdetail));
 
         getSubscriptions({ paymentData: JSON.stringify(this.paymentdetail) })
         .then((result) => {
           this.subscriptiondata = result.subscriptionDetails;
-          console.log('Subscriptions===>', result);
           this.isLoaded = !this.isLoaded;
         })
         .catch((error) => {
@@ -748,11 +723,9 @@ getIsValid(){
 
         }
         this.paymentdetail.otherdetails = otherDetails;
-        console.log('Payment Details : ', JSON.stringify(this.paymentdetail));
 
         chargeTransaction({ paymentData: JSON.stringify(this.paymentdetail) })
         .then((result) => {
-          //console.log('result===>', result);
           if(result.success){
               const event = new ShowToastEvent({
                 title: 'Payment Response',
@@ -868,7 +841,6 @@ getIsValid(){
       }
       this.paymentdetail.otherdetails = otherDetails;
 
-      console.log('Payment Details : ', JSON.stringify(this.paymentdetail));
 
       cancelSubscription({ paymentData: JSON.stringify(this.paymentdetail)})
       .then((result) => {
@@ -887,7 +859,6 @@ getIsValid(){
 
           this.getSubscriptions();
 
-          console.log('Subscription Cancel result==>',  result);
 
         }else{
 
@@ -902,9 +873,7 @@ getIsValid(){
 
         }
 
-/*
-        this.subscriptiondata = result.subscriptionDetails;
-        console.log('Subscriptions===>', result);*/
+
         this.showconfirmationpopup = false;
 
         this.isLoaded = !this.isLoaded;
@@ -958,7 +927,6 @@ getIsValid(){
             this.startdate = this.selectedrow.createTimeStampUTC.split('T')[0];
             this.occurrances = this.selectedrow.totalOccurrences;
             this.amount = this.selectedrow.amount;
-            console.log(this.selectedrow);
             this.showpaywith = true;
 
               break;
@@ -973,15 +941,6 @@ getIsValid(){
 
   handleExternalPaymentLink(event){
     this.showexternalpaymentlink = event.target.checked;
-    /*document.execCommand('copy');
-    let content = this.urlStateParameters.externalPaymentURL;
-    let inp = this.template.querySelector('.my-class');
-    inp.disabled = false;
-    inp.value = JSON.stringify(content);
-    inp.select();
-    document.execCommand('copy');
-
-    console.log(`copied`);*/
 
 
   }
