@@ -141,6 +141,7 @@ export default class PaymentManager extends  NavigationMixin(LightningElement)  
       }
 
       console.log("recordId", this.recordId);
+      console.log("paymentserviceprovider", this.paymentserviceprovider);
       this.account = {BillingCountry:"USA", BillingCity:"", BillingState:"", BillingPostalCode:"", BillingStreet:""};
       this.paymentMethods = [{'label': 'Credit Card', 'value': 'Credit Card', selected: true},
       {'label': 'eCheck', 'value': 'eCheck'}]
@@ -692,11 +693,20 @@ getIsValid(){
             this.isLoaded = !this.isLoaded;
         });
         
-
-
       }
 
       handlePay(){
+        if(!this.urlStateParameters.amount || !this.urlStateParameters.product){
+            const event = new ShowToastEvent({
+              title: 'Payment Response',
+              message: 'Amount or Product is missind',
+              variant: 'error',
+              mode: 'dismissable'
+          });
+          this.dispatchEvent(event);
+          return;
+        }
+
         this.isLoaded = !this.isLoaded;
         this.disablepay = true;
         let otherDetails = {

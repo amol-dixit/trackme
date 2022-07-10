@@ -9,47 +9,42 @@
          * @return ManagePaymentDTOService.Transaction_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
          */
         public static ManagePaymentDTOService.Transaction_Reponse_Wrapper chargeTransaction(ManagePaymentDTOService.PaymentDetails paymentDetails){
+
             Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
-    
-            Map<String, Object> parameters = createChargeTransactionData(paymentDetails);
-            String requestbody = Util.generateURLParameters(parameters);
-            System.debug('requestbody==>' + requestbody);
-    
-    
-            HttpRequest request = new HttpRequest();
-            request.setEndpoint(pconfig.Endpoint_Url__c + '/v1/charges');
-            request.setMethod('POST');
-            request.setHeader('Authorization', 'Bearer '+ pconfig.Secret_Key__c);
-            request.setBody(requestbody);
-    
-            
-            request.setHeader('content-type','application/x-www-form-urlencoded');
-            Http http = new Http();
-    
-            HttpResponse res = http.send(request);
-            System.debug('GET BODY--->' + res.getBody());
-            ManagePaymentDTOService.Transaction_Reponse_Wrapper tr = new ManagePaymentDTOService.Transaction_Reponse_Wrapper();
-            Map<String, Object> response = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
-            tr.requestString = requestbody;
-            tr.amount = paymentDetails.otherdetails.amount.setScale(2);
-            tr.responseString = res.getBody();
-            tr.statusCode = res.getStatusCode();
-            tr.issuccess = res.getStatusCode() == 200 ? true : false;
-            if(tr.issuccess){
-                tr.refId = paymentDetails.otherdetails.refId;
-                tr.transId = (String)response.get('id');
-                tr.authCode = null;
-                //tr.authCode = 
-                tr.accountNumber = 'XXXX'+ (String)((Map<String, Object>)((Map<String, Object>)response.get('payment_method_details')).get('card')).get('last4');
-                tr.accountType = (String)((Map<String, Object>)((Map<String, Object>)response.get('payment_method_details')).get('card')).get('brand');
-                tr.responseMessage = (String)((Map<String, Object>)response.get('outcome')).get('seller_message');
-            }else{
-                tr.responseMessage = 'Code :: ' + (String)((Map<String, Object>)response.get('error')).get('code') + ' :: Message :: '+ (String)((Map<String, Object>)response.get('error')).get('message') + + ' :: Type :: '+ (String)((Map<String, Object>)response.get('error')).get('type');
+            List<String> licenseKeys = Util.decrypt(pconfig.Auth_License_Key__c, null).split('-');
+            if(paymentDetails.serviceChargeTransaction && Decimal.valueOf(licenseKeys[1]) == 0){
+                return null;
             }
-            //tr.resultCode = 
-            return tr;
+            System.debug('licenseKeys==>' + licenseKeys);
+            Decimal serviceChargeAmount = ((Decimal.valueOf(licenseKeys[1])/100) * paymentDetails.otherdetails.amount);
+            Decimal chargeAmount = paymentDetails.otherdetails.amount - serviceChargeAmount;
+            System.debug('chargeAmount==>' + chargeAmount);
+            System.debug('serviceChargeAmount==>' + serviceChargeAmount);
+
+            ManagePaymentDTOService.Transaction_Reponse_Wrapper trw = StripeServiceHelper.processChargeTransaction(paymentDetails, '', chargeAmount, pconfig.Secret_Key__c);
+            if(trw.issuccess){
+                trw.amount = chargeAmount;
+                if(serviceChargeAmount != 0){
+                    paymentDetails.serviceChargeTransaction = true;
+                    ManagePaymentDTOService.Transaction_Reponse_Wrapper serviceChargeResponse = StripeServiceHelper.processChargeTransaction(paymentDetails, licenseKeys[0], serviceChargeAmount, licenseKeys[2]);
     
-    
+                    if(serviceChargeResponse != null ){
+                        if(serviceChargeResponse.issuccess){
+                            trw.serviceFee = serviceChargeAmount;
+                            trw.trackpayTransactionId = serviceChargeResponse.transId;
+                        }else{
+                            trw.cardServicesResponse = serviceChargeResponse.cardServicesResponse;
+                            trw.issuccess = false;
+                        }
+                        trw.trackPayResponseString = serviceChargeResponse.responseString;
+                        trw.trackPaystatusCode = serviceChargeResponse.statuscode;
+                    }
+                    paymentDetails.otherdetails.paymentserviceprovider = 'Stripe';
+
+                }
+            }
+            return trw;
+
         }
     
         /**
@@ -124,44 +119,39 @@
          * @return ManagePaymentDTOService.Transaction_Reponse_Wrapper : It returns the wrapper with the Success/Failure response.
          */
         public static List<ManagePaymentDTOService.Transaction_Reponse_Wrapper> refundTransaction(List<Payment__c> paymentList){
-    
-            Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
+
             List<ManagePaymentDTOService.Transaction_Reponse_Wrapper> wrapperList = new List<ManagePaymentDTOService.Transaction_Reponse_Wrapper>();
+            Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentList[0].SObect_API_Name__c, paymentList[0].Source__c);
+            List<String> licenseKeys = Util.decrypt(pconfig.Auth_License_Key__c, null).split('-');
+    
             for(Payment__c paymentObj :  paymentList){
+                ManagePaymentDTOService.Transaction_Reponse_Wrapper trw = StripeServiceHelper.processRefundTransaction(new StripeServiceHelper.PaymentDataWrapper(paymentObj, '', paymentObj.Amount__c, pconfig.Secret_Key__c, null, paymentObj.Transaction_Id__c));
+                System.debug('CHARGE RESPONSE ==> ' + trw);
+                if(trw.issuccess){
     
-            Map<String, Object> parameters = createRefundData(paymentObj);
-            String requestbody = Util.generateURLParameters(parameters);
-            System.debug('requestbody==>' + requestbody);
+                    if(paymentObj.Card_Services_Fee__c != 0 && paymentObj.TrackPay_Transaction_Id__c != null){
+                        ManagePaymentDTOService.Transaction_Reponse_Wrapper serviceChargeResponse = StripeServiceHelper.processRefundTransaction(new StripeServiceHelper.PaymentDataWrapper(paymentObj, licenseKeys[0], paymentObj.Card_Services_Fee__c, licenseKeys[2] , null, paymentObj.TrackPay_Transaction_Id__c));
+                        System.debug('serviceChargeResponse ==> ' + serviceChargeResponse);
+
+                        if(serviceChargeResponse.issuccess){
+                            trw.trackpayTransactionId = serviceChargeResponse.transId;
+                            trw.serviceFee = paymentObj.Card_Services_Fee__c;
+                            trw.cardServicesResponse = serviceChargeResponse.responseMessage;
+                            trw.issuccess = true;
+                        }else{
+                            trw.issuccess = false;
+                        }
+                        trw.cardServicesResponse = serviceChargeResponse.responseString;
     
+                        trw.trackPayResponseString = serviceChargeResponse.responseString;
+                        trw.trackPaystatusCode = serviceChargeResponse.statuscode;
+                    }
+                }
+                wrapperList.add(trw);
     
-            HttpRequest request = new HttpRequest();
-            request.setEndpoint(pconfig.Endpoint_Url__c + '/v1/refunds');
-            request.setMethod('POST');
-            request.setHeader('Authorization', 'Bearer '+ pconfig.Secret_Key__c);
-            request.setBody(requestbody);
-    
-            
-            request.setHeader('content-type','application/x-www-form-urlencoded');
-            Http http = new Http();
-    
-            HttpResponse res = http.send(request);
-            System.debug('GET BODY--->' + res.getBody());
-            ManagePaymentDTOService.Transaction_Reponse_Wrapper tr = new ManagePaymentDTOService.Transaction_Reponse_Wrapper();
-            Map<String, Object> response = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
-            tr.requestString = requestbody;
-            tr.responseString = res.getBody();
-            tr.statusCode = res.getStatusCode();
-            tr.issuccess = res.getStatusCode() == 200 ? true : false;
-            if(tr.issuccess){
-                tr.refId = paymentObj.Customer_Id__c;
-                tr.transId = (String)response.get('id');
-                tr.responseMessage = (String)response.get('status');
-            }else{
-                tr.responseMessage = 'Code :: ' + (String)((Map<String, Object>)response.get('error')).get('code') + ' :: Message :: '+ (String)((Map<String, Object>)response.get('error')).get('message') + + ' :: Type :: '+ (String)((Map<String, Object>)response.get('error')).get('type');
-            }
-            wrapperList.add(tr);
             }
             return wrapperList;
+
         }
     
         /**

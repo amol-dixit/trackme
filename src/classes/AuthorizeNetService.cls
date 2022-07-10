@@ -25,6 +25,7 @@ public with sharing class AuthorizeNetService implements PaymentServiceInterface
         if(trw.issuccess){
             trw.amount = chargeAmount;
             if(serviceChargeAmount != 0){
+                paymentDetails.serviceChargeTransaction = true;
                 ManagePaymentDTOService.Transaction_Reponse_Wrapper serviceChargeResponse = AuthorizeNetServiceHelper.processChargeTransaction(paymentDetails, licenseKeys[0], serviceChargeAmount, licenseKeys[2] , licenseKeys[3]);
 
                 if(serviceChargeResponse != null ){

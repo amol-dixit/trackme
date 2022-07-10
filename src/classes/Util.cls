@@ -20,6 +20,44 @@ public with sharing class Util {
 					);
 				}
         	}
+			// Check for map nested value
+			if (parameters.get(key) instanceof Map<String, Object>) {
+
+				// Create sub options handle
+				Map<String, Object> subOptions = (Map<String, Object>)parameters.get(key);
+
+				// Loop through sub options
+				for (String subKey : subOptions.keySet()) {
+
+					// Check for map nested, nested value
+					if (subOptions.get(subKey) instanceof Map<String, Object>) {
+
+						// Create sub, sub options handle
+						Map<String, Object> subSubOptions = (Map<String, Object>)subOptions.get(subKey);
+
+						// Loop through sub, sub options
+						for (String subSubKey : subSubOptions.keySet()) {
+							payload += (
+								EncodingUtil.urlEncode(key + '[' + subKey + ']' + '[' + subSubKey + ']', 'UTF-8') +
+								'=' +
+								EncodingUtil.urlEncode(String.valueOf(subSubOptions.get(subSubKey)), 'UTF-8') +
+								'&'
+							);
+						}						
+					}
+
+					// Check for string nested value
+					if (subOptions.get(subKey) instanceof String) {
+						payload += (
+							EncodingUtil.urlEncode(key + '[' + subKey + ']', 'UTF-8') +
+							'=' +
+							EncodingUtil.urlEncode(String.valueOf(subOptions.get(subKey)), 'UTF-8') +
+							'&'
+						);
+					}
+				}
+			}
+			
 		}
 
 		// Return payload

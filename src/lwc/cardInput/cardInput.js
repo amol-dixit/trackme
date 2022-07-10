@@ -38,8 +38,8 @@ export default class CardInput extends LightningElement {
   }
 
   set lastName(value) {
-
-    if(value && value != null && value != undefined ){
+    
+    //if(value && value != null && value != undefined ){
       this.setAttribute('lastName', value);
         this.cardHolderLastName = value;
         this.cardHolderLastNameValid = this.getIsValid(this.cardHolderLastName, "cardHolderLastName");
@@ -48,12 +48,13 @@ export default class CardInput extends LightningElement {
         this.checkIfComplete();
         //this.handlefirstnamechange();
 
-      }
+    //}
   
   }
 
   set firstName(value) {
-    if(value && value != null && value != undefined ){
+    console.log('FIRST NAME ', value);
+    //if(value && value != null && value != undefined ){
       this.setAttribute('firstName', value);
       this.cardHolderFirstName = value;
       this.cardHolderFirstNameValid = this.getIsValid(this.cardHolderFirstName, "cardHolderFirstName");
@@ -63,7 +64,7 @@ export default class CardInput extends LightningElement {
       this.checkIfComplete();
       this.handlefirstnamechange();
 
-    }
+    //}
 
 }
 

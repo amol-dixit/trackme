@@ -8,12 +8,13 @@ public with sharing class AuthorizeNetServiceHelper {
     public static Map<String, String> UNIT_MAPPING = new Map<String, String>{'Monthly'=>'months', 'Weekly'=>'days'};
 
     public static ManagePaymentDTOService.Transaction_Reponse_Wrapper processChargeTransaction(ManagePaymentDTOService.PaymentDetails paymentDetails, String company, Decimal amount, String apilogin, String authKey){
-
+            System.debug('paymentDetails.otherdetails.paymentserviceprovider==>' + paymentDetails.otherdetails.paymentserviceprovider);
             Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(paymentDetails.otherdetails.objectapiname, paymentDetails.otherdetails.paymentserviceprovider);
+            System.debug('pconfig==>'+ pconfig);
             ManagePaymentDTOService.Transaction_Reponse_Wrapper trw = new ManagePaymentDTOService.Transaction_Reponse_Wrapper();
             ManagePaymentDTOService.cls_transactionRequest tr = new ManagePaymentDTOService.cls_transactionRequest();
     
-            System.debug('paymentDetails===>' + paymentDetails.serviceChargeTransaction);
+            System.debug('AuthorizeNetServiceHelper :: paymentDetails===>' + paymentDetails);
             JSONGenerator gen = JSON.createGenerator(true);
     
             Boolean creditcard = true;
@@ -28,7 +29,7 @@ public with sharing class AuthorizeNetServiceHelper {
                     gen.writeStringField('name', apilogin);
                     gen.writeStringField('transactionKey', authKey);
                     gen.writeEndObject();
-                gen.writeStringField('refId', paymentDetails.otherdetails.refId);
+                gen.writeStringField('refId', paymentDetails.otherdetails.refId == null ? '' : paymentDetails.otherdetails.refId);
                 gen.writeFieldName('transactionRequest');
                 gen.writeStartObject();
                 gen.writeStringField('transactionType', 'authCaptureTransaction');
@@ -153,7 +154,7 @@ public with sharing class AuthorizeNetServiceHelper {
     }
 
     public static ManagePaymentDTOService.Transaction_Reponse_Wrapper processRefundTransaction(PaymentDataWrapper pdw){
-        Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(pdw.paymentObj.SObect_API_Name__c, pdw.paymentObj.Source__c);
+            Payment_Configuration__c pconfig = ManagePaymentServiceHelper.getPaymentConfig(pdw.paymentObj.SObect_API_Name__c, pdw.source == null ? pdw.paymentObj.Source__c : pdw.source);
 
             List<String> licenseKeys = Util.decrypt(pconfig.Auth_License_Key__c, null).split('-');
 
@@ -175,7 +176,7 @@ public with sharing class AuthorizeNetServiceHelper {
                 gen.writeFieldName('transactionRequest');
                 gen.writeStartObject();
                 gen.writeStringField('transactionType', 'refundTransaction');
-                gen.writeStringField('amount', String.valueOf(pdw.amount));//paymentObj.Card_Services_Fee__c));
+                gen.writeStringField('amount', String.valueOf(pconfig.Refund_Amount_API_Name__c == null ? pdw.paymentObj.Amount__c : (pdw.paymentObj.get(pconfig.Refund_Amount_API_Name__c))));//paymentObj.Card_Services_Fee__c));
                 gen.writeFieldName('payment');
                     gen.writeStartObject();
                         if(creditcard){
@@ -728,6 +729,7 @@ public with sharing class AuthorizeNetServiceHelper {
         public String apilogin;
         public String authKey;
         public String transactionId;
+        public String source;
         public PaymentDataWrapper(Payment__c paymentObj, String company, Decimal amount, String apilogin, String authKey, String transactionId){
             this.paymentObj = paymentObj;
             this.company = company;
@@ -735,6 +737,15 @@ public with sharing class AuthorizeNetServiceHelper {
             this.apilogin = apilogin;
             this.authKey = authKey;
             this.transactionId = transactionId;
+        }
+        public PaymentDataWrapper(Payment__c paymentObj, String company, Decimal amount, String apilogin, String authKey, String transactionId, String source){
+            this.paymentObj = paymentObj;
+            this.company = company;
+            this.amount = amount;
+            this.apilogin = apilogin;
+            this.authKey = authKey;
+            this.transactionId = transactionId;
+            this.source = source;
         }
     }
 
